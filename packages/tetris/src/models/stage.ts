@@ -150,11 +150,13 @@ export const moveDown = (state: State, position: PositionGrid, piece: Piece) => 
 
     if (collision) {
         const result: any = {
-            state: merge(state, position, piece).state as State,
+            state: removeCompletedLines(merge(state, position, piece).state as State),
             ...generateRandomPiece(),
             gameover, 
         }
+        
 
+        // check if new piece has collision with new state, if so then game over
         if (!hasCollision(result.state, result.position, result.piece)) {
             return result;
         } else {
@@ -175,13 +177,37 @@ export const moveDown = (state: State, position: PositionGrid, piece: Piece) => 
     }
 }
 
+const removeCompletedLines = (state: State) => {
+    const newState = state.filter((row) => {
+        // tslint:disable-next-line:prefer-for-of
+        for (let i=0; i<row.length; i++) {
+            if (!row[i]) {
+                return true;
+            }
+        }
+        return false;
+    })
+
+    // tslint:disable-next-line:no-console
+    console.log("size is " + newState.length);
+
+    if (newState.length < 18) {
+        const padEmptyLines = 18 - newState.length;
+        const lines = new Array(padEmptyLines);
+        lines.fill([0,0,0,0,0,0,0,0,0,0]);
+        newState.unshift(...lines);
+    }
+    
+    return newState;
+}
+
 const hasCollision = (state: State, position: PositionGrid, piece: Piece) => {
     // tslint:disable-next-line:no-console
-    console.log(piece);
+    // console.log(piece);
     for (let m=0; m<4; m++) {
         for (let n=0; n<4; n++) {
             // tslint:disable-next-line:no-console
-            console.log(m + ", " + n + " = " + piece[m][n]);
+            // console.log(m + ", " + n + " = " + piece[m][n]);
             if (piece[m][n] && (
                     n+position.col < 0 || 
                     n+position.col >= state[m].length ||
@@ -220,16 +246,16 @@ export const merge = (state: State, position: PositionGrid, p: Piece) => {
         for (let n=0; n<4; n++) {
             if (p[m][n]) {
                 // tslint:disable-next-line:no-console
-                console.log("ok");
+                // console.log("ok");
                 clonedState[m+position.row][n+position.col] = p[m][n];
             }
         }
     }
     
     // tslint:disable-next-line:no-console
-    console.log("****");
+    // console.log("****");
     // tslint:disable-next-line:no-console
-    console.log(clonedState);
+    // console.log(clonedState);
     return {
         state: clonedState,
     }
