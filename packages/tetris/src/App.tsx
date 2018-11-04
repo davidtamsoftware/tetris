@@ -11,14 +11,13 @@ interface State {
 }
 
 const colors = {
-  "0": "red",
-  "1": "orange",
-  "2": "yellow",
-  "3": "green",
-  "4": "blue",
-  "5": "gray",
-  "6": "brown",
-  "7": "purple"
+  "1": "orange orange darkorange orange",
+  "2": "yellow #ebeb5e #afaf59 yellow",
+  "3": "green lightgreen darkgreen green",
+  "4": "blue lightblue darkblue blue",
+  "5": "gray lightgray darkgray gray",
+  "6": "red brown darkred red",
+  "7": "purple #892289 #5a065a purple"
 };
 
 const initState: State = {
@@ -60,7 +59,7 @@ class App extends React.Component<{}, State> {
   }
 
   public componentDidMount() {
-    setTimeout(this.tick, 20);
+    setInterval(this.tick, 1000);
   }
 
   public componentWillUnmount() {
@@ -69,29 +68,41 @@ class App extends React.Component<{}, State> {
 
   public render() {
     const currBoard = merge(this.state.game, this.state.position, this.state.piece);
-    // tslint:disable-next-line:no-console
-    // console.log(this.state.game);
     const board = [];
-    // tslint:disable-next-line:prefer-for-of
     for (let i=0; i<currBoard.state.length; i++) {
       const row = [];
-      // tslint:disable-next-line:prefer-for-of
       for (let j=0; j<currBoard.state[i].length; j++) {
-        row.push(<td key={j} style={{border: "0px dotted black", width: "25px", height: "25px", backgroundColor: currBoard.state[i][j] ? colors[currBoard.state[i][j]]: "initial"}}>
-        {/* {currBoard.state[i][j]} */}
-        </td>);
+        row.push(<td key={j} 
+          style={{
+            border: "1px solid black",
+            backgroundColor: "black", 
+            width: "25px",
+            height: "25px", 
+            padding: "0",
+            }}>
+              {currBoard.state[i][j] ? 
+              <div 
+                style={{
+                  // backgroundColor: currBoard.state[i][j] ? colors[currBoard.state[i][j]]: "initial",
+                  border: "12.5px solid",
+                  borderRadius: "2px",
+                  // borderColor: "green lightgreen darkgreen green",
+                  borderColor: colors[currBoard.state[i][j]],
+                  width: "calc(100% - 25px)",
+                  height: "100%",
+                  padding: "0",
+                }}/> : null}
+            </td>);
       }
       board.push(<tr key={i}>{row}</tr>)
     }
 
     return (
       <div className="App">
-      <table style={{border: "1px solid black", borderSpacing: "0"}}>
-        <tbody>
-        { 
-          board
-        }
-        </tbody>
+        <table style={{border: "1px solid black", borderSpacing: "0", margin: "auto"}}>
+          <tbody>
+          { board }
+          </tbody>
         </table>
         { this.state.gameover && 
           <div>game over! <button onClick={this.restart}>restart now</button></div> }
@@ -104,15 +115,15 @@ class App extends React.Component<{}, State> {
   }
 
   private tick() {
-    const result = moveDown(this.state.game, this.state.position, this.state.piece);
-    this.setState({
-      game: result.state,
-      position: result.position,
-      piece: result.piece,
-      gameover: result.gameover,
-    });
-
-    setTimeout(this.tick, 1000);
+    if (!this.state.gameover) {
+      const result = moveDown(this.state.game, this.state.position, this.state.piece);
+      this.setState({
+        game: result.state,
+        position: result.position,
+        piece: result.piece,
+        gameover: result.gameover,
+      });      
+    }
   }
 
   private handleKeyDown(event: KeyboardEvent) {

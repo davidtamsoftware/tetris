@@ -155,7 +155,6 @@ export const moveDown = (state: State, position: PositionGrid, piece: Piece) => 
             gameover, 
         }
         
-
         // check if new piece has collision with new state, if so then game over
         if (!hasCollision(result.state, result.position, result.piece)) {
             return result;
@@ -188,31 +187,24 @@ const removeCompletedLines = (state: State) => {
         return false;
     })
 
-    // tslint:disable-next-line:no-console
-    console.log("size is " + newState.length);
-
     if (newState.length < 18) {
         const padEmptyLines = 18 - newState.length;
         const lines = new Array(padEmptyLines);
         lines.fill([0,0,0,0,0,0,0,0,0,0]);
         newState.unshift(...lines);
     }
-    
+
     return newState;
 }
 
 const hasCollision = (state: State, position: PositionGrid, piece: Piece) => {
-    // tslint:disable-next-line:no-console
-    // console.log(piece);
     for (let m=0; m<4; m++) {
         for (let n=0; n<4; n++) {
-            // tslint:disable-next-line:no-console
-            // console.log(m + ", " + n + " = " + piece[m][n]);
             if (piece[m][n] && (
                     n+position.col < 0 || 
                     n+position.col >= state[m].length ||
                     m+position.row >= state.length ||
-                    state[m+position.row][n+position.col])) {
+                    (position.row+m >= 0 && state[m+position.row][n+position.col]))) {
                 return true;
             }
         }
@@ -233,7 +225,7 @@ export const generateRandomPiece = () => {
     
     return {
         position: {
-            row: 0,
+            row: -1,
             col: 3,
         },
         piece: mapOfPieces[Math.round(Math.random() * 6)],
@@ -244,18 +236,12 @@ export const merge = (state: State, position: PositionGrid, p: Piece) => {
     const clonedState = state.map((row) => [...row]);
     for (let m=0; m<4; m++) {
         for (let n=0; n<4; n++) {
-            if (p[m][n]) {
-                // tslint:disable-next-line:no-console
-                // console.log("ok");
+            if (p[m][n] && position.row+m >= 0) {
                 clonedState[m+position.row][n+position.col] = p[m][n];
             }
         }
     }
     
-    // tslint:disable-next-line:no-console
-    // console.log("****");
-    // tslint:disable-next-line:no-console
-    // console.log(clonedState);
     return {
         state: clonedState,
     }
