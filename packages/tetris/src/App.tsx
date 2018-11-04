@@ -84,11 +84,12 @@ class App extends React.Component<{}, State> {
               <div 
                 style={{
                   // backgroundColor: currBoard.state[i][j] ? colors[currBoard.state[i][j]]: "initial",
-                  border: "12.5px solid",
+                  border: "5px solid",
                   borderRadius: "2px",
                   // borderColor: "green lightgreen darkgreen green",
                   borderColor: colors[currBoard.state[i][j]],
-                  width: "calc(100% - 25px)",
+                  backgroundColor: colors[currBoard.state[i][j]].split(" ")[0],
+                  width: "calc(100% - 10px)",
                   height: "100%",
                   padding: "0",
                 }}/> : null}
@@ -99,7 +100,7 @@ class App extends React.Component<{}, State> {
 
     return (
       <div className="App">
-        <table style={{border: "1px solid black", borderSpacing: "0", margin: "auto"}}>
+        <table style={{ borderRadius: "5px", border: "10px solid gray", borderSpacing: "0", margin: "auto"}}>
           <tbody>
           { board }
           </tbody>
