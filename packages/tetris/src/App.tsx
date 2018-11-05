@@ -1,5 +1,6 @@
 import * as React from 'react';
 import './App.css';
+import { Block } from "./Block";
 import { GameState, Piece } from './models/pieces';
 import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, PositionGrid, rotateRight } from './models/stage';
 
@@ -8,10 +9,21 @@ interface State {
   position: PositionGrid;
   piece: Piece;
   gameover: boolean;
+  paused?: boolean;
+  stats?: Stats
+  nextPiece?: Piece;
 }
 
+interface Stats {
+  score: number;
+  highscore: number;
+  count?: Map<Piece, number>;
+};
+
+type GamePiece = Piece;
+
 const colors = {
-  "1": "orange orange darkorange orange",
+  "1": "orange #c88a19 darkorange orange",
   "2": "yellow #ebeb5e #afaf59 yellow",
   "3": "green lightgreen darkgreen green",
   "4": "blue lightblue darkblue blue",
@@ -20,7 +32,7 @@ const colors = {
   "7": "purple #892289 #5a065a purple"
 };
 
-const initState: State = {
+const initializeState = (): State => ({
   game: [
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
@@ -43,13 +55,13 @@ const initState: State = {
     ],
     ...generateRandomPiece(),
     gameover: false,
-};
+});
 
 class App extends React.Component<{}, State> {
 
   constructor(props: {}) {
     super(props)
-    this.state = initState;
+    this.state = initializeState();
     this.restart = this.restart.bind(this);
     this.tick = this.tick.bind(this);
   }
@@ -80,19 +92,7 @@ class App extends React.Component<{}, State> {
             height: "25px", 
             padding: "0",
             }}>
-              {currBoard.state[i][j] ? 
-              <div 
-                style={{
-                  // backgroundColor: currBoard.state[i][j] ? colors[currBoard.state[i][j]]: "initial",
-                  border: "5px solid",
-                  borderRadius: "2px",
-                  // borderColor: "green lightgreen darkgreen green",
-                  borderColor: colors[currBoard.state[i][j]],
-                  backgroundColor: colors[currBoard.state[i][j]].split(" ")[0],
-                  width: "calc(100% - 10px)",
-                  height: "100%",
-                  padding: "0",
-                }}/> : null}
+              {currBoard.state[i][j] ? <Block data={currBoard.state[i][j]} /> : null}
             </td>);
       }
       board.push(<tr key={i}>{row}</tr>)
@@ -100,9 +100,17 @@ class App extends React.Component<{}, State> {
 
     return (
       <div className="App">
-        <table style={{ borderRadius: "5px", border: "10px solid gray", borderSpacing: "0", margin: "auto"}}>
+        <table style={{ display: "inline-block", borderRadius: "5px", border: "10px solid gray", borderSpacing: "0", margin: "auto"}}>
           <tbody>
           { board }
+          </tbody>
+        </table>
+        <table style={{ display: "inline-block", verticalAlign: "top", borderRadius: "5px", border: "10px solid gray", borderSpacing: "0", margin: "auto"}}>
+          <tbody>
+          <tr>
+            <td>Score: </td>
+            <td>Level: </td>
+          </tr>
           </tbody>
         </table>
         { this.state.gameover && 
@@ -112,7 +120,7 @@ class App extends React.Component<{}, State> {
   }
 
   private restart() {
-    this.setState(initState);
+    this.setState(initializeState());
   }
 
   private tick() {
