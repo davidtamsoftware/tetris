@@ -34,44 +34,46 @@ export const o: Piece = [
     [0,0,0,0],
 ];
 
-export const i = [
+export const i: Piece = [
     [0,0,0,0],
     [2,2,2,2],
     [0,0,0,0],
     [0,0,0,0],
 ];
 
-export const s = [
+export const s: Piece = [
     [0,0,0,0],
     [0,0,3,3],
     [0,3,3,0],
     [0,0,0,0],
 ];
 
-export const z = [
+export const z: Piece = [
     [0,0,0,0],
     [0,4,4,0],
     [0,0,4,4],
     [0,0,0,0],
 ];
 
-export const l = [
+export const l: Piece = [
     [0,0,0,0],
     [0,5,5,5],
     [0,5,0,0],
     [0,0,0,0],
 ];
 
-export const j = [
+export const j: Piece = [
     [0,0,0,0],
     [0,6,6,6],
     [0,0,0,6],
     [0,0,0,0],
 ];
 
-export const t = [
+export const t: Piece = [
     [0,0,0,0],
     [0,7,7,7],
     [0,0,7,0],
     [0,0,0,0],
 ];
+
+export const pieces: Piece[] = [o, i, s, z, l, j, t];

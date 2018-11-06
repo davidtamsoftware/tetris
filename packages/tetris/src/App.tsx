@@ -1,8 +1,8 @@
 import * as React from 'react';
 import './App.css';
 import { Block } from "./Block";
-import { GameState, Piece } from './models/pieces';
-import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, PositionGrid, rotateRight } from './models/stage';
+import { GameState, Piece, pieces } from './models/pieces';
+import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, PositionGrid, rotateRight, hasCollision } from './models/stage';
 
 interface State {
   game: GameState;
@@ -17,7 +17,7 @@ interface State {
 interface Stats {
   score: number;
   highscore: number;
-  count?: Map<Piece, number>;
+  count?: { [pieceId: string]: number };
 };
 
 type GamePiece = Piece;
@@ -32,30 +32,40 @@ const colors = {
   "7": "purple #892289 #5a065a purple"
 };
 
-const initializeState = (): State => ({
-  game: [
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-    ],
-    ...generateRandomPiece(),
-    gameover: false,
-});
+const initializeState = (): State => {
+  const randomPiece = generateRandomPiece();
+  return {
+    game: [
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+      ],
+      ...randomPiece,
+      gameover: false,
+      stats: {
+        count: pieces
+          .map((item) => ({[item.toString()]: item === randomPiece.piece ? 1 : 0}))
+          .reduce((acc, item) => ({ ...acc, ...item })),
+        highscore: 1000,
+        score: 1,
+      }
+  };
+};
 
 class App extends React.Component<{}, State> {
 
@@ -64,6 +74,7 @@ class App extends React.Component<{}, State> {
     this.state = initializeState();
     this.restart = this.restart.bind(this);
     this.tick = this.tick.bind(this);
+    this.incrementCount = this.incrementCount.bind(this);
   }
 
   public componentWillMount() {
@@ -89,13 +100,32 @@ class App extends React.Component<{}, State> {
             border: "1px solid black",
             backgroundColor: "black", 
             width: "25px",
-            height: "25px", 
+            height: "26px", 
             padding: "0",
             }}>
               {currBoard.state[i][j] ? <Block data={currBoard.state[i][j]} /> : null}
             </td>);
       }
       board.push(<tr key={i}>{row}</tr>)
+    }
+
+    const counts = [];
+
+    // tslint:disable-next-line:prefer-for-of
+    for (let i=0; i<pieces.length; i++) {
+      counts.push(
+      <tr>
+        <td>
+          <table style={{borderSpacing: "0", margin: "auto"}}>
+            <tbody>
+              { this.generatePiece(pieces[i]) }
+            </tbody>
+          </table>
+        </td>
+        <td>
+          {this.state.stats!.count![pieces[i].toString()]}
+        </td>
+      </tr>);
     }
 
     return (
@@ -108,9 +138,22 @@ class App extends React.Component<{}, State> {
         <table style={{ display: "inline-block", verticalAlign: "top", borderRadius: "5px", border: "10px solid gray", borderSpacing: "0", margin: "auto"}}>
           <tbody>
           <tr>
-            <td>Score: </td>
-            <td>Level: </td>
+            <td>High Score: </td>
+            <td>{this.state.stats!.highscore}</td>
           </tr>
+          <tr>
+            <td>Score: </td>
+            <td>{this.state.stats!.score}</td>
+          </tr>
+          <tr>
+            <td>Level: </td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td>Counts: </td>
+            <td/>
+          </tr>
+          { counts }
           </tbody>
         </table>
         { this.state.gameover && 
@@ -119,13 +162,28 @@ class App extends React.Component<{}, State> {
     );
   }
 
+  private generatePiece(piece: Piece) {
+    const row = [];
+    // tslint:disable-next-line:prefer-for-of
+    for (let i=0; i<piece.length; i++) {
+      const col = [];
+      // tslint:disable-next-line:prefer-for-of
+      for (let j=0; j<piece[i].length; j++) {
+        col.push(<td style={{padding: "0"}}>{piece[i][j] ? <Block data={piece[i][j]} size="small" />: null }</td>);
+      }
+      row.push(<tr>{col}</tr>);
+    }
+    return row;
+  }
+
   private restart() {
     this.setState(initializeState());
   }
 
   private tick() {
     if (!this.state.gameover) {
-      const result = moveDown(this.state.game, this.state.position, this.state.piece);
+      const result = moveDown(this.state.game, this.state.position, this.state.piece, this.incrementCount);
+
       this.setState({
         game: result.state,
         position: result.position,
@@ -133,6 +191,20 @@ class App extends React.Component<{}, State> {
         gameover: result.gameover,
       });      
     }
+  }
+
+  private incrementCount(pieceKey: string) {
+      const count = {
+        ...this.state.stats!.count
+      };
+      count[pieceKey] += 1;
+
+      this.setState({
+        stats: {            
+          count,
+          highscore: 1,
+        } as any,
+      });
   }
 
   private handleKeyDown(event: KeyboardEvent) {
@@ -161,7 +233,8 @@ class App extends React.Component<{}, State> {
         piece: result.piece,
       });
     } else if (event.keyCode === 40) {
-      const result = moveDown(this.state.game, this.state.position, this.state.piece);
+      const result = moveDown(this.state.game, this.state.position, this.state.piece, this.incrementCount);
+
       this.setState({
         game: result.state,
         position: result.position,

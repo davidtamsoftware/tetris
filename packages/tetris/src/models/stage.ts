@@ -6,7 +6,7 @@ export interface PositionGrid {
     col: number,
 }
 
-export const rotateRight = (state: State, position: PositionGrid, p: Piece) => {
+export const rotate = (rotatePiece: (p: Piece) => Piece, state: State, position: PositionGrid, p: Piece) => {
     // rotate
     // check for collision
     // return result if no collision
@@ -18,12 +18,7 @@ export const rotateRight = (state: State, position: PositionGrid, p: Piece) => {
     // return result if no collision
     // else return same result as args
 
-    const piece: Piece = [
-        [p[3][0], p[2][0], p[1][0], p[0][0]],
-        [p[3][1], p[2][1], p[1][1], p[0][1]],
-        [p[3][2], p[2][2], p[1][2], p[0][2]],
-        [p[3][3], p[2][3], p[1][3], p[0][3]],
-    ];
+    const piece: Piece = rotatePiece(p);
 
     if (!hasCollision(state, position, piece)) {
         return {
@@ -33,20 +28,14 @@ export const rotateRight = (state: State, position: PositionGrid, p: Piece) => {
         };
     }
 
-    const newPosL = { row: position.row, col: position.col - 1 };
-    if (!hasCollision(state, newPosL, piece)) {
-        return {
-            state,
-            position: newPosL,
-            piece,
-        };
-    }
+    const shiftedPosition = [-1,1,-2,2,-3,3]
+        .map((val) => ({ row: position.row, col: position.col + val } as PositionGrid))
+        .filter((newPos) => !hasCollision(state, newPos, piece));
 
-    const newPosR = { row: position.row, col: position.col + 1 };
-    if (!hasCollision(state, newPosR, piece)) {
+    if (shiftedPosition.length>0) {
         return {
             state,
-            position: newPosR,
+            position: shiftedPosition[0],
             piece,
         };
     }
@@ -58,56 +47,22 @@ export const rotateRight = (state: State, position: PositionGrid, p: Piece) => {
     }
 };
 
-export const rotateLeft = (state: State, position: PositionGrid, p: Piece) => {
-    // rotate
-    // check for collision
-    // return result if no collision
-    // if collision move left 1
-    // check for collision
-    // return result if no collision
-    // if collision move right 1
-    // check for collision
-    // return result if no collision
-    // else return same result as args
+export const rotateRight = (state: State, position: PositionGrid, p: Piece) => {
+    return rotate((piece: Piece) => ([
+        [p[3][0], p[2][0], p[1][0], p[0][0]],
+        [p[3][1], p[2][1], p[1][1], p[0][1]],
+        [p[3][2], p[2][2], p[1][2], p[0][2]],
+        [p[3][3], p[2][3], p[1][3], p[0][3]],
+    ]), state, position, p);
+};
 
-    const piece: Piece = [
+export const rotateLeft = (state: State, position: PositionGrid, p: Piece) => {
+    return rotate((piece: Piece) => ([
         [p[0][3], p[1][3], p[2][3], p[3][3]],
         [p[0][2], p[1][2], p[2][2], p[3][2]],
         [p[0][1], p[1][1], p[2][1], p[3][1]],
         [p[0][0], p[1][0], p[2][0], p[3][0]],
-    ]
-
-    if (!hasCollision(state, position, piece)) {
-        return {
-            state,
-            position,
-            piece,
-        };
-    }
-
-    const newPosL = { row: position.row, col: position.col - 1 };
-    if (!hasCollision(state, newPosL, piece)) {
-        return {
-            state,
-            position: newPosL,
-            piece,
-        };
-    }
-
-    const newPosR = { row: position.row, col: position.col + 1 };
-    if (!hasCollision(state, newPosR, piece)) {
-        return {
-            state,
-            position: newPosR,
-            piece,
-        };
-    }
-
-    return {
-        state,
-        position,
-        piece: p,
-    }
+    ]), state, position, p);
 };
 
 export const moveLeft = (state: State, position: PositionGrid, piece: Piece) => {
@@ -138,7 +93,7 @@ export const moveRight = (state: State, position: PositionGrid, piece: Piece) =>
     }
 }
 
-export const moveDown = (state: State, position: PositionGrid, piece: Piece) => {
+export const moveDown = (state: State, position: PositionGrid, piece: Piece, incrementCounter: (pieceKey: string) => void) => {
     // calc position
     // check for collision
     // return result if no collision
@@ -146,58 +101,51 @@ export const moveDown = (state: State, position: PositionGrid, piece: Piece) => 
     
     const newPos = { row: position.row + 1, col: position.col };
     const collision = hasCollision(state, newPos, piece);
-    let gameover = false;
 
     if (collision) {
         const result: any = {
             state: removeCompletedLines(merge(state, position, piece).state as State),
             ...generateRandomPiece(),
-            gameover, 
+            gameover: false,
         }
         
+        incrementCounter(result.piece.toString());
+
         // check if new piece has collision with new state, if so then game over
         if (!hasCollision(result.state, result.position, result.piece)) {
             return result;
         } else {
-            gameover = true;
             return {
                 state,
                 position,
                 piece,
                 gameover: true,
-            }
+            };
         };
     } 
+
     return {
         state,
         position: newPos,
         piece,
-        gameover
-    }
+        gameover: false,
+    };
 }
 
-const removeCompletedLines = (state: State) => {
-    const newState = state.filter((row) => {
-        // tslint:disable-next-line:prefer-for-of
-        for (let i=0; i<row.length; i++) {
-            if (!row[i]) {
-                return true;
-            }
-        }
-        return false;
-    })
+export const removeCompletedLines = (state: State) => {
+    const newState = state.filter((row) => !row.every((col) => !!col));
 
-    if (newState.length < 18) {
-        const padEmptyLines = 18 - newState.length;
+    if (newState.length < state.length) {
+        const padEmptyLines = state.length - newState.length;
         const lines = new Array(padEmptyLines);
-        lines.fill([0,0,0,0,0,0,0,0,0,0]);
+        lines.fill(new Array(state[0].length).fill(0));
         newState.unshift(...lines);
     }
 
     return newState;
 }
 
-const hasCollision = (state: State, position: PositionGrid, piece: Piece) => {
+export const hasCollision = (state: State, position: PositionGrid, piece: Piece) => {
     for (let m=0; m<4; m++) {
         for (let n=0; n<4; n++) {
             if (piece[m][n] && (
@@ -232,8 +180,8 @@ export const generateRandomPiece = () => {
     }
 }
 
-export const merge = (state: State, position: PositionGrid, p: Piece) => {
-    const clonedState = state.map((row) => [...row]);
+export const merge = (state: State, position: PositionGrid, p: Piece): { state: State} => {
+    const clonedState = state.map((row) => [...row]) as State;
     for (let m=0; m<4; m++) {
         for (let n=0; n<4; n++) {
             if (p[m][n] && position.row+m >= 0) {
