@@ -1,5 +1,8 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family: 'Press Start 2P', cursive;
+  background: #131010;
+  color: white;
+  font-size: 0.8em;
 }
