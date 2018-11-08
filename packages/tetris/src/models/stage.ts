@@ -1,5 +1,6 @@
 import * as pieces from "./pieces";
 import { GameState as State, Piece } from "./pieces";
+import { number } from 'prop-types';
 
 export interface PositionGrid {
     row: number,
@@ -93,7 +94,20 @@ export const moveRight = (state: State, position: PositionGrid, piece: Piece) =>
     }
 }
 
-export const moveDown = (state: State, position: PositionGrid, piece: Piece, incrementCounter: (pieceKey: string) => void) => {
+export const moveDown = async (state: State, position: PositionGrid, piece: Piece, 
+    incrementCounter: (pieceKey: string) => void,
+    addScore: (score: number) => void,
+    addLines: (lines: number) => void,
+    updateGame: (game: pieces.GameState) => void) => {
+
+    // TODO: *** add lines from remove completed lines action
+    // add score based on the removed lines
+    // update the handler for keypress down to add score
+    // increase the tick speed when score increases.
+    // add tick speed to initial state so that we can update the state to control tick speed
+
+
+
     // calc position
     // check for collision
     // return result if no collision
@@ -103,12 +117,14 @@ export const moveDown = (state: State, position: PositionGrid, piece: Piece, inc
     const collision = hasCollision(state, newPos, piece);
 
     if (collision) {
+        const newState = await removeCompletedLines(merge(state, position, piece).state as State, updateGame);
         const result: any = {
-            state: removeCompletedLines(merge(state, position, piece).state as State),
+            state: newState.state,
             ...generateRandomPiece(),
             gameover: false,
         }
         
+        addLines(newState.linesRemoved);
         incrementCounter(result.piece.toString());
 
         // check if new piece has collision with new state, if so then game over
@@ -132,17 +148,31 @@ export const moveDown = (state: State, position: PositionGrid, piece: Piece, inc
     };
 }
 
-export const removeCompletedLines = (state: State) => {
+export const removeCompletedLines = (state: State, updateGame: (game: pieces.GameState) => void) => {
+    const animateDeletionState = state.map((row) => row.every((col) => !!col) ? row.map((col) => 8) : row);
     const newState = state.filter((row) => !row.every((col) => !!col));
-
-    if (newState.length < state.length) {
-        const padEmptyLines = state.length - newState.length;
+    const padEmptyLines = state.length - newState.length;
+    if (!!padEmptyLines) {
         const lines = new Array(padEmptyLines);
         lines.fill(new Array(state[0].length).fill(0));
         newState.unshift(...lines);
     }
 
-    return newState;
+    if (padEmptyLines) {
+        updateGame(animateDeletionState as pieces.GameState);
+        return new Promise<{state: pieces.GameState; linesRemoved: number;}>((resolve, reject) => {
+            setTimeout(() => resolve({
+                state: newState,
+                linesRemoved: padEmptyLines,
+            } as any), 100);
+        });
+    }
+
+    return Promise.resolve({
+        state: newState,
+        linesRemoved: padEmptyLines,
+    });
+    
 }
 
 export const hasCollision = (state: State, position: PositionGrid, piece: Piece) => {

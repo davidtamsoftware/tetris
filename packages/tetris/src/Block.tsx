@@ -13,7 +13,8 @@ const colors = {
     "4": "blue lightblue darkblue blue",
     "5": "gray lightgray darkgray gray",
     "6": "red brown darkred red",
-    "7": "purple #892289 #5a065a purple"
+    "7": "purple #892289 #5a065a purple",
+    "8": "white",
   };
 
 export const Block = (props: Props) => (
@@ -26,5 +27,5 @@ export const Block = (props: Props) => (
             width: `${props.size === "small" ? "5":"15"}px`,
             height: `${props.size === "small" ? "5":"15"}px`,
             padding: "0",
-        }}/>
+        }} />
 );
