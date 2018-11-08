@@ -1,8 +1,8 @@
 import * as React from 'react';
 import './App.css';
 import { Block } from "./Block";
-import { PlayField, Piece, pieces } from './models/pieces';
-import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, PiecePosition, rotateRight, hasCollision } from './models/stage';
+import { PlayField, Piece, pieces } from './models';
+import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, PiecePosition, rotateRight, hasCollision } from './actions/stage';
 
 interface State {
   playField: PlayField;

@@ -1,5 +1,5 @@
-import * as pieces from "./pieces";
-import { PlayField, Piece } from "./pieces";
+import * as pieces from "../models/pieces";
+import { PlayField, Piece } from "../models";
 import { number } from 'prop-types';
 
 export interface PiecePosition {
@@ -98,7 +98,7 @@ export const moveDown = async (playField: PlayField, position: PiecePosition, pi
     incrementCounter: (pieceKey: string) => void,
     addScore: (score: number) => void,
     addLines: (lines: number) => void,
-    updateGame: (game: pieces.PlayField) => void) => {
+    updateGame: (game: PlayField) => void) => {
 
     // TODO: *** add lines from remove completed lines action
     // add score based on the removed lines
@@ -148,7 +148,7 @@ export const moveDown = async (playField: PlayField, position: PiecePosition, pi
     };
 }
 
-export const removeCompletedLines = (playField: PlayField, updateGame: (game: pieces.PlayField) => void) => {
+export const removeCompletedLines = (playField: PlayField, updateGame: (game: PlayField) => void) => {
     const animateDeletionState = playField.map((row) => row.every((col) => !!col) ? row.map((col) => 8) : row);
     const newState = playField.filter((row) => !row.every((col) => !!col));
     const padEmptyLines = playField.length - newState.length;
@@ -159,8 +159,8 @@ export const removeCompletedLines = (playField: PlayField, updateGame: (game: pi
     }
 
     if (padEmptyLines) {
-        updateGame(animateDeletionState as pieces.PlayField);
-        return new Promise<{playField: pieces.PlayField; linesRemoved: number;}>((resolve, reject) => {
+        updateGame(animateDeletionState as PlayField);
+        return new Promise<{playField: PlayField; linesRemoved: number;}>((resolve, reject) => {
             setTimeout(() => resolve({
                 playField: newState,
                 linesRemoved: padEmptyLines,

@@ -5,28 +5,6 @@ export type Piece = [
     [number, number, number, number]
 ];
 
-// 10W X 18H
-export type PlayField = [
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number],
-    [number, number, number, number, number, number, number, number, number, number]
-];
-
 export const o: Piece = [
     [0,0,0,0],
     [0,1,1,0],
