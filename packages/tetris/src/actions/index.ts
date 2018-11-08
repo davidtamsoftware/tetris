@@ -1,4 +1,4 @@
-import * as pieces from "../models/pieces";
+import * as pieces from "../models";
 import { PlayField, Piece } from "../models";
 import { number } from 'prop-types';
 

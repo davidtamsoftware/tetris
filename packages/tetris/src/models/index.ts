@@ -1,2 +1,2 @@
-export * from "./pieces";
+export * from "./piece";
 export * from "./playField";
