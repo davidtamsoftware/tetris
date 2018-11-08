@@ -2,12 +2,12 @@ import * as pieces from "./pieces";
 import { PlayField, Piece } from "./pieces";
 import { number } from 'prop-types';
 
-export interface PositionGrid {
+export interface PiecePosition {
     row: number,
     col: number,
 }
 
-export const rotate = (rotatePiece: (p: Piece) => Piece, playField: PlayField, position: PositionGrid, p: Piece) => {
+export const rotate = (rotatePiece: (p: Piece) => Piece, playField: PlayField, position: PiecePosition, p: Piece) => {
     // rotate
     // check for collision
     // return result if no collision
@@ -30,7 +30,7 @@ export const rotate = (rotatePiece: (p: Piece) => Piece, playField: PlayField, p
     }
 
     const shiftedPosition = [-1,1,-2,2,-3,3]
-        .map((val) => ({ row: position.row, col: position.col + val } as PositionGrid))
+        .map((val) => ({ row: position.row, col: position.col + val } as PiecePosition))
         .filter((newPos) => !hasCollision(playField, newPos, piece));
 
     if (shiftedPosition.length>0) {
@@ -48,7 +48,7 @@ export const rotate = (rotatePiece: (p: Piece) => Piece, playField: PlayField, p
     }
 };
 
-export const rotateRight = (playField: PlayField, position: PositionGrid, p: Piece) => {
+export const rotateRight = (playField: PlayField, position: PiecePosition, p: Piece) => {
     return rotate((piece: Piece) => ([
         [p[3][0], p[2][0], p[1][0], p[0][0]],
         [p[3][1], p[2][1], p[1][1], p[0][1]],
@@ -57,7 +57,7 @@ export const rotateRight = (playField: PlayField, position: PositionGrid, p: Pie
     ]), playField, position, p);
 };
 
-export const rotateLeft = (playField: PlayField, position: PositionGrid, p: Piece) => {
+export const rotateLeft = (playField: PlayField, position: PiecePosition, p: Piece) => {
     return rotate((piece: Piece) => ([
         [p[0][3], p[1][3], p[2][3], p[3][3]],
         [p[0][2], p[1][2], p[2][2], p[3][2]],
@@ -66,7 +66,7 @@ export const rotateLeft = (playField: PlayField, position: PositionGrid, p: Piec
     ]), playField, position, p);
 };
 
-export const moveLeft = (playField: PlayField, position: PositionGrid, piece: Piece) => {
+export const moveLeft = (playField: PlayField, position: PiecePosition, piece: Piece) => {
     // calc position
     // check for collision
     // return result if no collision
@@ -80,7 +80,7 @@ export const moveLeft = (playField: PlayField, position: PositionGrid, piece: Pi
     }
 }
 
-export const moveRight = (playField: PlayField, position: PositionGrid, piece: Piece) => {
+export const moveRight = (playField: PlayField, position: PiecePosition, piece: Piece) => {
     // calc position
     // check for collision
     // return result if no collision
@@ -94,7 +94,7 @@ export const moveRight = (playField: PlayField, position: PositionGrid, piece: P
     }
 }
 
-export const moveDown = async (playField: PlayField, position: PositionGrid, piece: Piece, 
+export const moveDown = async (playField: PlayField, position: PiecePosition, piece: Piece, 
     incrementCounter: (pieceKey: string) => void,
     addScore: (score: number) => void,
     addLines: (lines: number) => void,
@@ -175,7 +175,7 @@ export const removeCompletedLines = (playField: PlayField, updateGame: (game: pi
     
 }
 
-export const hasCollision = (playField: PlayField, position: PositionGrid, piece: Piece) => {
+export const hasCollision = (playField: PlayField, position: PiecePosition, piece: Piece) => {
     for (let m=0; m<4; m++) {
         for (let n=0; n<4; n++) {
             if (piece[m][n] && (
@@ -210,7 +210,7 @@ export const generateRandomPiece = () => {
     }
 }
 
-export const merge = (playField: PlayField, position: PositionGrid, p: Piece): { playField: PlayField} => {
+export const merge = (playField: PlayField, position: PiecePosition, p: Piece): { playField: PlayField} => {
     const clonedPlayField = playField.map((row) => [...row]) as PlayField;
     for (let m=0; m<4; m++) {
         for (let n=0; n<4; n++) {

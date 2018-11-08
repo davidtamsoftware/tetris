@@ -2,11 +2,11 @@ import * as React from 'react';
 import './App.css';
 import { Block } from "./Block";
 import { PlayField, Piece, pieces } from './models/pieces';
-import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, PositionGrid, rotateRight, hasCollision } from './models/stage';
+import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, PiecePosition, rotateRight, hasCollision } from './models/stage';
 
 interface State {
   playField: PlayField;
-  position: PositionGrid;
+  position: PiecePosition;
   piece: Piece;
   gameover: boolean;
   paused?: boolean;
