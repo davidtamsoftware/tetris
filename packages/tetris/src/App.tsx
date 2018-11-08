@@ -1,11 +1,11 @@
 import * as React from 'react';
 import './App.css';
 import { Block } from "./Block";
-import { GameState, Piece, pieces } from './models/pieces';
+import { PlayField, Piece, pieces } from './models/pieces';
 import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, PositionGrid, rotateRight, hasCollision } from './models/stage';
 
 interface State {
-  game: GameState;
+  playField: PlayField;
   position: PositionGrid;
   piece: Piece;
   gameover: boolean;
@@ -27,7 +27,7 @@ type GamePiece = Piece;
 const initializeState = (): State => {
   const randomPiece = generateRandomPiece();
   return {
-    game: [
+    playField: [
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -62,10 +62,12 @@ const initializeState = (): State => {
 class App extends React.Component<{}, State> {
 
   private loop: NodeJS.Timeout;
-  private freeze: boolean;
+  private freezeSemaphore: boolean;
+  private refreshInterval: number;
 
   constructor(props: {}) {
     super(props)
+    this.refreshInterval = 1000;
     this.state = initializeState();
     this.restart = this.restart.bind(this);
     this.ticker = this.ticker.bind(this);
@@ -78,22 +80,21 @@ class App extends React.Component<{}, State> {
   public componentWillMount() {
     document.addEventListener("keydown", this.handleKeyDown.bind(this));
   }
-
-
+  
+  public componentWillUnmount() {
+    document.removeEventListener("keydown", this.handleKeyDown.bind(this));
+  }
+  
   public componentDidMount() {
     this.levelUp();
   }
 
-  public componentWillUnmount() {
-    document.removeEventListener("keydown", this.handleKeyDown.bind(this));
-  }
-
   public render() {
-    const currBoard = merge(this.state.game, this.state.position, this.state.piece);
+    const result = merge(this.state.playField, this.state.position, this.state.piece);
     const board = [];
-    for (let i = 0; i < currBoard.state.length; i++) {
+    for (let i = 0; i < result.playField.length; i++) {
       const row = [];
-      for (let j = 0; j < currBoard.state[i].length; j++) {
+      for (let j = 0; j < result.playField[i].length; j++) {
         row.push(<td key={j}
           style={{
             border: "1px solid black",
@@ -102,7 +103,7 @@ class App extends React.Component<{}, State> {
             height: "26px",
             padding: "0",
           }}>
-          {currBoard.state[i][j] ? <Block data={currBoard.state[i][j]} /> : null}
+          {result.playField[i][j] ? <Block data={result.playField[i][j]} /> : null}
         </td>);
       }
       board.push(<tr key={i}>{row}</tr>)
@@ -110,19 +111,18 @@ class App extends React.Component<{}, State> {
 
     const counts = [];
 
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < pieces.length; i++) {
+    for (const piece of pieces) {
       counts.push(
         <tr>
           <td>
             <table style={{ borderSpacing: "0", margin: "auto" }}>
               <tbody>
-                {this.generatePiece(pieces[i])}
+                {this.generatePiece(piece)}
               </tbody>
             </table>
           </td>
           <td>
-            {this.state.stats[pieces[i].toString()]}
+            {this.state.stats[piece.toString()]}
           </td>
         </tr>);
     }
@@ -193,33 +193,26 @@ class App extends React.Component<{}, State> {
   private levelUp() {
     clearInterval(this.loop);
     // check state, and set timeout based on level
-    this.loop = setInterval(this.ticker, 1000);
+    this.loop = setInterval(this.ticker, this.refreshInterval);
   }
 
   private generatePiece(piece: Piece) {
-    const row = [];
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < piece.length; i++) {
-      const col = [];
-      // tslint:disable-next-line:prefer-for-of
-      for (let j = 0; j < piece[i].length; j++) {
-        col.push(<td style={{ padding: "0" }}>{piece[i][j] ? <Block data={piece[i][j]} size="small" /> : null}</td>);
-      }
-      row.push(<tr>{col}</tr>);
-    }
-    return row;
+    return piece.map((r) => (
+      <tr>
+        {r.map((c) => (<td style={{ padding: "0" }}>{c ? <Block data={c} size="small" /> : null}</td>))}
+      </tr>
+    ));
   }
 
   private restart() {
     this.setState(initializeState());
   }
 
-
   private async ticker() {
-    if (!this.state.gameover && !this.state.paused && !this.freeze) {
-      this.freeze = true;
+    if (!this.state.gameover && !this.state.paused && !this.freezeSemaphore) {
+      this.freezeSemaphore = true;
       const result = await moveDown(
-        this.state.game,
+        this.state.playField,
         this.state.position,
         this.state.piece,
         this.incrementCount,
@@ -227,9 +220,9 @@ class App extends React.Component<{}, State> {
         this.addLines,
         this.updateGame);
 
-      this.freeze = false;
+      this.freezeSemaphore = false;
       this.setState({
-        game: result.state,
+        playField: result.playField,
         position: result.position,
         piece: result.piece,
         gameover: result.gameover,
@@ -257,16 +250,14 @@ class App extends React.Component<{}, State> {
   }
 
   private addLines(lines: number) {
-    // tslint:disable-next-line:no-console
-    console.log(lines);
     this.setState({
       lines: this.state.lines + lines
     });
   }
 
-  private updateGame(game: GameState) {
+  private updateGame(playField: PlayField) {
     this.setState({
-      game,
+      playField,
       piece: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
     })
   }
@@ -282,22 +273,20 @@ class App extends React.Component<{}, State> {
       return;
     }
 
-    // tslint:disable-next-line:no-console
-    // console.log("event fired " + event.keyCode);
     if (event.keyCode === 32) {
-      const { position, piece } = rotateRight(this.state.game, this.state.position, this.state.piece);
+      const { position, piece } = rotateRight(this.state.playField, this.state.position, this.state.piece);
       this.setState({
         position,
         piece,
       });
     } else if (event.keyCode === 39) {
-      const result = moveRight(this.state.game, this.state.position, this.state.piece);
+      const result = moveRight(this.state.playField, this.state.position, this.state.piece);
       this.setState({
         position: result.position,
         piece: result.piece,
       });
     } else if (event.keyCode === 37) {
-      const result = moveLeft(this.state.game, this.state.position, this.state.piece);
+      const result = moveLeft(this.state.playField, this.state.position, this.state.piece);
       this.setState({
         position: result.position,
         piece: result.piece,

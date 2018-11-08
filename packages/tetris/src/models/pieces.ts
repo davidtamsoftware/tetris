@@ -6,7 +6,7 @@ export type Piece = [
 ];
 
 // 10W X 18H
-export type GameState = [
+export type PlayField = [
     [number, number, number, number, number, number, number, number, number, number],
     [number, number, number, number, number, number, number, number, number, number],
     [number, number, number, number, number, number, number, number, number, number],
