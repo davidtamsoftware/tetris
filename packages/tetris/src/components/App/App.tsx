@@ -4,12 +4,17 @@ import { Block } from "../Block/Block";
 import { PlayField, playField as initialPlayField, Piece, pieces } from '../../models';
 import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, PiecePosition, rotateRight, hasCollision } from '../../actions';
 
+enum GameState {
+  Paused,
+  Active,
+  GameOver,
+};
+
 interface State {
   playField: PlayField;
   position: PiecePosition;
   piece: Piece;
-  gameover: boolean;
-  paused?: boolean;
+  gameState: GameState; 
   stats: Stats
   score: number;
   highscore: number;
@@ -29,7 +34,7 @@ const initializeState = (): State => {
   return {
     playField: initialPlayField,
     ...randomPiece,
-    gameover: false,
+    gameState: GameState.Active,
     level: 1,
     lines: 0,
     highscore: 1000,
@@ -164,9 +169,9 @@ class App extends React.Component<{}, State> {
             {board}
           </tbody>
         </table>
-        {this.state.gameover &&
+        {this.state.gameState === GameState.GameOver &&
           <div>game over! <button onClick={this.restart}>restart now</button></div>}
-        {this.state.paused && <div>Paused</div>}
+        {this.state.gameState === GameState.Paused && <div>Paused</div>}
       </div>
     );
   }
@@ -190,7 +195,7 @@ class App extends React.Component<{}, State> {
   }
 
   private async ticker() {
-    if (!this.state.gameover && !this.state.paused && !this.freezeSemaphore) {
+    if (this.state.gameState === GameState.Active && !this.freezeSemaphore) {
       this.freezeSemaphore = true;
       const result = await moveDown(
         this.state.playField,
@@ -206,7 +211,7 @@ class App extends React.Component<{}, State> {
         playField: result.playField,
         position: result.position,
         piece: result.piece,
-        gameover: result.gameover,
+        gameState: result.gameover ? GameState.GameOver : GameState.Active,
       });
     }
   }
@@ -244,13 +249,13 @@ class App extends React.Component<{}, State> {
   }
 
   private handleKeyDown(event: KeyboardEvent) {
-    if (!this.state.gameover && event.keyCode === 80) {
+    if (this.state.gameState !== GameState.GameOver && event.keyCode === 80) {
       this.setState({
-        paused: !this.state.paused,
+        gameState: this.state.gameState === GameState.Paused ? GameState.Active : GameState.Paused,
       });
     }
 
-    if (this.state.gameover || this.state.paused) {
+    if (this.state.gameState !== GameState.Active) {
       return;
     }
 
