@@ -1,6 +1,6 @@
 import * as React from 'react';
-import './App.css';
-import { Block } from "../Block/Block";
+import './index.css';
+import { Block } from "../Block";
 import { PlayField, playField as initialPlayField, Piece, pieces } from '../../models';
 import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, PiecePosition, rotateRight, hasCollision } from '../../actions';
 
@@ -164,7 +164,7 @@ class App extends React.Component<{}, State> {
             {counts}
           </tbody>
         </table>
-        <table style={{ float: "right", borderRadius: "0px", border: "3px solid white", borderSpacing: "0", margin: "auto" }}>
+        <table style={{ filter: `grayscale(${this.state.gameState === GameState.Paused ? "80" : "0"}%)`, float: "right", borderRadius: "0px", border: "3px solid white", borderSpacing: "0", margin: "auto" }}>
           <tbody>
             {board}
           </tbody>
