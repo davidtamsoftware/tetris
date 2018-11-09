@@ -1,11 +1,5 @@
 import * as pieces from "../models";
-import { PlayField, Piece } from "../models";
-import { number } from 'prop-types';
-
-export interface PiecePosition {
-    row: number,
-    col: number,
-}
+import { PlayField, Piece, PiecePosition, Fill } from "../models";
 
 export const rotate = (rotatePiece: (p: Piece) => Piece, playField: PlayField, position: PiecePosition, p: Piece) => {
     // rotate
@@ -67,11 +61,6 @@ export const rotateLeft = (playField: PlayField, position: PiecePosition, p: Pie
 };
 
 export const moveLeft = (playField: PlayField, position: PiecePosition, piece: Piece) => {
-    // calc position
-    // check for collision
-    // return result if no collision
-    // else return same result
-
     const newPos = { row: position.row, col: position.col - 1 };
     return {
         playField,
@@ -81,11 +70,6 @@ export const moveLeft = (playField: PlayField, position: PiecePosition, piece: P
 }
 
 export const moveRight = (playField: PlayField, position: PiecePosition, piece: Piece) => {
-    // calc position
-    // check for collision
-    // return result if no collision
-    // else return same result
-    
     const newPos = { row: position.row, col: position.col + 1 };
     return {
         playField,
@@ -149,7 +133,7 @@ export const moveDown = async (playField: PlayField, position: PiecePosition, pi
 }
 
 export const removeCompletedLines = (playField: PlayField, updateGame: (game: PlayField) => void) => {
-    const animateDeletionState = playField.map((row) => row.every((col) => !!col) ? row.map((col) => 8) : row);
+    const animateDeletionState = playField.map((row) => row.every((col) => !!col) ? row.map(() => Fill.White) : row);
     const newState = playField.filter((row) => !row.every((col) => !!col));
     const padEmptyLines = playField.length - newState.length;
     if (!!padEmptyLines) {

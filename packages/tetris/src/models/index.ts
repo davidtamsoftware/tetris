@@ -1,2 +1,4 @@
-export * from "./piece";
-export * from "./playField";
+export * from "./Piece";
+export * from "./PiecePosition";
+export * from "./PlayField";
+export * from "./Fill";

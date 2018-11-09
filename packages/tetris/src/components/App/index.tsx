@@ -1,8 +1,8 @@
 import * as React from 'react';
 import './index.css';
 import { Block } from "../Block";
-import { PlayField, playField as initialPlayField, Piece, pieces } from '../../models';
-import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, PiecePosition, rotateRight, hasCollision } from '../../actions';
+import { PlayField, playField as initialPlayField, Piece, pieces, PiecePosition } from '../../models';
+import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision } from '../../actions';
 
 enum GameState {
   Paused,
