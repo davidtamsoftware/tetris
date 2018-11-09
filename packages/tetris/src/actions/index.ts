@@ -206,7 +206,7 @@ export const generateRandomPiece = () => {
             row: -1,
             col: 3,
         },
-        piece: mapOfPieces[Math.round(Math.random() * 6)],
+        piece: mapOfPieces[Math.floor(Math.random() * 7)],
     }
 }
 
