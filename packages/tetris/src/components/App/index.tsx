@@ -178,8 +178,8 @@ class App extends React.Component<{}, State> {
 
   private levelUp() {
     clearInterval(this.loop);
-    // check state, and set timeout based on level
-    this.loop = setInterval(this.ticker, this.refreshInterval);
+
+    this.loop = setInterval(this.ticker, 1000);
   }
 
   private generatePiece(piece: Piece) {
