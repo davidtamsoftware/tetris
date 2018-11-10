@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './index.css';
 import { Block } from "../Block";
-import { PlayField, playField as initialPlayField, Piece, pieces, PiecePosition } from '../../models';
+import { PlayField, playField as initialPlayField, Piece, pieces, PiecePosition, Fill } from '../../models';
 import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision } from '../../actions';
 
 enum GameState {
@@ -244,7 +244,7 @@ class App extends React.Component<{}, State> {
   private updateGame(playField: PlayField) {
     this.setState({
       playField,
-      piece: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+      piece: new Array<Fill[]>(4).fill(new Array<Fill>(4).fill(Fill.Blank)) as Piece,
     })
   }
 
