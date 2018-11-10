@@ -133,7 +133,8 @@ export const moveDown = async (playField: PlayField, position: PiecePosition, pi
 }
 
 export const removeCompletedLines = (playField: PlayField, updateGame: (game: PlayField) => void) => {
-    const animateDeletionState = playField.map((row) => row.every((col) => !!col) ? row.map(() => Fill.White) : row);
+    const animateDeletionState1 = playField.map((row) => row.every((col) => !!col) ? row.map(() => Fill.White) : row);
+    const animateDeletionState2 = playField.map((row) => row.every((col) => !!col) ? row.map(() => Fill.Gray) : row);
     const newState = playField.filter((row) => !row.every((col) => !!col));
     const padEmptyLines = playField.length - newState.length;
     if (!!padEmptyLines) {
@@ -143,12 +144,15 @@ export const removeCompletedLines = (playField: PlayField, updateGame: (game: Pl
     }
 
     if (padEmptyLines) {
-        updateGame(animateDeletionState as PlayField);
+        updateGame(animateDeletionState1 as PlayField);
+        setTimeout(() => updateGame(animateDeletionState2 as PlayField), 50);
+        setTimeout(() => updateGame(animateDeletionState1 as PlayField), 100);
+        setTimeout(() => updateGame(animateDeletionState2 as PlayField), 150);
         return new Promise<{playField: PlayField; linesRemoved: number;}>((resolve, reject) => {
             setTimeout(() => resolve({
                 playField: newState,
                 linesRemoved: padEmptyLines,
-            } as any), 100);
+            } as any), 200);
         });
     }
 

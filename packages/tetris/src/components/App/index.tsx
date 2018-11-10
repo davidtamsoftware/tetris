@@ -89,7 +89,7 @@ class App extends React.Component<{}, State> {
             height: "26px",
             padding: "0",
           }}>
-          {result.playField[i][j] ? <Block data={result.playField[i][j]} /> : null}
+          <Block data={result.playField[i][j]} />
         </td>);
       }
       board.push(<tr key={i}>{row}</tr>)
@@ -115,63 +115,88 @@ class App extends React.Component<{}, State> {
 
     return (
       <div className="App">
-        <table style={{ float: "left", borderRadius: "0px", border: "5px solid white", borderSpacing: "0", margin: "auto" }}>
+        <div style={{ width: "250px", height: "250px", float: "left", borderRadius: "0px", border: "0px solid white", borderSpacing: "0", margin: "auto" }}>
+        <table style={{ tableLayout: "fixed", border: "0px solid white", width: "100%"}}>
           <tbody>
             <tr>
-              <td>Rotate: </td>
+              <td>Rotate</td>
               <td>Spacebar</td>
             </tr>
             <tr>
-              <td>Move Left: </td>
+              <td>Move Left</td>
               <td>&larr;</td>
             </tr>
             <tr>
-              <td>Move Right: </td>
+              <td>Move Right</td>
               <td>&rarr;</td>
             </tr>
             <tr>
-              <td>Move Down: </td>
+              <td>Move Down</td>
               <td>&darr;</td>
             </tr>
             <tr>
-              <td>Pause/Resume: </td>
+              <td>Pause/Resume</td>
               <td>P</td>
             </tr>
           </tbody>
-        </table>
-        <table style={{ float: "right", verticalAlign: "top", borderRadius: "0px", border: "5px solid white", borderSpacing: "0", margin: "auto" }}>
+          </table>
+        </div>
+        <div style={{ 
+          float: "right", 
+          verticalAlign: "top", 
+          borderRadius: "0px", 
+          border: "0px solid white", 
+          borderSpacing: "0", 
+          margin: "auto",
+          width: "250px",
+          height: "250px" }}>
+          <table style={{ tableLayout: "fixed", border: "0px solid white", width: "100%"}}>
           <tbody>
             <tr>
-              <td>High Score: </td>
+              <td>High Score</td>
               <td>{this.state.highscore}</td>
             </tr>
             <tr>
-              <td>Score: </td>
+              <td>Score</td>
               <td>{this.state.score}</td>
             </tr>
             <tr>
-              <td>Lines: </td>
+              <td>Lines</td>
               <td>{this.state.lines}</td>
             </tr>
             <tr>
-              <td>Level: </td>
+              <td>Level</td>
               <td>{this.state.level}</td>
             </tr>
             <tr>
-              <td>Counts: </td>
+              <td><br/></td>
+              <td />
+            </tr>
+            <tr>
+              <td><br/></td>
+              <td />
+            </tr>
+            <tr>
+              <td>Counts</td>
               <td />
             </tr>
             {counts}
           </tbody>
-        </table>
-        <table style={{ filter: `grayscale(${this.state.gameState === GameState.Paused ? "80" : "0"}%)`, float: "right", borderRadius: "0px", border: "3px solid white", borderSpacing: "0", margin: "auto" }}>
+          </table>
+        </div>
+        <table style={{ 
+          filter: `grayscale(${this.state.gameState === GameState.Paused ? "80" : "0"}%)`, 
+          borderRadius: "0px", 
+          border: "3px solid white", 
+          borderSpacing: "0", 
+          margin: "auto" }}>
           <tbody>
+          {this.state.gameState === GameState.Paused && <div style={{ position: "absolute", left: "38%", top: "42%", backgroundColor: "black"}}>Paused</div>}
+          {this.state.gameState === GameState.GameOver &&
+          <div style={{ position: "absolute", left: "5%", top: "40%", backgroundColor: "black"}}>Game Over!<br/>Click <a href="#" onClick={this.restart}>here</a> to restart</div>}
             {board}
           </tbody>
         </table>
-        {this.state.gameState === GameState.GameOver &&
-          <div>game over! <button onClick={this.restart}>restart now</button></div>}
-        {this.state.gameState === GameState.Paused && <div>Paused</div>}
       </div>
     );
   }
