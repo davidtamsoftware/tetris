@@ -78,11 +78,12 @@ export const moveRight = (playField: PlayField, position: PiecePosition, piece: 
     }
 }
 
-export const moveDown = async (playField: PlayField, position: PiecePosition, piece: Piece, 
+export const moveDown = async (playField: PlayField, position: PiecePosition, piece: Piece,
     incrementCounter: (pieceKey: string) => void,
     addScore: (score: number) => void,
     addLines: (lines: number) => void,
-    updateGame: (game: PlayField) => void) => {
+    updateGame: (game: PlayField) => void,
+    hardDrop?: boolean) => {
 
     // TODO: *** add lines from remove completed lines action
     // add score based on the removed lines
@@ -97,11 +98,17 @@ export const moveDown = async (playField: PlayField, position: PiecePosition, pi
     // return result if no collision
     // else return merged playField + piece and generate a random piece and reset position
     
-    const newPos = { row: position.row + 1, col: position.col };
-    const collision = hasCollision(playField, newPos, piece);
+    let collision;
+    let newPos = { ...position };
+    let prevPosition;
+    do {
+        prevPosition = { row: newPos.row, col: newPos.col };
+        newPos = { row: prevPosition.row + 1, col: prevPosition.col };
+        collision = hasCollision(playField, newPos, piece);
+    } while (hardDrop && !collision);
 
     if (collision) {
-        const newState = await removeCompletedLines(merge(playField, position, piece).playField, updateGame);
+        const newState = await removeCompletedLines(merge(playField, prevPosition, piece).playField, updateGame);
         const result: any = {
             playField: newState.playField,
             ...generateRandomPiece(),

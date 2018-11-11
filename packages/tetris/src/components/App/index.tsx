@@ -2,7 +2,7 @@ import * as React from 'react';
 import './index.css';
 import { Block } from "../Block";
 import { PlayField, playField as initialPlayField, Piece, pieces, PiecePosition, Fill } from '../../models';
-import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision } from '../../actions';
+import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision, rotateLeft } from '../../actions';
 
 enum GameState {
   Paused,
@@ -116,11 +116,15 @@ class App extends React.Component<{}, State> {
     return (
       <div className="App">
         <div style={{ width: "250px", height: "250px", float: "left", borderRadius: "0px", border: "0px solid white", borderSpacing: "0", margin: "auto" }}>
-        <table style={{ tableLayout: "fixed", border: "0px solid white", width: "100%"}}>
+        <table style={{ tableLayout: "fixed", border: "0px solid white", width: "100%", borderSpacing: "0 10px"}}>
           <tbody>
             <tr>
-              <td>Rotate</td>
-              <td>Spacebar</td>
+              <td>Rotate Left</td>
+              <td>Z</td>
+            </tr>
+            <tr>
+              <td>Rotate Right</td>
+              <td>&uarr;</td>
             </tr>
             <tr>
               <td>Move Left</td>
@@ -131,8 +135,12 @@ class App extends React.Component<{}, State> {
               <td>&rarr;</td>
             </tr>
             <tr>
-              <td>Move Down</td>
+              <td>Soft Drop</td>
               <td>&darr;</td>
+            </tr>
+            <tr>
+              <td>Hard Drop</td>
+              <td>Spacebar</td>
             </tr>
             <tr>
               <td>Pause/Resume</td>
@@ -150,7 +158,7 @@ class App extends React.Component<{}, State> {
           margin: "auto",
           width: "250px",
           height: "250px" }}>
-          <table style={{ tableLayout: "fixed", border: "0px solid white", width: "100%"}}>
+          <table style={{ tableLayout: "fixed", border: "0px solid white", width: "100%", borderSpacing: "0 10px"}}>
           <tbody>
             <tr>
               <td>High Score</td>
@@ -219,7 +227,7 @@ class App extends React.Component<{}, State> {
     this.setState(initializeState());
   }
 
-  private async ticker() {
+  private async drop(hardDrop?: boolean) {
     if (this.state.gameState === GameState.Active && !this.freezeSemaphore) {
       this.freezeSemaphore = true;
       const result = await moveDown(
@@ -229,7 +237,8 @@ class App extends React.Component<{}, State> {
         this.incrementCount,
         this.addScore,
         this.addLines,
-        this.updateGame);
+        this.updateGame,
+        hardDrop);
 
       this.freezeSemaphore = false;
       this.setState({
@@ -239,6 +248,10 @@ class App extends React.Component<{}, State> {
         gameState: result.gameover ? GameState.GameOver : GameState.Active,
       });
     }
+  }
+
+  private async ticker() {
+    this.drop();
   }
 
   private incrementCount(pieceKey: string) {
@@ -284,7 +297,13 @@ class App extends React.Component<{}, State> {
       return;
     }
 
-    if (event.keyCode === 32) {
+    if (event.keyCode === 90) {
+      const { position, piece } = rotateLeft(this.state.playField, this.state.position, this.state.piece);
+      this.setState({
+        position,
+        piece,
+      });
+    } else if (event.keyCode === 38) {
       const { position, piece } = rotateRight(this.state.playField, this.state.position, this.state.piece);
       this.setState({
         position,
@@ -303,7 +322,9 @@ class App extends React.Component<{}, State> {
         piece: result.piece,
       });
     } else if (event.keyCode === 40) {
-      this.ticker();
+      this.drop();
+    } else if (event.keyCode === 32) {
+      this.drop(true);
     }
   }
 }
