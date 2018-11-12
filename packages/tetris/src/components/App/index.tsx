@@ -79,7 +79,7 @@ class App extends React.Component<{}, State> {
   }
 
   public componentDidMount() {
-    this.levelUp();
+    this.levelUp(1);
   }
 
   public render() {
@@ -234,10 +234,10 @@ class App extends React.Component<{}, State> {
     );
   }
 
-  private levelUp() {
+  private levelUp(level: number) {
     clearInterval(this.loop);
 
-    this.loop = setInterval(this.ticker, 1000);
+    this.loop = setInterval(this.ticker, 1000/level);
   }
 
   private generatePiece(piece: Piece, size: "small" | "large") {
@@ -253,10 +253,11 @@ class App extends React.Component<{}, State> {
   }
 
   private restart() {
+    this.levelUp(1);
     this.setState(initializeState());
   }
 
-  private async drop(hardDrop?: boolean) {
+  private async drop(tick: boolean, hardDrop?: boolean) {
     if (this.state.gameState === GameState.Active && !this.freezeSemaphore) {
       this.freezeSemaphore = true;
       const result = await moveDown(
@@ -267,6 +268,7 @@ class App extends React.Component<{}, State> {
         this.addScore,
         this.addLines,
         this.updateGame,
+        tick,
         hardDrop);
 
       this.freezeSemaphore = false;
@@ -298,7 +300,7 @@ class App extends React.Component<{}, State> {
   }
 
   private async ticker() {
-    this.drop();
+    this.drop(true);
   }
 
   private incrementCount(pieceKey: string) {
@@ -324,12 +326,24 @@ class App extends React.Component<{}, State> {
   }
 
   private addLines(lines: number) {
+    const pts = [0, 40, 100, 300, 400]; 
+
+    const level = Math.floor((this.state.scoreboard.lines + lines)/10) + 1;
+    if (this.state.scoreboard.level !==  level) {
+      this.levelUp(level);
+    };
+
     this.setState({
       scoreboard: {
         ...this.state.scoreboard,
-        lines: this.state.scoreboard.score + lines,
+        lines: this.state.scoreboard.lines + lines,
+        score: this.state.scoreboard.score + this.state.scoreboard.level*pts[lines],
+        level,
       },
     });
+
+    // tslint:disable-next-line:no-console
+    console.log(this.state.scoreboard.lines);
   }
 
   private updateGame(playfield: Playfield) {
@@ -379,9 +393,9 @@ class App extends React.Component<{}, State> {
         piece: result.piece,
       });
     } else if (event.keyCode === 40) {
-      this.drop();
+      this.drop(false);
     } else if (event.keyCode === 32) {
-      this.drop(true);
+      this.drop(false, true);
     }
   }
 }

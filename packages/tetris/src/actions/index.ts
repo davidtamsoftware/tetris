@@ -71,25 +71,29 @@ export const moveDown = async (playfield: Playfield, position: PiecePosition, pi
     addScore: (score: number) => void,
     addLines: (lines: number) => void,
     updateGame: (game: Playfield) => void,
+    tick: boolean,
     hardDrop?: boolean) => {
     
     let collision;
     let newPos = { ...position };
     let prevPosition;
+    let count = 0;
     do {
+        count++;   
         prevPosition = { row: newPos.row, col: newPos.col };
         newPos = { row: prevPosition.row + 1, col: prevPosition.col };
         collision = hasCollision(playfield, newPos, piece);
     } while (hardDrop && !collision);
+    
+    addScore(!tick?count:0);
 
     if (collision) {
         const newState = await removeCompletedLines(merge(playfield, prevPosition, piece).playfield, updateGame);
         const result: any = {
             playfield: newState.playfield,
         }
-        
-        addLines(newState.linesRemoved);
 
+        addLines(newState.linesRemoved);    
         return result;
     } 
 
