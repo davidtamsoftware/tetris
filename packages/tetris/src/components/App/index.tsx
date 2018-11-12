@@ -15,12 +15,16 @@ interface State {
   position: PiecePosition;
   piece: Piece;
   gameState: GameState;
-  stats: Stats
+  stats: Stats;
+  scoreboard: Scoreboard;
+  nextPiece: Piece;
+}
+
+interface Scoreboard {
   score: number;
   highscore: number;
   level: number;
   lines: number;
-  nextPiece: Piece;
 }
 
 interface Stats {
@@ -35,11 +39,13 @@ const initializeState = (): State => {
     playfield: initialPlayfield,
     ...randomPiece,
     gameState: GameState.Active,
-    level: 1,
-    lines: 0,
+    scoreboard: {
+      level: 1,
+      lines: 0,
+      highscore: 1000,
+      score: 1,
+    },
     nextPiece: generateRandomPiece().piece,
-    highscore: 1000,
-    score: 1,
     stats: pieces
       .map((item) => ({ [item.toString()]: item === randomPiece.piece ? 1 : 0 }))
       .reduce((acc, item) => ({ ...acc, ...item })),
@@ -180,19 +186,19 @@ class App extends React.Component<{}, State> {
               </tr>
               <tr>
                 <td>High Score</td>
-                <td>{this.state.highscore}</td>
+                <td>{this.state.scoreboard.highscore}</td>
               </tr>
               <tr>
                 <td>Score</td>
-                <td>{this.state.score}</td>
+                <td>{this.state.scoreboard.score}</td>
               </tr>
               <tr>
                 <td>Lines</td>
-                <td>{this.state.lines}</td>
+                <td>{this.state.scoreboard.lines}</td>
               </tr>
               <tr>
                 <td>Level</td>
-                <td>{this.state.level}</td>
+                <td>{this.state.scoreboard.level}</td>
               </tr>
               <tr>
                 <td><br /></td>
@@ -310,13 +316,19 @@ class App extends React.Component<{}, State> {
 
   private addScore(score: number) {
     this.setState({
-      lines: this.state.lines + score
+      scoreboard: {
+        ...this.state.scoreboard,
+        score: this.state.scoreboard.score + score,
+      },
     });
   }
 
   private addLines(lines: number) {
     this.setState({
-      lines: this.state.lines + lines
+      scoreboard: {
+        ...this.state.scoreboard,
+        lines: this.state.scoreboard.score + lines,
+      },
     });
   }
 
