@@ -2,17 +2,6 @@ import * as pieces from "../models";
 import { PlayField, Piece, PiecePosition, Fill } from "../models";
 
 export const rotate = (rotatePiece: (p: Piece) => Piece, playField: PlayField, position: PiecePosition, p: Piece) => {
-    // rotate
-    // check for collision
-    // return result if no collision
-    // if collision move left 1
-    // check for collision
-    // return result if no collision
-    // if collision move right 1
-    // check for collision
-    // return result if no collision
-    // else return same result as args
-
     const piece: Piece = rotatePiece(p);
 
     if (!hasCollision(playField, position, piece)) {
@@ -27,17 +16,11 @@ export const rotate = (rotatePiece: (p: Piece) => Piece, playField: PlayField, p
         .map((val) => ({ row: position.row, col: position.col + val } as PiecePosition))
         .filter((newPos) => !hasCollision(playField, newPos, piece));
 
-    if (shiftedPosition.length>0) {
-        return {
-            playField,
-            position: shiftedPosition[0],
-            piece,
-        };
-    }
+    const updatedPos = shiftedPosition.length>0 ? shiftedPosition[0] : position;
 
     return {
         playField,
-        position,
+        position: updatedPos,
         piece: p,
     }
 };
@@ -79,24 +62,10 @@ export const moveRight = (playField: PlayField, position: PiecePosition, piece: 
 }
 
 export const moveDown = async (playField: PlayField, position: PiecePosition, piece: Piece,
-    incrementCounter: (pieceKey: string) => void,
     addScore: (score: number) => void,
     addLines: (lines: number) => void,
     updateGame: (game: PlayField) => void,
     hardDrop?: boolean) => {
-
-    // TODO: *** add lines from remove completed lines action
-    // add score based on the removed lines
-    // update the handler for keypress down to add score
-    // increase the tick speed when score increases.
-    // add tick speed to initial playField so that we can update the playField to control tick speed
-
-
-
-    // calc position
-    // check for collision
-    // return result if no collision
-    // else return merged playField + piece and generate a random piece and reset position
     
     let collision;
     let newPos = { ...position };
@@ -111,37 +80,23 @@ export const moveDown = async (playField: PlayField, position: PiecePosition, pi
         const newState = await removeCompletedLines(merge(playField, prevPosition, piece).playField, updateGame);
         const result: any = {
             playField: newState.playField,
-            ...generateRandomPiece(),
-            gameover: false,
         }
         
         addLines(newState.linesRemoved);
-        incrementCounter(result.piece.toString());
 
-        // check if new piece has collision with new playField, if so then game over
-        if (!hasCollision(result.playField, result.position, result.piece)) {
-            return result;
-        } else {
-            return {
-                playField,
-                position,
-                piece,
-                gameover: true,
-            };
-        };
+        return result;
     } 
 
     return {
         playField,
         position: newPos,
         piece,
-        gameover: false,
     };
 }
 
 export const removeCompletedLines = (playField: PlayField, updateGame: (game: PlayField) => void) => {
-    const animateDeletionState1 = playField.map((row) => row.every((col) => !!col) ? row.map(() => Fill.White) : row);
-    const animateDeletionState2 = playField.map((row) => row.every((col) => !!col) ? row.map(() => Fill.Gray) : row);
+    const animateDeletionState1 = playField.map((row) => row.every((col) => !!col) ? row.map(() => Fill.White) : row) as PlayField;
+    const animateDeletionState2 = playField.map((row) => row.every((col) => !!col) ? row.map(() => Fill.Gray) : row) as PlayField;
     const newState = playField.filter((row) => !row.every((col) => !!col));
     const padEmptyLines = playField.length - newState.length;
     if (!!padEmptyLines) {
@@ -151,10 +106,10 @@ export const removeCompletedLines = (playField: PlayField, updateGame: (game: Pl
     }
 
     if (padEmptyLines) {
-        updateGame(animateDeletionState1 as PlayField);
-        setTimeout(() => updateGame(animateDeletionState2 as PlayField), 50);
-        setTimeout(() => updateGame(animateDeletionState1 as PlayField), 100);
-        setTimeout(() => updateGame(animateDeletionState2 as PlayField), 150);
+        updateGame(animateDeletionState1);
+        setTimeout(() => updateGame(animateDeletionState2), 50);
+        setTimeout(() => updateGame(animateDeletionState1), 100);
+        setTimeout(() => updateGame(animateDeletionState2), 150);
         return new Promise<{playField: PlayField; linesRemoved: number;}>((resolve, reject) => {
             setTimeout(() => resolve({
                 playField: newState,
@@ -171,6 +126,7 @@ export const removeCompletedLines = (playField: PlayField, updateGame: (game: Pl
 }
 
 export const hasCollision = (playField: PlayField, position: PiecePosition, piece: Piece) => {
+
     for (let m=0; m<4; m++) {
         for (let n=0; n<4; n++) {
             if (piece[m][n] && (
