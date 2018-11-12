@@ -220,7 +220,7 @@ class App extends React.Component<{}, State> {
           <tbody>
             {this.state.gameState === GameState.Paused && <div style={{ position: "absolute", left: "38%", top: "42%", backgroundColor: "black" }}>Paused</div>}
             {this.state.gameState === GameState.GameOver &&
-              <div style={{ width: "180px", position: "absolute", left: "20%", top: "40%", backgroundColor: "black" }}>Game Over!<br/>Press the R to restart</div>}
+              <div style={{ width: "180px", position: "absolute", left: "20%", top: "40%", backgroundColor: "black" }}>Game Over!<br/>Press R to restart</div>}
             {board}
           </tbody>
         </table>
