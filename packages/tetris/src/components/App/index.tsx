@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './index.css';
 import { Block } from "../Block";
-import { PlayField, playField as initialPlayField, Piece, pieces, PiecePosition, Fill } from '../../models';
+import { Playfield, playfield as initialPlayfield, Piece, pieces, PiecePosition, Fill } from '../../models';
 import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision, rotateLeft } from '../../actions';
 
 enum GameState {
@@ -11,7 +11,7 @@ enum GameState {
 };
 
 interface State {
-  playField: PlayField;
+  playfield: Playfield;
   position: PiecePosition;
   piece: Piece;
   gameState: GameState;
@@ -32,7 +32,7 @@ type GamePiece = Piece;
 const initializeState = (): State => {
   const randomPiece = generateRandomPiece();
   return {
-    playField: initialPlayField,
+    playfield: initialPlayfield,
     ...randomPiece,
     gameState: GameState.Active,
     level: 1,
@@ -77,11 +77,11 @@ class App extends React.Component<{}, State> {
   }
 
   public render() {
-    const result = merge(this.state.playField, this.state.position, this.state.piece);
+    const result = merge(this.state.playfield, this.state.position, this.state.piece);
     const board = [];
-    for (let i = 0; i < result.playField.length; i++) {
+    for (let i = 0; i < result.playfield.length; i++) {
       const row = [];
-      for (let j = 0; j < result.playField[i].length; j++) {
+      for (let j = 0; j < result.playfield[i].length; j++) {
         row.push(<td key={j}
           style={{
             border: "1px solid black",
@@ -90,7 +90,7 @@ class App extends React.Component<{}, State> {
             height: "26px",
             padding: "0",
           }}>
-          <Block data={result.playField[i][j]} />
+          <Block data={result.playfield[i][j]} />
         </td>);
       }
       board.push(<tr key={i}>{row}</tr>)
@@ -254,7 +254,7 @@ class App extends React.Component<{}, State> {
     if (this.state.gameState === GameState.Active && !this.freezeSemaphore) {
       this.freezeSemaphore = true;
       const result = await moveDown(
-        this.state.playField,
+        this.state.playfield,
         this.state.position,
         this.state.piece,
         // this.incrementCount,
@@ -277,8 +277,8 @@ class App extends React.Component<{}, State> {
         nextPiece = generateRandomPiece().piece;
         this.incrementCount(result.piece.toString());
 
-        // check if new piece has collision with new playField, if so then game over
-        if (hasCollision(result.playField, newPos, result.piece)) {
+        // check if new piece has collision with new playfield, if so then game over
+        if (hasCollision(result.playfield, newPos, result.piece)) {
           result.gameover = GameState.GameOver;
         }
       }
@@ -320,9 +320,9 @@ class App extends React.Component<{}, State> {
     });
   }
 
-  private updateGame(playField: PlayField) {
+  private updateGame(playfield: Playfield) {
     this.setState({
-      playField,
+      playfield,
       piece: new Array<Fill[]>(4).fill(new Array<Fill>(4).fill(Fill.Blank)) as Piece,
     })
   }
@@ -343,25 +343,25 @@ class App extends React.Component<{}, State> {
     }
 
     if (event.keyCode === 90) {
-      const { position, piece } = rotateLeft(this.state.playField, this.state.position, this.state.piece);
+      const { position, piece } = rotateLeft(this.state.playfield, this.state.position, this.state.piece);
       this.setState({
         position,
         piece,
       });
     } else if (event.keyCode === 38) {
-      const { position, piece } = rotateRight(this.state.playField, this.state.position, this.state.piece);
+      const { position, piece } = rotateRight(this.state.playfield, this.state.position, this.state.piece);
       this.setState({
         position,
         piece,
       });
     } else if (event.keyCode === 39) {
-      const result = moveRight(this.state.playField, this.state.position, this.state.piece);
+      const result = moveRight(this.state.playfield, this.state.position, this.state.piece);
       this.setState({
         position: result.position,
         piece: result.piece,
       });
     } else if (event.keyCode === 37) {
-      const result = moveLeft(this.state.playField, this.state.position, this.state.piece);
+      const result = moveLeft(this.state.playfield, this.state.position, this.state.piece);
       this.setState({
         position: result.position,
         piece: result.piece,

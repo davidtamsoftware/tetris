@@ -1,12 +1,12 @@
 import * as pieces from "../models";
-import { PlayField, Piece, PiecePosition, Fill } from "../models";
+import { Playfield, Piece, PiecePosition, Fill } from "../models";
 
-export const rotate = (rotatePiece: (p: Piece) => Piece, playField: PlayField, position: PiecePosition, p: Piece) => {
+export const rotate = (rotatePiece: (p: Piece) => Piece, playfield: Playfield, position: PiecePosition, p: Piece) => {
     const piece: Piece = rotatePiece(p);
 
-    if (!hasCollision(playField, position, piece)) {
+    if (!hasCollision(playfield, position, piece)) {
         return {
-            playField,
+            playfield,
             position,
             piece,
         };
@@ -14,63 +14,63 @@ export const rotate = (rotatePiece: (p: Piece) => Piece, playField: PlayField, p
 
     const shiftedPosition = [-1,1,-2,2,-3,3]
         .map((val) => ({ row: position.row, col: position.col + val } as PiecePosition))
-        .filter((newPos) => !hasCollision(playField, newPos, piece));
+        .filter((newPos) => !hasCollision(playfield, newPos, piece));
 
     if (shiftedPosition.length>0) {
         return {
-            playField,
+            playfield,
             position: shiftedPosition[0],
             piece,
         };
     }
 
     return {
-        playField,
+        playfield,
         position,
         piece: p,
     }
 };
 
-export const rotateRight = (playField: PlayField, position: PiecePosition, p: Piece) => {
+export const rotateRight = (playfield: Playfield, position: PiecePosition, p: Piece) => {
     return rotate((piece: Piece) => ([
         [p[3][0], p[2][0], p[1][0], p[0][0]],
         [p[3][1], p[2][1], p[1][1], p[0][1]],
         [p[3][2], p[2][2], p[1][2], p[0][2]],
         [p[3][3], p[2][3], p[1][3], p[0][3]],
-    ]), playField, position, p);
+    ]), playfield, position, p);
 };
 
-export const rotateLeft = (playField: PlayField, position: PiecePosition, p: Piece) => {
+export const rotateLeft = (playfield: Playfield, position: PiecePosition, p: Piece) => {
     return rotate((piece: Piece) => ([
         [p[0][3], p[1][3], p[2][3], p[3][3]],
         [p[0][2], p[1][2], p[2][2], p[3][2]],
         [p[0][1], p[1][1], p[2][1], p[3][1]],
         [p[0][0], p[1][0], p[2][0], p[3][0]],
-    ]), playField, position, p);
+    ]), playfield, position, p);
 };
 
-export const moveLeft = (playField: PlayField, position: PiecePosition, piece: Piece) => {
+export const moveLeft = (playfield: Playfield, position: PiecePosition, piece: Piece) => {
     const newPos = { row: position.row, col: position.col - 1 };
     return {
-        playField,
-        position: hasCollision(playField, newPos, piece) ? position : newPos,
+        playfield,
+        position: hasCollision(playfield, newPos, piece) ? position : newPos,
         piece,
     }
 }
 
-export const moveRight = (playField: PlayField, position: PiecePosition, piece: Piece) => {
+export const moveRight = (playfield: Playfield, position: PiecePosition, piece: Piece) => {
     const newPos = { row: position.row, col: position.col + 1 };
     return {
-        playField,
-        position: hasCollision(playField, newPos, piece) ? position : newPos,
+        playfield,
+        position: hasCollision(playfield, newPos, piece) ? position : newPos,
         piece,
     }
 }
 
-export const moveDown = async (playField: PlayField, position: PiecePosition, piece: Piece,
+export const moveDown = async (playfield: Playfield, position: PiecePosition, piece: Piece,
     addScore: (score: number) => void,
     addLines: (lines: number) => void,
-    updateGame: (game: PlayField) => void,
+    updateGame: (game: Playfield) => void,
     hardDrop?: boolean) => {
     
     let collision;
@@ -79,13 +79,13 @@ export const moveDown = async (playField: PlayField, position: PiecePosition, pi
     do {
         prevPosition = { row: newPos.row, col: newPos.col };
         newPos = { row: prevPosition.row + 1, col: prevPosition.col };
-        collision = hasCollision(playField, newPos, piece);
+        collision = hasCollision(playfield, newPos, piece);
     } while (hardDrop && !collision);
 
     if (collision) {
-        const newState = await removeCompletedLines(merge(playField, prevPosition, piece).playField, updateGame);
+        const newState = await removeCompletedLines(merge(playfield, prevPosition, piece).playfield, updateGame);
         const result: any = {
-            playField: newState.playField,
+            playfield: newState.playfield,
         }
         
         addLines(newState.linesRemoved);
@@ -94,20 +94,20 @@ export const moveDown = async (playField: PlayField, position: PiecePosition, pi
     } 
 
     return {
-        playField,
+        playfield,
         position: newPos,
         piece,
     };
 }
 
-export const removeCompletedLines = (playField: PlayField, updateGame: (game: PlayField) => void) => {
-    const animateDeletionState1 = playField.map((row) => row.every((col) => !!col) ? row.map(() => Fill.White) : row) as PlayField;
-    const animateDeletionState2 = playField.map((row) => row.every((col) => !!col) ? row.map(() => Fill.Gray) : row) as PlayField;
-    const newState = playField.filter((row) => !row.every((col) => !!col));
-    const padEmptyLines = playField.length - newState.length;
+export const removeCompletedLines = (playfield: Playfield, updateGame: (game: Playfield) => void) => {
+    const animateDeletionState1 = playfield.map((row) => row.every((col) => !!col) ? row.map(() => Fill.White) : row) as Playfield;
+    const animateDeletionState2 = playfield.map((row) => row.every((col) => !!col) ? row.map(() => Fill.Gray) : row) as Playfield;
+    const newState = playfield.filter((row) => !row.every((col) => !!col));
+    const padEmptyLines = playfield.length - newState.length;
     if (!!padEmptyLines) {
         const lines = new Array(padEmptyLines);
-        lines.fill(new Array(playField[0].length).fill(0));
+        lines.fill(new Array(playfield[0].length).fill(0));
         newState.unshift(...lines);
     }
 
@@ -116,30 +116,30 @@ export const removeCompletedLines = (playField: PlayField, updateGame: (game: Pl
         setTimeout(() => updateGame(animateDeletionState2), 50);
         setTimeout(() => updateGame(animateDeletionState1), 100);
         setTimeout(() => updateGame(animateDeletionState2), 150);
-        return new Promise<{playField: PlayField; linesRemoved: number;}>((resolve, reject) => {
+        return new Promise<{playfield: Playfield; linesRemoved: number;}>((resolve, reject) => {
             setTimeout(() => resolve({
-                playField: newState,
+                playfield: newState,
                 linesRemoved: padEmptyLines,
             } as any), 200);
         });
     }
 
     return Promise.resolve({
-        playField: newState,
+        playfield: newState,
         linesRemoved: padEmptyLines,
     });
     
 }
 
-export const hasCollision = (playField: PlayField, position: PiecePosition, piece: Piece) => {
+export const hasCollision = (playfield: Playfield, position: PiecePosition, piece: Piece) => {
 
     for (let m=0; m<4; m++) {
         for (let n=0; n<4; n++) {
             if (piece[m][n] && (
                     n+position.col < 0 || 
-                    n+position.col >= playField[m].length ||
-                    m+position.row >= playField.length ||
-                    (position.row+m >= 0 && playField[m+position.row][n+position.col]))) {
+                    n+position.col >= playfield[m].length ||
+                    m+position.row >= playfield.length ||
+                    (position.row+m >= 0 && playfield[m+position.row][n+position.col]))) {
                 return true;
             }
         }
@@ -167,17 +167,17 @@ export const generateRandomPiece = () => {
     }
 }
 
-export const merge = (playField: PlayField, position: PiecePosition, p: Piece): { playField: PlayField} => {
-    const clonedPlayField = playField.map((row) => [...row]) as PlayField;
+export const merge = (playfield: Playfield, position: PiecePosition, p: Piece): { playfield: Playfield} => {
+    const clonedPlayfield = playfield.map((row) => [...row]) as Playfield;
     for (let m=0; m<4; m++) {
         for (let n=0; n<4; n++) {
             if (p[m][n] && position.row+m >= 0) {
-                clonedPlayField[m+position.row][n+position.col] = p[m][n];
+                clonedPlayfield[m+position.row][n+position.col] = p[m][n];
             }
         }
     }
     
     return {
-        playField: clonedPlayField,
+        playfield: clonedPlayfield,
     }
 }
