@@ -280,8 +280,6 @@ class App extends React.Component<{}, State> {
         // check if new piece has collision with new playField, if so then game over
         if (hasCollision(result.playField, newPos, result.piece)) {
           result.gameover = GameState.GameOver;
-          const r = [-2,-3].filter((row) => !hasCollision(result.playField, { row, col: 3}, this.state.nextPiece))[0];
-          result.position = { row: r, col: 3 };
         }
       }
 

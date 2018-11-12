@@ -16,11 +16,17 @@ export const rotate = (rotatePiece: (p: Piece) => Piece, playField: PlayField, p
         .map((val) => ({ row: position.row, col: position.col + val } as PiecePosition))
         .filter((newPos) => !hasCollision(playField, newPos, piece));
 
-    const updatedPos = shiftedPosition.length>0 ? shiftedPosition[0] : position;
+    if (shiftedPosition.length>0) {
+        return {
+            playField,
+            position: shiftedPosition[0],
+            piece,
+        };
+    }
 
     return {
         playField,
-        position: updatedPos,
+        position,
         piece: p,
     }
 };
