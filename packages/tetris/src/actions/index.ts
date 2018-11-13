@@ -32,20 +32,39 @@ export const rotate = (rotatePiece: (p: Piece) => Piece, playfield: Playfield, p
 };
 
 export const rotateRight = (playfield: Playfield, position: PiecePosition, p: Piece) => {
-    return rotate((piece: Piece) => ([
-        [p[3][0], p[2][0], p[1][0], p[0][0]],
-        [p[3][1], p[2][1], p[1][1], p[0][1]],
-        [p[3][2], p[2][2], p[1][2], p[0][2]],
-        [p[3][3], p[2][3], p[1][3], p[0][3]],
-    ]), playfield, position, p);
+    const getNewP = (piece: Piece) => {
+        const newP = p.map((row) => [...row]);
+        for (let i=0; i<newP.length; i++) {
+            for (let j=i; j<(newP[i].length-i); j++) {            
+                const rows = newP.length;
+                const cols = newP[i].length;    
+                if (j+1 === newP[i].length-i) {
+                    break;
+                }
+                const temp = newP[i][j]; 
+                newP[i][j] = newP[j][cols-1-i];
+                newP[j][cols-1-i] = newP[rows-1-i][cols-1-j];
+                newP[rows-1-i][cols-1-j] = newP[rows-1-j][i];
+                newP[rows-1-j][i] = temp;
+            }
+        }
+        return newP;
+    }
+    return rotate(getNewP as any, playfield, position, p);
+    // return rotate((piece: Piece) => ([
+    //     [p[3][0], p[2][0], p[1][0], p[0][0]],
+    //     [p[3][1], p[2][1], p[1][1], p[0][1]],
+    //     [p[3][2], p[2][2], p[1][2], p[0][2]],
+    //     [p[3][3], p[2][3], p[1][3], p[0][3]],
+    // ]), playfield, position, p);
 };
 
 export const rotateLeft = (playfield: Playfield, position: PiecePosition, p: Piece) => {
     return rotate((piece: Piece) => ([
-        [p[0][3], p[1][3], p[2][3], p[3][3]],
-        [p[0][2], p[1][2], p[2][2], p[3][2]],
-        [p[0][1], p[1][1], p[2][1], p[3][1]],
-        [p[0][0], p[1][0], p[2][0], p[3][0]],
+        [piece[0][3], piece[1][3], piece[2][3], piece[3][3]],
+        [piece[0][2], piece[1][2], piece[2][2], piece[3][2]],
+        [piece[0][1], piece[1][1], piece[2][1], piece[3][1]],
+        [piece[0][0], piece[1][0], piece[2][0], piece[3][0]],
     ]), playfield, position, p);
 };
 
@@ -137,8 +156,8 @@ export const removeCompletedLines = (playfield: Playfield, updateGame: (game: Pl
 
 export const hasCollision = (playfield: Playfield, position: PiecePosition, piece: Piece) => {
 
-    for (let m=0; m<4; m++) {
-        for (let n=0; n<4; n++) {
+    for (let m=0; m<piece.length; m++) {
+        for (let n=0; n<piece[m].length; n++) {
             if (piece[m][n] && (
                     n+position.col < 0 || 
                     n+position.col >= playfield[m].length ||
@@ -163,8 +182,8 @@ export const generateRandomPiece = () => {
 
 export const merge = (playfield: Playfield, position: PiecePosition, p: Piece): { playfield: Playfield} => {
     const clonedPlayfield = playfield.map((row) => [...row]) as Playfield;
-    for (let m=0; m<4; m++) {
-        for (let n=0; n<4; n++) {
+    for (let m=0; m<p.length; m++) {
+        for (let n=0; n<p[m].length; n++) {
             if (p[m][n] && position.row+m >= 0) {
                 clonedPlayfield[m+position.row][n+position.col] = p[m][n];
             }

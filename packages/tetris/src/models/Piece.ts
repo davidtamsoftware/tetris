@@ -56,6 +56,11 @@ export const t: Piece = [
     [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
 ];
 
+// export const tt: any = [
+//     [Fill.Blue, Fill.Red, Fill.Blank],
+//     [Fill.Blank, Fill.Purple, Fill.Purple],
+//     [Fill.Blank, Fill.Blank, Fill.Purple],
+// ];
 export const pieces: Piece[] = [o, i, s, z, l, j, t];
 
 export default Piece;
