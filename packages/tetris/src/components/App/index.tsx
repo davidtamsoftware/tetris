@@ -43,7 +43,7 @@ const initializeState = (): State => {
       level: 1,
       lines: 0,
       highscore: Number(localStorage.getItem("highscore") || 0),
-      score: 1,
+      score: 0,
     },
     nextPiece: generateRandomPiece().piece,
     stats: pieces
