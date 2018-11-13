@@ -1,4 +1,4 @@
-import * as pieces from "../models";
+import { pieces } from "../models";
 import { Playfield, Piece, PiecePosition, Fill } from "../models";
 
 export const rotate = (rotatePiece: (p: Piece) => Piece, playfield: Playfield, position: PiecePosition, p: Piece) => {
@@ -152,22 +152,12 @@ export const hasCollision = (playfield: Playfield, position: PiecePosition, piec
 }
 
 export const generateRandomPiece = () => {
-    const mapOfPieces = {
-        0: pieces.i,
-        1: pieces.j,
-        2: pieces.l,
-        3: pieces.o,
-        4: pieces.s,
-        5: pieces.t,
-        6: pieces.z,
-    };
-    
     return {
         position: {
             row: -1,
             col: 3,
         },
-        piece: mapOfPieces[Math.floor(Math.random() * 7)],
+        piece: pieces[Math.floor(Math.random() * pieces.length)],
     }
 }
 
