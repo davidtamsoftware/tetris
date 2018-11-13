@@ -42,7 +42,7 @@ const initializeState = (): State => {
     scoreboard: {
       level: 1,
       lines: 0,
-      highscore: 1000,
+      highscore: Number(localStorage.getItem("highscore") || 0),
       score: 1,
     },
     nextPiece: generateRandomPiece().piece,
@@ -288,6 +288,7 @@ class App extends React.Component<{}, State> {
         // check if new piece has collision with new playfield, if so then game over
         if (hasCollision(result.playfield, newPos, result.piece)) {
           result.gameover = GameState.GameOver;
+          localStorage.setItem("highscore", this.state.scoreboard.highscore.toString());
         }
       }
 
@@ -329,15 +330,19 @@ class App extends React.Component<{}, State> {
     const pts = [0, 40, 100, 300, 400]; 
 
     const level = Math.floor((this.state.scoreboard.lines + lines)/10) + 1;
-    if (this.state.scoreboard.level !==  level) {
+    const score = this.state.scoreboard.score + this.state.scoreboard.level*pts[lines];
+    if (this.state.scoreboard.level !== level) {
       this.levelUp(level);
     };
+
+
 
     this.setState({
       scoreboard: {
         ...this.state.scoreboard,
+        highscore: this.state.scoreboard.highscore > score ? this.state.scoreboard.highscore : score,
         lines: this.state.scoreboard.lines + lines,
-        score: this.state.scoreboard.score + this.state.scoreboard.level*pts[lines],
+        score,
         level,
       },
     });
