@@ -217,6 +217,7 @@ class App extends React.Component<{}, State> {
             </tbody>
           </table>
         </div>
+        <div>
         <table style={{
           filter: `grayscale(${this.state.gameState === GameState.Paused ? "80" : "0"}%)`,
           borderRadius: "0px",
@@ -225,12 +226,14 @@ class App extends React.Component<{}, State> {
           margin: "auto"
         }}>
           <tbody>
-            {this.state.gameState === GameState.Paused && <div style={{ position: "absolute", left: "38%", top: "42%", backgroundColor: "black" }}>Paused</div>}
-            {this.state.gameState === GameState.GameOver &&
-              <div style={{ width: "180px", position: "absolute", left: "20%", top: "40%", backgroundColor: "black" }}>Game Over!<br/>Press R to restart</div>}
             {board}
           </tbody>
         </table>
+        {this.state.gameState === GameState.Paused && 
+          <div style={{ position: "absolute", left: "47%", top: "42%", backgroundColor: "black" }}>Paused</div>}
+        {this.state.gameState === GameState.GameOver &&
+          <div style={{ width: "180px", position: "absolute", left: "44%", top: "40%", backgroundColor: "black" }}>Game Over!<br/>Press R to restart</div>}
+        </div>
       </div>
     );
   }
