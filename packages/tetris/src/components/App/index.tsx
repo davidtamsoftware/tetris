@@ -1,39 +1,10 @@
 import * as React from 'react';
 import './index.css';
 import { Block } from "../Block";
-import { Playfield, playfield as initialPlayfield, Piece, pieces, PiecePosition, Fill } from '../../models';
+import { Playfield, playfield as initialPlayfield, Piece, pieces, Game, GameState } from '../../models';
 import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision, rotateLeft, calculatePosition } from '../../actions';
 
-enum GameState {
-  Paused,
-  Active,
-  GameOver,
-};
-
-interface State {
-  playfield: Playfield;
-  position: PiecePosition;
-  piece: Piece;
-  gameState: GameState;
-  stats: Stats;
-  scoreboard: Scoreboard;
-  nextPiece: Piece;
-}
-
-interface Scoreboard {
-  score: number;
-  highscore: number;
-  level: number;
-  lines: number;
-}
-
-interface Stats {
-  [pieceId: string]: number;
-};
-
-type GamePiece = Piece;
-
-const initializeState = (): State => {
+const initializeState = (): Game => {
   const randomPiece = generateRandomPiece();
   return {
     playfield: initialPlayfield,
@@ -53,7 +24,7 @@ const initializeState = (): State => {
   };
 };
 
-class App extends React.Component<{}, State> {
+class App extends React.Component<{}, Game> {
 
   private loop: NodeJS.Timeout;
   private freezeSemaphore: boolean;

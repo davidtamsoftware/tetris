@@ -9,5 +9,3 @@ export enum Fill {
     Purple,
     White,
 }
-
-export default Fill;

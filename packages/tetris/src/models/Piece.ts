@@ -45,5 +45,3 @@ export const t: Piece = [
 ];
 
 export const pieces: Piece[] = [o, i, s, z, l, j, t];
-
-export default Piece;
