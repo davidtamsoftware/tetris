@@ -1,7 +1,8 @@
 import * as React from 'react';
 import './index.css';
 import { Block } from "../Block";
-import { PlayfieldGrid } from "../PlayfieldGrid";
+import { Playfield as PlayfieldGrid } from "../Playfield";
+import { Piece as PieceDisplay } from "../Piece";
 import { Playfield, playfield as initialPlayfield, Piece, pieces, Game, GameState } from '../../models';
 import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision, rotateLeft, calculatePosition } from '../../actions';
 
@@ -29,11 +30,9 @@ class App extends React.Component<{}, Game> {
 
   private loop: NodeJS.Timeout;
   private freezeSemaphore: boolean;
-  private refreshInterval: number;
 
   constructor(props: {}) {
     super(props)
-    this.refreshInterval = 1000;
     this.state = initializeState();
     this.restart = this.restart.bind(this);
     this.ticker = this.ticker.bind(this);
@@ -64,7 +63,7 @@ class App extends React.Component<{}, Game> {
       counts.push(
         <tr>
           <td>
-            {this.generatePiece(piece, "small")}
+            <PieceDisplay piece={piece} size={"small"} />
           </td>
           <td>
             {this.state.stats[piece.toString()]}
@@ -118,7 +117,7 @@ class App extends React.Component<{}, Game> {
                 <td />
               </tr>
               <tr>
-                <td>{this.generatePiece(this.state.nextPiece, "large")}</td>
+                <td><PieceDisplay piece={this.state.nextPiece} size={"large"} /></td>
                 <td />
               </tr>
             </tbody>
@@ -187,18 +186,6 @@ class App extends React.Component<{}, Game> {
     clearInterval(this.loop);
 
     this.loop = setInterval(this.ticker, 1000 / level);
-  }
-
-  private generatePiece(piece: Piece, size: "small" | "large") {
-    return (<table style={{ borderSpacing: "0", margin: "auto" }}>
-      <tbody>
-        {piece.map((r) => (
-          <tr>
-            {r.map((c) => (<td style={{ border: `${size === "small" ? "0" : "1"}px solid #131010`, padding: "0" }}>{c ? <Block data={c} size={size} /> : null}</td>))}
-          </tr>
-        ))}
-      </tbody>
-    </table>)
   }
 
   private restart() {

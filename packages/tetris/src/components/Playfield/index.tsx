@@ -1,14 +1,14 @@
 import * as React from 'react';
 import './index.css';
-import { Playfield, GameState } from 'src/models';
+import { Playfield as PlayfieldModel, GameState } from 'src/models';
 import { Block } from '../Block';
 
 interface Props {
     gameState: GameState;
-    playfield: Playfield;
+    playfield: PlayfieldModel;
 }
 
-export const PlayfieldGrid = (props: Props) => {
+export const Playfield = (props: Props) => {
     const board = [];
     for (let i = 0; i < props.playfield.length; i++) {
         const row = [];
@@ -40,4 +40,4 @@ export const PlayfieldGrid = (props: Props) => {
     </table>)
 };
 
-export default PlayfieldGrid;
+export default Playfield;
