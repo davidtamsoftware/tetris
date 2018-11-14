@@ -1,5 +1,5 @@
 import * as React from 'react';
-import './Playfield.css';
+import './index.css';
 import { Playfield, GameState } from 'src/models';
 import { Block } from '../Block';
 
@@ -8,7 +8,7 @@ interface Props {
     playfield: Playfield;
 }
 
-const Playfield = (props: Props) => {
+export const PlayfieldGrid = (props: Props) => {
     const board = [];
     for (let i = 0; i < props.playfield.length; i++) {
         const row = [];
@@ -40,4 +40,4 @@ const Playfield = (props: Props) => {
     </table>)
 };
 
-export default Playfield;
+export default PlayfieldGrid;
