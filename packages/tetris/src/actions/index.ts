@@ -32,40 +32,48 @@ export const rotate = (rotatePiece: (p: Piece) => Piece, playfield: Playfield, p
 };
 
 export const rotateRight = (playfield: Playfield, position: PiecePosition, p: Piece) => {
-    const getNewP = (piece: Piece) => {
-        const newP = p.map((row) => [...row]);
-        for (let i=0; i<newP.length; i++) {
-            for (let j=i; j<(newP[i].length-i); j++) {            
-                const rows = newP.length;
-                const cols = newP[i].length;    
-                if (j+1 === newP[i].length-i) {
+    const transform = (piece: Piece) => {
+        const rotated = p.map((row) => [...row]);
+        for (let i=0; i<rotated.length; i++) {
+            for (let j=i; j<(rotated[i].length-i); j++) {            
+                if (j+1 === rotated[i].length-i) {
                     break;
                 }
-                const temp = newP[i][j]; 
-                newP[i][j] = newP[j][cols-1-i];
-                newP[j][cols-1-i] = newP[rows-1-i][cols-1-j];
-                newP[rows-1-i][cols-1-j] = newP[rows-1-j][i];
-                newP[rows-1-j][i] = temp;
+                const rows = rotated.length;
+                const cols = rotated[i].length;    
+                const temp = rotated[i][j]; 
+
+                rotated[i][j] = rotated[rows-1-j][i];
+                rotated[rows-1-j][i] = rotated[rows-1-i][cols-1-j];
+                rotated[rows-1-i][cols-1-j] = rotated[j][cols-1-i];
+                rotated[j][cols-1-i] = temp;
             }
         }
-        return newP;
+        return rotated;
     }
-    return rotate(getNewP as any, playfield, position, p);
-    // return rotate((piece: Piece) => ([
-    //     [p[3][0], p[2][0], p[1][0], p[0][0]],
-    //     [p[3][1], p[2][1], p[1][1], p[0][1]],
-    //     [p[3][2], p[2][2], p[1][2], p[0][2]],
-    //     [p[3][3], p[2][3], p[1][3], p[0][3]],
-    // ]), playfield, position, p);
+    return rotate(transform as any, playfield, position, p);
 };
 
 export const rotateLeft = (playfield: Playfield, position: PiecePosition, p: Piece) => {
-    return rotate((piece: Piece) => ([
-        [piece[0][3], piece[1][3], piece[2][3], piece[3][3]],
-        [piece[0][2], piece[1][2], piece[2][2], piece[3][2]],
-        [piece[0][1], piece[1][1], piece[2][1], piece[3][1]],
-        [piece[0][0], piece[1][0], piece[2][0], piece[3][0]],
-    ]), playfield, position, p);
+    const transform = (piece: Piece) => {
+        const rotated = p.map((row) => [...row]);
+        for (let i=0; i<rotated.length; i++) {
+            for (let j=i; j<(rotated[i].length-i); j++) {            
+                if (j+1 === rotated[i].length-i) {
+                    break;
+                }
+                const rows = rotated.length;
+                const cols = rotated[i].length;    
+                const temp = rotated[i][j]; 
+                rotated[i][j] = rotated[j][cols-1-i];
+                rotated[j][cols-1-i] = rotated[rows-1-i][cols-1-j];
+                rotated[rows-1-i][cols-1-j] = rotated[rows-1-j][i];
+                rotated[rows-1-j][i] = temp;
+            }
+        }
+        return rotated;
+    }
+    return rotate(transform as any, playfield, position, p);
 };
 
 export const moveLeft = (playfield: Playfield, position: PiecePosition, piece: Piece) => {
