@@ -178,15 +178,12 @@ export const hasCollision = (playfield: Playfield, position: PiecePosition, piec
     return false;
 }
 
-export const generateRandomPiece = () => {
-    return {
-        position: {
-            row: -1,
-            col: 3,
-        },
-        piece: pieces[Math.floor(Math.random() * pieces.length)],
-    }
-}
+export const generateRandomPiece = () => pieces[Math.floor(Math.random() * pieces.length)];
+
+export const calculatePosition = (playfield: Playfield, piece: Piece) => ({
+    row: 0 - piece.findIndex((row) => !row.every((col) => col === Fill.Blank)),
+    col: Math.floor(playfield[0].length/2) - Math.floor(piece[0].length/2),
+});
 
 export const merge = (playfield: Playfield, position: PiecePosition, p: Piece): { playfield: Playfield} => {
     const clonedPlayfield = playfield.map((row) => [...row]) as Playfield;

@@ -2,7 +2,7 @@ import * as React from 'react';
 import './index.css';
 import { Block } from "../Block";
 import { Playfield, playfield as initialPlayfield, Piece, pieces, PiecePosition, Fill } from '../../models';
-import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision, rotateLeft } from '../../actions';
+import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision, rotateLeft, calculatePosition } from '../../actions';
 
 enum GameState {
   Paused,
@@ -37,7 +37,8 @@ const initializeState = (): State => {
   const randomPiece = generateRandomPiece();
   return {
     playfield: initialPlayfield,
-    ...randomPiece,
+    piece: randomPiece,
+    position: calculatePosition(initialPlayfield, randomPiece),
     gameState: GameState.Active,
     scoreboard: {
       level: 1,
@@ -45,9 +46,9 @@ const initializeState = (): State => {
       highscore: Number(localStorage.getItem("highscore") || 0),
       score: 0,
     },
-    nextPiece: generateRandomPiece().piece,
+    nextPiece: generateRandomPiece(),
     stats: pieces
-      .map((item) => ({ [item.toString()]: item === randomPiece.piece ? 1 : 0 }))
+      .map((item) => ({ [item.toString()]: item === randomPiece ? 1 : 0 }))
       .reduce((acc, item) => ({ ...acc, ...item })),
   };
 };
@@ -264,7 +265,6 @@ class App extends React.Component<{}, State> {
         this.state.playfield,
         this.state.position,
         this.state.piece,
-        // this.incrementCount,
         this.addScore,
         this.addLines,
         this.updateGame,
@@ -275,18 +275,14 @@ class App extends React.Component<{}, State> {
 
       let nextPiece;
       if (!result.piece) {
-        const newPos = {
-          row: -1,
-          col: 3,
-        };
-
+        const position = calculatePosition(this.state.playfield, this.state.nextPiece);
         result.piece = this.state.nextPiece;
-        result.position = newPos;
-        nextPiece = generateRandomPiece().piece;
+        result.position = position;
+        nextPiece = generateRandomPiece();
         this.incrementCount(result.piece.toString());
 
         // check if new piece has collision with new playfield, if so then game over
-        if (hasCollision(result.playfield, newPos, result.piece)) {
+        if (hasCollision(result.playfield, position, result.piece)) {
           result.gameover = GameState.GameOver;
           localStorage.setItem("highscore", this.state.scoreboard.highscore.toString());
         }
@@ -335,8 +331,6 @@ class App extends React.Component<{}, State> {
       this.levelUp(level);
     };
 
-
-
     this.setState({
       scoreboard: {
         ...this.state.scoreboard,
@@ -346,15 +340,12 @@ class App extends React.Component<{}, State> {
         level,
       },
     });
-
-    // tslint:disable-next-line:no-console
-    console.log(this.state.scoreboard.lines);
   }
 
   private updateGame(playfield: Playfield) {
     this.setState({
       playfield,
-      piece: new Array<Fill[]>(4).fill(new Array<Fill>(4).fill(Fill.Blank)) as Piece,
+      piece: [] as Piece,
     })
   }
 

@@ -1,17 +1,10 @@
 import { Fill } from "./Fill";
 
-export type Piece = [
-    [Fill, Fill, Fill, Fill],
-    [Fill, Fill, Fill, Fill],
-    [Fill, Fill, Fill, Fill],
-    [Fill, Fill, Fill, Fill]
-];
+export type Piece = Fill[][];
 
 export const o: Piece = [
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
-    [Fill.Blank, Fill.Blue, Fill.Blue, Fill.Blank],
-    [Fill.Blank, Fill.Blue, Fill.Blue, Fill.Blank],
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
+    [Fill.Blue, Fill.Blue],
+    [Fill.Blue, Fill.Blue],
 ];
 
 export const i: Piece = [
@@ -22,45 +15,35 @@ export const i: Piece = [
 ];
 
 export const s: Piece = [
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
-    [Fill.Blank, Fill.Blank, Fill.Yellow, Fill.Yellow],
-    [Fill.Blank, Fill.Yellow, Fill.Yellow, Fill.Blank],
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
+    [Fill.Blank, Fill.Blank, Fill.Blank],
+    [Fill.Blank, Fill.Yellow, Fill.Yellow],
+    [Fill.Yellow, Fill.Yellow, Fill.Blank],
 ];
 
 export const z: Piece = [
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
-    [Fill.Blank, Fill.Orange, Fill.Orange, Fill.Blank],
-    [Fill.Blank, Fill.Blank, Fill.Orange, Fill.Orange],
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
+    [Fill.Blank, Fill.Blank, Fill.Blank],
+    [Fill.Orange, Fill.Orange, Fill.Blank],
+    [Fill.Blank, Fill.Orange, Fill.Orange],
 ];
 
 export const l: Piece = [
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
-    [Fill.Blank, Fill.Green, Fill.Green, Fill.Green],
-    [Fill.Blank, Fill.Green, Fill.Blank, Fill.Blank],
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
+    [Fill.Blank, Fill.Blank, Fill.Blank],
+    [Fill.Green, Fill.Green, Fill.Green],
+    [Fill.Green, Fill.Blank, Fill.Blank],
 ];
 
 export const j: Piece = [
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
-    [Fill.Blank, Fill.Red, Fill.Red, Fill.Red],
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Red],
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
+    [Fill.Blank, Fill.Blank, Fill.Blank],
+    [Fill.Red, Fill.Red, Fill.Red],
+    [Fill.Blank, Fill.Blank, Fill.Red],
 ];
 
 export const t: Piece = [
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
-    [Fill.Blank, Fill.Purple, Fill.Purple, Fill.Purple],
-    [Fill.Blank, Fill.Blank, Fill.Purple, Fill.Blank],
-    [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank],
+    [Fill.Blank, Fill.Blank, Fill.Blank],
+    [Fill.Purple, Fill.Purple, Fill.Purple],
+    [Fill.Blank, Fill.Purple, Fill.Blank],
 ];
 
-// export const tt: any = [
-//     [Fill.Blue, Fill.Red, Fill.Blank],
-//     [Fill.Blank, Fill.Purple, Fill.Purple],
-//     [Fill.Blank, Fill.Blank, Fill.Purple],
-// ];
 export const pieces: Piece[] = [o, i, s, z, l, j, t];
 
 export default Piece;
