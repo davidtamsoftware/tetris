@@ -124,7 +124,7 @@ class App extends React.Component<{}, State> {
             <tbody>
               <tr>
                 <td><h2>Controls</h2></td>
-                <td/>
+                <td />
               </tr>
               <tr>
                 <td>Rotate Left</td>
@@ -155,16 +155,16 @@ class App extends React.Component<{}, State> {
                 <td>P</td>
               </tr>
               <tr>
-                <td><br/><br/></td>
-                <td/>
+                <td><br /><br /></td>
+                <td />
               </tr>
               <tr>
                 <td><h2>Next</h2></td>
-                <td/>
+                <td />
               </tr>
               <tr>
                 <td>{this.generatePiece(this.state.nextPiece, "large")}</td>
-                <td/>
+                <td />
               </tr>
             </tbody>
           </table>
@@ -183,7 +183,7 @@ class App extends React.Component<{}, State> {
             <tbody>
               <tr>
                 <td><h2>Scoreboard</h2></td>
-                <td/>
+                <td />
               </tr>
               <tr>
                 <td>High Score</td>
@@ -211,28 +211,28 @@ class App extends React.Component<{}, State> {
               </tr>
               <tr>
                 <td><h2>Stats</h2></td>
-                <td/>
+                <td />
               </tr>
               {counts}
             </tbody>
           </table>
         </div>
         <div>
-        <table style={{
-          filter: `grayscale(${this.state.gameState === GameState.Paused ? "80" : "0"}%)`,
-          borderRadius: "0px",
-          border: "3px solid white",
-          borderSpacing: "0",
-          margin: "auto"
-        }}>
-          <tbody>
-            {board}
-          </tbody>
-        </table>
-        {this.state.gameState === GameState.Paused && 
-          <div style={{ position: "absolute", left: "47%", top: "42%", backgroundColor: "black" }}>Paused</div>}
-        {this.state.gameState === GameState.GameOver &&
-          <div style={{ width: "180px", position: "absolute", left: "44%", top: "40%", backgroundColor: "black" }}>Game Over!<br/>Press R to restart</div>}
+          <table style={{
+            filter: `grayscale(${this.state.gameState === GameState.Paused ? "80" : "0"}%)`,
+            borderRadius: "0px",
+            border: "3px solid white",
+            borderSpacing: "0",
+            margin: "auto"
+          }}>
+            <tbody>
+              {board}
+            </tbody>
+          </table>
+          {this.state.gameState === GameState.Paused &&
+            <div style={{ position: "absolute", left: "47%", top: "42%", backgroundColor: "black" }}>Paused</div>}
+          {this.state.gameState === GameState.GameOver &&
+            <div style={{ width: "180px", position: "absolute", left: "44%", top: "40%", backgroundColor: "black" }}>Game Over!<br />Press R to restart</div>}
         </div>
       </div>
     );
@@ -241,15 +241,15 @@ class App extends React.Component<{}, State> {
   private levelUp(level: number) {
     clearInterval(this.loop);
 
-    this.loop = setInterval(this.ticker, 1000/level);
+    this.loop = setInterval(this.ticker, 1000 / level);
   }
 
   private generatePiece(piece: Piece, size: "small" | "large") {
-    return (<table style={{borderSpacing: "0", margin: "auto" }}>
+    return (<table style={{ borderSpacing: "0", margin: "auto" }}>
       <tbody>
         {piece.map((r) => (
           <tr>
-            {r.map((c) => (<td style={{ border: `${size==="small"?"0":"1"}px solid #131010`, padding: "0" }}>{c ? <Block data={c} size={size} /> : null}</td>))}
+            {r.map((c) => (<td style={{ border: `${size === "small" ? "0" : "1"}px solid #131010`, padding: "0" }}>{c ? <Block data={c} size={size} /> : null}</td>))}
           </tr>
         ))}
       </tbody>
@@ -326,10 +326,10 @@ class App extends React.Component<{}, State> {
   }
 
   private addLines(lines: number) {
-    const pts = [0, 40, 100, 300, 400]; 
+    const pts = [0, 40, 100, 300, 400];
 
-    const level = Math.floor((this.state.scoreboard.lines + lines)/10) + 1;
-    const score = this.state.scoreboard.score + this.state.scoreboard.level*pts[lines];
+    const level = Math.floor((this.state.scoreboard.lines + lines) / 10) + 1;
+    const score = this.state.scoreboard.score + this.state.scoreboard.level * pts[lines];
     if (this.state.scoreboard.level !== level) {
       this.levelUp(level);
     };
