@@ -1,10 +1,14 @@
 import * as React from 'react';
-import './index.css';
-import { Block } from "../Block";
+import "./index.css";
 import { Playfield as PlayfieldGrid } from "../Playfield";
 import { Piece as PieceDisplay } from "../Piece";
+import { Controls } from "../Controls";
 import { Playfield, playfield as initialPlayfield, Piece, pieces, Game, GameState } from '../../models';
 import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision, rotateLeft, calculatePosition } from '../../actions';
+import { Scoreboard as ScoreboardDisplay } from '../Scoreboard';
+import { Stats } from '../Stats';
+import { Paused } from '../Paused/Paused';
+import { GameOver } from '../GameOver';
 
 const initializeState = (): Game => {
   const randomPiece = generateRandomPiece();
@@ -57,126 +61,23 @@ class App extends React.Component<{}, Game> {
   public render() {
     const result = merge(this.state.playfield, this.state.position, this.state.piece);
 
-    const counts = [];
-
-    for (const piece of pieces) {
-      counts.push(
-        <tr>
-          <td>
-            <PieceDisplay piece={piece} size={"small"} />
-          </td>
-          <td>
-            {this.state.stats[piece.toString()]}
-          </td>
-        </tr>);
-    }
-
     return (
       <div className="App">
-        <div style={{ width: "250px", height: "250px", float: "left", borderRadius: "0px", border: "0px solid white", borderSpacing: "0", margin: "auto" }}>
-          <table style={{ tableLayout: "fixed", border: "0px solid white", width: "100%", borderSpacing: "0 10px" }}>
-            <tbody>
-              <tr>
-                <td><h2>Controls</h2></td>
-                <td />
-              </tr>
-              <tr>
-                <td>Rotate Left</td>
-                <td>Z</td>
-              </tr>
-              <tr>
-                <td>Rotate Right</td>
-                <td>&uarr;</td>
-              </tr>
-              <tr>
-                <td>Move Left</td>
-                <td>&larr;</td>
-              </tr>
-              <tr>
-                <td>Move Right</td>
-                <td>&rarr;</td>
-              </tr>
-              <tr>
-                <td>Soft Drop</td>
-                <td>&darr;</td>
-              </tr>
-              <tr>
-                <td>Hard Drop</td>
-                <td>Spacebar</td>
-              </tr>
-              <tr>
-                <td>Pause/Resume</td>
-                <td>P</td>
-              </tr>
-              <tr>
-                <td><br /><br /></td>
-                <td />
-              </tr>
-              <tr>
-                <td><h2>Next</h2></td>
-                <td />
-              </tr>
-              <tr>
-                <td><PieceDisplay piece={this.state.nextPiece} size={"large"} /></td>
-                <td />
-              </tr>
-            </tbody>
-          </table>
+        <div className="left">
+          <Controls />
+          <div>
+            <h2>Next</h2>
+            <PieceDisplay piece={this.state.nextPiece} size={"large"} />
+          </div>
         </div>
-        <div style={{
-          float: "right",
-          verticalAlign: "top",
-          borderRadius: "0px",
-          border: "0px solid white",
-          borderSpacing: "0",
-          margin: "auto",
-          width: "250px",
-          height: "250px"
-        }}>
-          <table style={{ tableLayout: "fixed", border: "0px solid white", width: "100%", borderSpacing: "0 10px" }}>
-            <tbody>
-              <tr>
-                <td><h2>Scoreboard</h2></td>
-                <td />
-              </tr>
-              <tr>
-                <td>High Score</td>
-                <td>{this.state.scoreboard.highscore}</td>
-              </tr>
-              <tr>
-                <td>Score</td>
-                <td>{this.state.scoreboard.score}</td>
-              </tr>
-              <tr>
-                <td>Lines</td>
-                <td>{this.state.scoreboard.lines}</td>
-              </tr>
-              <tr>
-                <td>Level</td>
-                <td>{this.state.scoreboard.level}</td>
-              </tr>
-              <tr>
-                <td><br /></td>
-                <td />
-              </tr>
-              <tr>
-                <td><br /></td>
-                <td />
-              </tr>
-              <tr>
-                <td><h2>Stats</h2></td>
-                <td />
-              </tr>
-              {counts}
-            </tbody>
-          </table>
+        <div className="right">
+         <ScoreboardDisplay scoreboard={this.state.scoreboard} />
+         <Stats stats={this.state.stats} />
         </div>
         <div>
           <PlayfieldGrid playfield={result.playfield} gameState={this.state.gameState} />
-          {this.state.gameState === GameState.Paused &&
-            <div style={{ position: "absolute", left: "47%", top: "42%", backgroundColor: "black" }}>Paused</div>}
-          {this.state.gameState === GameState.GameOver &&
-            <div style={{ width: "180px", position: "absolute", left: "44%", top: "40%", backgroundColor: "black" }}>Game Over!<br />Press R to restart</div>}
+          {this.state.gameState === GameState.Paused && <Paused /> }
+          {this.state.gameState === GameState.GameOver && <GameOver /> }
         </div>
       </div>
     );
