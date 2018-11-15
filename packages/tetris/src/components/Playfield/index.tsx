@@ -17,8 +17,6 @@ export const Playfield = (props: Props) => {
                 style={{
                     border: "1px solid black",
                     backgroundColor: "black",
-                    width: "25px",
-                    height: "26px",
                     padding: "0",
                 }}>
                 <Block data={props.playfield[i][j]} />

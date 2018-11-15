@@ -15,6 +15,7 @@ const initializeState = (): Game => {
   return {
     playfield: initialPlayfield,
     piece: randomPiece,
+    nextPiece: generateRandomPiece(),
     position: calculatePosition(initialPlayfield, randomPiece),
     gameState: GameState.Active,
     scoreboard: {
@@ -23,7 +24,6 @@ const initializeState = (): Game => {
       highscore: Number(localStorage.getItem("highscore") || 0),
       score: 0,
     },
-    nextPiece: generateRandomPiece(),
     stats: pieces
       .map((item) => ({ [item.toString()]: item === randomPiece ? 1 : 0 }))
       .reduce((acc, item) => ({ ...acc, ...item })),
@@ -77,7 +77,7 @@ class App extends React.Component<{}, Game> {
         <div>
           <PlayfieldGrid playfield={result.playfield} gameState={this.state.gameState} />
           {this.state.gameState === GameState.Paused && <Paused /> }
-          {this.state.gameState === GameState.GameOver && <GameOver /> }
+          {this.state.gameState === GameState.GameOver && <GameOver />}
         </div>
       </div>
     );

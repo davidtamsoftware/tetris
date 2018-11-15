@@ -4,7 +4,11 @@ import { Piece as PieceDisplay } from "../Piece";
 
 
 export const Controls = (props: {}) => (
-    <table style={{ tableLayout: "fixed", border: "0px solid white", width: "100%", borderSpacing: "0 10px" }}>
+    <table style={{ 
+        tableLayout: "fixed", 
+        border: "0px solid white", 
+        width: "100%", 
+        borderSpacing: "0 10px" }}>
     <tbody>
       <tr>
         <td colSpan={2}><h2>Controls</h2></td>
