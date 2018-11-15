@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { Scoreboard as ScoreboardModel } from 'src/models';
+import * as React from "react";
+import { Scoreboard as ScoreboardModel } from "src/models";
 
 interface Props {
     scoreboard: ScoreboardModel;

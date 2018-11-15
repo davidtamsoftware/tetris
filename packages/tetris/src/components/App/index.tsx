@@ -1,14 +1,14 @@
-import * as React from 'react';
+import * as React from "react";
 import "./index.css";
 import { Playfield as PlayfieldGrid } from "../Playfield";
 import { Piece as PieceDisplay } from "../Piece";
 import { Controls } from "../Controls";
-import { Playfield, playfield as initialPlayfield, Piece, pieces, Game, GameState } from '../../models';
-import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision, rotateLeft, calculatePosition } from '../../actions';
-import { Scoreboard as ScoreboardDisplay } from '../Scoreboard';
-import { Stats } from '../Stats';
-import { Paused } from '../Paused/Paused';
-import { GameOver } from '../GameOver';
+import { Playfield, playfield as initialPlayfield, Piece, pieces, Game, GameState } from "../../models";
+import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision, rotateLeft, calculatePosition } from "../../actions";
+import { Scoreboard as ScoreboardDisplay } from "../Scoreboard";
+import { Stats } from "../Stats";
+import { Paused } from "../Paused/Paused";
+import { GameOver } from "../GameOver";
 
 const initializeState = (): Game => {
   const randomPiece = generateRandomPiece();

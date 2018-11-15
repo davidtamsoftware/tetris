@@ -1,6 +1,6 @@
-import * as React from 'react';
+import * as React from "react";
 import { Piece as PieceModel } from "src/models";
-import { Block } from '../Block';
+import { Block } from "../Block";
 
 interface Props {
     piece: PieceModel;
