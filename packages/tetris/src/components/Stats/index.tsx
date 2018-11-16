@@ -1,6 +1,6 @@
 import * as React from "react";
 import { pieces, Stats as StatsModel } from "src/models";
-import { Piece as PieceDisplay } from "../Piece";
+import { Piece } from "../Piece";
 
 interface Props {
     stats: StatsModel;
@@ -12,7 +12,7 @@ export const Stats = (props: Props) => {
         counts.push(
             <tr>
                 <td>
-                    <PieceDisplay piece={piece} size={"small"} />
+                    <Piece piece={piece} size={"small"} />
                 </td>
                 <td>
                     {props.stats[piece.toString()]}

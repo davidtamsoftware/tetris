@@ -1,11 +1,11 @@
 import * as React from "react";
 import "./index.css";
 import { Playfield as PlayfieldGrid } from "../Playfield";
-import { Piece as PieceDisplay } from "../Piece";
+import { Piece } from "../Piece";
 import { Controls } from "../Controls";
-import { Playfield, playfield as initialPlayfield, Piece, pieces, Game, GameState } from "../../models";
+import { Playfield, playfield as initialPlayfield, pieces, Game, GameState } from "../../models";
 import { generateRandomPiece, merge, moveDown, moveLeft, moveRight, rotateRight, hasCollision, rotateLeft, calculatePosition } from "../../actions";
-import { Scoreboard as ScoreboardDisplay } from "../Scoreboard";
+import { Scoreboard } from "../Scoreboard";
 import { Stats } from "../Stats";
 import { Paused } from "../Paused/Paused";
 import { GameOver } from "../GameOver";
@@ -67,11 +67,11 @@ class App extends React.Component<{}, Game> {
           <Controls />
           <div>
             <h2>Next</h2>
-            <PieceDisplay piece={this.state.nextPiece} size={"large"} />
+            <Piece piece={this.state.nextPiece} size={"large"} />
           </div>
         </div>
         <div className="right">
-         <ScoreboardDisplay scoreboard={this.state.scoreboard} />
+         <Scoreboard scoreboard={this.state.scoreboard} />
          <Stats stats={this.state.stats} />
         </div>
         <div>
@@ -138,14 +138,12 @@ class App extends React.Component<{}, Game> {
 
   private incrementCount(pieceKey: string) {
     const stats = {
-      ...this.state.stats
+      ...this.state.stats,
+      [pieceKey]: this.state.stats[pieceKey] + 1
     };
-    stats[pieceKey] += 1;
 
     this.setState({
-      stats: {
-        ...stats,
-      } as any,
+      stats
     });
   }
 
@@ -181,7 +179,7 @@ class App extends React.Component<{}, Game> {
   private updateGame(playfield: Playfield) {
     this.setState({
       playfield,
-      piece: [] as Piece,
+      piece: [],
     })
   }
 
@@ -213,16 +211,16 @@ class App extends React.Component<{}, Game> {
         piece,
       });
     } else if (event.keyCode === 39) {
-      const result = moveRight(this.state.playfield, this.state.position, this.state.piece);
+      const { position, piece } = moveRight(this.state.playfield, this.state.position, this.state.piece);
       this.setState({
-        position: result.position,
-        piece: result.piece,
+        position,
+        piece,
       });
     } else if (event.keyCode === 37) {
-      const result = moveLeft(this.state.playfield, this.state.position, this.state.piece);
+      const { position, piece } = moveLeft(this.state.playfield, this.state.position, this.state.piece);
       this.setState({
-        position: result.position,
-        piece: result.piece,
+        position,
+        piece,
       });
     } else if (event.keyCode === 40) {
       this.drop(false);
