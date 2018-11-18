@@ -1,0 +1,61 @@
+.block {
+    padding: 0;
+    border-radius: 2px;
+}
+
+.block.small {
+    border: 2px solid;
+    width: 5px;
+    height: 5px;
+}
+
+.block.large {
+    border: 5px solid;
+    width: 15px;
+    height: 15px;
+}
+
+.block.black {
+    border-color: black;
+    background-color: black;
+}
+
+.block.orange {
+    border-color:orange #c88a19 darkorange orange;
+    background-color: orange;
+}
+
+.block.yellow {
+    border-color: yellow #ebeb5e #afaf59 yellow;
+    background-color: yellow;
+}
+
+.block.green {
+    border-color: green lightgreen darkgreen green;
+    background-color: green;
+}
+
+.block.blue {
+    border-color: blue lightblue darkblue blue;
+    background-color: blue;
+}
+
+.block.gray {
+    border-color: gray lightgray darkgray gray;
+    background-color: gray;
+}
+
+.block.red {
+    border-color: red brown darkred red;
+    background-color: red;
+}
+
+.block.purple {
+    border-color: purple #892289 #5a065a purple;
+    background-color: purple;
+}
+
+.block.white {
+    border-color: white;
+    background-color: white;
+}

@@ -20,13 +20,15 @@ const colors = {
 
 export const Block = (props: Props) => (
     <div 
-        style={{
-            border: `${props.size === "small" ? "2":"5"}px solid`,
-            borderRadius: "2px",
-            borderColor: colors[props.data],
-            backgroundColor: colors[props.data].split(" ")[0],
-            width: `${props.size === "small" ? "5":"15"}px`,
-            height: `${props.size === "small" ? "5":"15"}px`,
-            padding: "0",
-        }} />
+        // style={{
+        //     border: `${props.size === "small" ? "2":"5"}px solid`,
+        //     borderRadius: "2px",
+        //     borderColor: colors[props.data],
+        //     backgroundColor: colors[props.data].split(" ")[0],
+        //     width: `${props.size === "small" ? "5":"15"}px`,
+        //     height: `${props.size === "small" ? "5":"15"}px`,
+        //     padding: "0",
+        // }}
+        className={`block ${colors[props.data].split(" ")[0]} ${props.size || "large"}`}
+        />
 );
