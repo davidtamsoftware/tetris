@@ -6,6 +6,7 @@ import { Block } from "../Block";
 interface Props {
     gameState: GameState;
     playfield: PlayfieldModel;
+    size?: "small" | "large";
 }
 
 export const Playfield = (props: Props) => {
@@ -14,13 +15,13 @@ export const Playfield = (props: Props) => {
         const row = [];
         for (let j = 0; j < props.playfield[i].length; j++) {
             row.push(<td key={j}>
-                {props.playfield[i][j] ? <Block data={props.playfield[i][j]} /> : null}
+                {props.playfield[i][j] ? <Block data={props.playfield[i][j]} size={props.size} /> : null}
             </td>);
         }
         board.push(<tr key={i}>{row}</tr>)
     }
 
-    return (<table className={`playfield large ${props.gameState === GameState.Paused ? "paused" : ""}`}>
+    return (<table className={`playfield ${props.size || "large"} ${props.gameState === GameState.Paused ? "paused" : ""}`}>
         <tbody>
             {board}
         </tbody>
