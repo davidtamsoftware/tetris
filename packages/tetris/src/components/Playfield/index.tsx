@@ -13,25 +13,14 @@ export const Playfield = (props: Props) => {
     for (let i = 0; i < props.playfield.length; i++) {
         const row = [];
         for (let j = 0; j < props.playfield[i].length; j++) {
-            row.push(<td key={j}
-                style={{
-                    border: "1px solid black",
-                    backgroundColor: "black",
-                    padding: "0",
-                }}>
-                <Block data={props.playfield[i][j]} />
+            row.push(<td key={j}>
+                {props.playfield[i][j] ? <Block data={props.playfield[i][j]} /> : null}
             </td>);
         }
         board.push(<tr key={i}>{row}</tr>)
     }
 
-    return (<table style={{
-        filter: `grayscale(${props.gameState === GameState.Paused ? "80" : "0"}%)`,
-        borderRadius: "0px",
-        border: "3px solid white",
-        borderSpacing: "0",
-        margin: "auto"
-    }}>
+    return (<table className={`playfield large ${props.gameState === GameState.Paused ? "paused" : ""}`}>
         <tbody>
             {board}
         </tbody>
