@@ -1,5 +1,5 @@
-import { Game, GameState, Playfield, pieces, playfield as initialPlayfield } from "src/models";
-import { moveLeft, hasCollision, calculatePosition, generateRandomPiece, rotateLeft, rotateRight, moveRight, moveDown } from ".";
+import { Game, GameState, pieces, Playfield, playfield as initialPlayfield } from "src/models";
+import { calculatePosition, generateRandomPiece, hasCollision, moveDown, moveLeft, moveRight, rotateLeft, rotateRight } from ".";
 
 type Handler = (game: Game) => void;
 

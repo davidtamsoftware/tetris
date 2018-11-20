@@ -1,7 +1,7 @@
 import * as React from "react";
-import "./index.css";
-import { Playfield as PlayfieldModel, GameState, Fill } from "src/models";
+import { GameState, Playfield as PlayfieldModel } from "src/models";
 import { BlockMatrix } from "../BlockMatrix";
+import "./index.css";
 
 interface Props {
     gameState: GameState;

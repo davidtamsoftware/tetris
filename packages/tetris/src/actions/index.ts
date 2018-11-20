@@ -1,5 +1,5 @@
 import { pieces } from "../models";
-import { Playfield, Piece, PiecePosition, Fill } from "../models";
+import { Fill, Piece, PiecePosition, Playfield } from "../models";
 
 export const rotate = (rotatePiece: (p: Piece) => Piece, playfield: Playfield, position: PiecePosition, p: Piece) => {
     const piece: Piece = rotatePiece(p);

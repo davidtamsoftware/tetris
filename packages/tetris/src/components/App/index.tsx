@@ -1,15 +1,15 @@
 import * as React from "react";
-import "./index.css";
-import { Playfield } from "../Playfield";
-import { Piece } from "../Piece";
-import { Controls } from "../Controls";
-import { Game, GameState } from "../../models";
+import { Tetris } from "src/actions/Tetris";
 import { merge } from "../../actions";
+import { Game, GameState } from "../../models";
+import { Controls } from "../Controls";
+import { GameOver } from "../GameOver";
+import { Paused } from "../Paused";
+import { Piece } from "../Piece";
+import { Playfield } from "../Playfield";
 import { Scoreboard } from "../Scoreboard";
 import { Stats } from "../Stats";
-import { Paused } from "../Paused/Paused";
-import { GameOver } from "../GameOver";
-import { Tetris } from "src/actions/Tetris";
+import "./index.css";
 
 class App extends React.Component<{}, Game> {
 

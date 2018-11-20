@@ -3,10 +3,10 @@ import { Fill } from "src/models";
 import { Block } from "../Block";
 
 interface Props {
-        matrix: Fill[][];
-        size?: "small" | "large";
-        className?: string;
-        style?: React.CSSProperties;
+    matrix: Fill[][];
+    size?: "small" | "large";
+    className?: string;
+    style?: React.CSSProperties;
 }
 
 export const BlockMatrix = (props: Props) => (

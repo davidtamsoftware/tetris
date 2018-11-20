@@ -1,5 +1,5 @@
 import * as React from "react";
-import { pieces, Stats as StatsModel } from "src/models";
+import { pieces, Stats as StatsModel } from "../../models";
 import { Piece } from "../Piece";
 
 interface Props {

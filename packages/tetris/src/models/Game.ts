@@ -1,8 +1,8 @@
-import { Playfield } from "./Playfield";
-import { PiecePosition } from "./PiecePosition";
 import { Piece } from "./Piece";
-import { Stats } from "./Stats";
+import { PiecePosition } from "./PiecePosition";
+import { Playfield } from "./Playfield";
 import { Scoreboard } from "./Scoreboard";
+import { Stats } from "./Stats";
 
 export enum GameState {
     Paused,
