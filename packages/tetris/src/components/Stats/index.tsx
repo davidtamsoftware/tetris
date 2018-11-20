@@ -7,18 +7,17 @@ interface Props {
 }
 
 export const Stats = (props: Props) => {
-    const counts = [];
-    for (const piece of pieces) {
-        counts.push(
-            <tr>
-                <td>
-                    <Piece piece={piece} size={"small"} />
-                </td>
-                <td>
-                    {props.stats[piece.toString()]}
-                </td>
-            </tr>);
-    }
+    const counts = pieces.map((piece) => (
+        <tr>
+            <td>
+                <Piece piece={piece} size={"small"} />
+            </td>
+            <td>
+                {props.stats[piece.toString()]}
+            </td>
+        </tr>
+    ));
+
     return (
         <table style={{ tableLayout: "fixed", border: "0px solid white", width: "100%", borderSpacing: "0 10px" }}>
             <tbody>
