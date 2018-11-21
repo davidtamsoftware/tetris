@@ -45,6 +45,10 @@
   height: 250px;
 }
 
+.main {
+  position: relative;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

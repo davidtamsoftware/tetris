@@ -3,7 +3,7 @@ import * as React from "react";
 export const Paused = () => (
     <div style={{ 
         position: "absolute", 
-        left: "47%", 
+        left: "46%", 
         top: "42%", 
         backgroundColor: "black" }}>
         Paused

@@ -36,7 +36,7 @@
 }
 
 .block.blue {
-    border-color: blue lightblue darkblue blue;
+    border-color: blue rgb(85, 184, 218) darkblue blue;
     background-color: blue;
 }
 

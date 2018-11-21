@@ -52,7 +52,7 @@ class App extends React.Component<{}, Game> {
          <Scoreboard scoreboard={this.state.scoreboard} />
          <Stats stats={this.state.stats} />
         </div>
-        <div>
+        <div className="main">
           <Playfield playfield={result.playfield} gameState={this.state.gameState} />
           {this.state.gameState === GameState.Paused && <Paused /> }
           {this.state.gameState === GameState.GameOver && <GameOver />}
