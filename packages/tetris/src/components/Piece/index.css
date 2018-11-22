@@ -1,0 +1,13 @@
+.piece {
+    border-spacing: 0;
+    margin: auto;
+}
+.piece.large td {
+    border: 1.5px solid transparent;
+    padding: 0;
+}
+
+.piece.small td {
+    border: 0.5px solid transparent;
+    padding: 0;
+}

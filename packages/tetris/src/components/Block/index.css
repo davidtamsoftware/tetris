@@ -21,7 +21,7 @@
 }
 
 .block.orange {
-    border-color:orange #c88a19 darkorange orange;
+    border-color:orange rgb(243, 179, 61) darkorange orange;
     background-color: orange;
 }
 
@@ -41,7 +41,7 @@
 }
 
 .block.gray {
-    border-color: gray lightgray darkgray gray;
+    border-color: gray lightgray rgb(102, 102, 102) gray;
     background-color: gray;
 }
 

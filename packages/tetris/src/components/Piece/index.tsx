@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Piece as PieceModel } from "src/models";
 import { BlockMatrix } from "../BlockMatrix";
+import "./index.css";
 
 interface Props {
     piece: PieceModel;
@@ -9,6 +10,6 @@ interface Props {
 
 export const Piece = (props: Props) =>
     <BlockMatrix
-        style={{ borderSpacing: "0", margin: "auto" }} 
+        className={`piece ${props.size}`}
         matrix={props.piece} 
         size={props.size}/>;
