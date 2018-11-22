@@ -62,7 +62,7 @@ class App extends React.Component<{}, Game> {
   }
 
   private handle(game: Game) {
-    if (this.state.gameState === GameState.GameOver) {
+    if (game.gameState === GameState.GameOver) {
       localStorage.setItem("highscore", game.scoreboard.highscore.toString());
     }
     this.setState(game);
