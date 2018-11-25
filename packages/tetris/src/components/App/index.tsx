@@ -4,6 +4,7 @@ import { merge } from "../../actions";
 import { Game, GameState } from "../../models";
 import { Controls } from "../Controls";
 import { GameOver } from "../GameOver";
+import { NextPiece } from "../NextPiece";
 import { Paused } from "../Paused";
 import { Piece } from "../Piece";
 import { Playfield } from "../Playfield";
@@ -43,10 +44,7 @@ class App extends React.Component<{}, Game> {
       <div className="App">
         <div className="left">
           <Controls />
-          <div>
-            <h2>Next</h2>
-            <Piece piece={this.state.nextPiece} size={"large"} />
-          </div>
+          <NextPiece piece={this.state.nextPiece} />
         </div>
         <div className="right">
          <Scoreboard scoreboard={this.state.scoreboard} />
