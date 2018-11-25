@@ -3,6 +3,11 @@ import { calculatePosition, generateRandomPiece, hasCollision, moveDown, moveLef
 
 type Handler = (game: Game) => void;
 
+/**
+ * @class Tetris
+ * @description Contains the logic for tetris actions and uses pure functions to transform playfield contents
+ * and save state to memory.
+ */
 export class Tetris {
 
     private subscribers: Set<Handler>;
@@ -20,6 +25,10 @@ export class Tetris {
     }
 
     public moveLeft() {
+        if (this.game.gameState !== GameState.Active) {
+            return;
+        }
+
         const { position, piece } = moveLeft(this.game.playfield, this.game.position, this.game.piece);
         this.setState({
             position,
@@ -28,6 +37,10 @@ export class Tetris {
     }
 
     public moveRight() {
+        if (this.game.gameState !== GameState.Active) {
+            return;
+        }
+
         const { position, piece } = moveRight(this.game.playfield, this.game.position, this.game.piece);
         this.setState({
             position,
@@ -36,6 +49,10 @@ export class Tetris {
     }
 
     public rotateRight() {
+        if (this.game.gameState !== GameState.Active) {
+            return;
+        }
+
         const { position, piece } = rotateRight(this.game.playfield, this.game.position, this.game.piece);
         this.setState({
             position,
@@ -44,6 +61,10 @@ export class Tetris {
     }
 
     public rotateLeft() {
+        if (this.game.gameState !== GameState.Active) {
+            return;
+        }
+
         const { position, piece } = rotateLeft(this.game.playfield, this.game.position, this.game.piece);
         this.setState({
             position,
@@ -52,6 +73,10 @@ export class Tetris {
     }
 
     public togglePause() {
+        if (this.game.gameState === GameState.GameOver) {
+            return;
+        }
+
         this.setState({
             gameState: this.game.gameState === GameState.Paused ? GameState.Active : GameState.Paused,
         });
@@ -83,7 +108,6 @@ export class Tetris {
                 // check if new piece has collision with new playfield, if so then game over
                 if (hasCollision(result.playfield, position, result.piece)) {
                     result.gameover = GameState.GameOver;
-                    //   localStorage.setItem("highscore", this.game.scoreboard.highscore.toString());
                 }
             }
 
@@ -92,7 +116,18 @@ export class Tetris {
                 nextPiece: nextPiece ? nextPiece : this.game.nextPiece,
                 gameState: result.gameover ? GameState.GameOver : GameState.Active,
             });
+
+            if (result.gameover) {
+                clearInterval(this.loop);
+            }
         }
+    }
+
+    public endGame() {
+        this.setState({
+            gameState: GameState.GameOver,
+        })
+        clearInterval(this.loop);
     }
 
     public start() {
