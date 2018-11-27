@@ -114,11 +114,12 @@ export class Tetris {
             this.setState({
                 ...result,
                 nextPiece: nextPiece ? nextPiece : this.game.nextPiece,
-                gameState: result.gameover ? GameState.GameOver : GameState.Active,
+                // gameState: result.gameover ? GameState.GameOver : GameState.Active,
             });
 
             if (result.gameover) {
-                clearInterval(this.loop);
+                // clearInterval(this.loop);
+                this.endGame();
             }
         }
     }
