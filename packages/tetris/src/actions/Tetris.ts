@@ -14,6 +14,7 @@ export class Tetris {
     private game: Game;
     private freezeSemaphore: boolean;
     private loop: NodeJS.Timeout;
+    private refreshLoop: NodeJS.Timeout;
 
     constructor() {
         this.incrementCount = this.incrementCount.bind(this);
@@ -125,9 +126,15 @@ export class Tetris {
     }
 
     public endGame() {
+        if (this.getState().gameState === GameState.GameOver) {
+            return;
+        }
+
         this.setState({
             gameState: GameState.GameOver,
         })
+        this.notify();
+        clearInterval(this.refreshLoop);
         clearInterval(this.loop);
     }
 
@@ -138,6 +145,7 @@ export class Tetris {
     public restart() {
         this.tick(1);
         this.setState(this.initializeState());
+        this.refreshLoop = setInterval(this.notify, 20);
     }
 
     public getState() {
@@ -229,7 +237,7 @@ export class Tetris {
         })
     }
 
-    private notify() {
+    private notify = () => {
         this.subscribers.forEach((subscriber) => subscriber(this.game));
     }
 
@@ -240,6 +248,6 @@ export class Tetris {
             ...state,
         }
 
-        this.notify();
+        // this.notify();
     }
 }

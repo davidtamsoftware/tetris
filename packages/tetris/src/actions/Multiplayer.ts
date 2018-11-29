@@ -61,10 +61,10 @@ export class Multiplayer {
         return this.players[player].drop(tick, hardDrop);
     }
 
-    public endGame(player: Player) {
-        clearInterval(this.refreshLoop);
-        return this.players[player].endGame();
-    }
+    // public endGame(player: Player) {
+    //     clearInterval(this.refreshLoop);
+    //     return this.players[player].endGame();
+    // }
     
     public start() {
         this.restart();
@@ -74,7 +74,7 @@ export class Multiplayer {
         this.players[Player.One].restart();
         this.players[Player.Two].restart();
         this.initializeState();
-        this.refreshLoop = setInterval(this.notify, 25);
+        this.refreshLoop = setInterval(this.notify, 20);
     }
 
     public getState() {
