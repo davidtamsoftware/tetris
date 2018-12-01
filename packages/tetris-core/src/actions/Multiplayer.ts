@@ -1,4 +1,4 @@
-import { Game, GameState } from "src/models";
+import { Game, GameState } from "../models";
 import { Tetris } from "./Tetris";
 
 export enum Player {
@@ -6,7 +6,7 @@ export enum Player {
     Two,
 };
 
-export type Handler = (game: any) => void;
+type Handler = (game: any) => void;
 
 export interface MultiplayerState {
     winner?: Player;
@@ -15,14 +15,17 @@ export interface MultiplayerState {
     player2: Game;
 }
 
+// TODO: move subsribe into start, unsub in end
+// use players array and get rid of player 1 and player 2 intance var
+
 export class Multiplayer {
     private subscribers: Set<Handler>;
-    private multiplayerState: MultiplayerState;
+    private multiplayerState: MultiplayerState | any;
     private player1: Tetris;
     private player2: Tetris;
     private players: Tetris[];
 
-    private refreshLoop: NodeJS.Timeout;
+    private refreshLoop?: number;
 
     constructor() {
         this.player1 = new Tetris();
@@ -57,21 +60,30 @@ export class Multiplayer {
         this.players[Player.Two].togglePause();
     }
 
-    public endGame() {
-        this.players[Player.One].endGame();
-        this.players[Player.Two].endGame();
-        this.notify();
-        clearInterval(this.refreshLoop);
-    }
-
-    public drop(player: Player, tick: boolean, hardDrop?: boolean) {
-        this.players[player].drop(tick, hardDrop);
-    }
-
-    // public endGame(player: Player) {
-    //     clearInterval(this.refreshLoop);
-    //     return this.players[player].endGame();
+    // public endGame() {
+    //     this.players[Player.One].endGame();
+    //     // this.players[Player.Two].endGame();
+    //     // this.notify();
+    //     // clearInterval(this.refreshLoop);
     // }
+
+    public drop(player: Player, tick: boolean, hardDrop?: boolean): Promise<void> {
+        return this.players[player].drop(tick, hardDrop);
+    }
+
+    public endGame(player?: Player) {
+        clearInterval(this.refreshLoop);
+        if (player) {
+            this.players[player].endGame();
+        } else {
+            this.player1.endGame();
+            this.player2.endGame();
+            this.setState({
+                gameState: GameState.GameOver,
+                winner: undefined,
+            });
+        }
+    }
     
     public start() {
         this.restart();
@@ -133,6 +145,8 @@ export class Multiplayer {
                 winner: Player.Two,
             });
             this.player2.endGame();
+            this.notify();
+            clearInterval(this.refreshLoop);
         }
     }
 
@@ -148,6 +162,8 @@ export class Multiplayer {
                 winner: Player.One,
             });
             this.player1.endGame();
+            this.notify();
+            clearInterval(this.refreshLoop);
         }
     }
 }

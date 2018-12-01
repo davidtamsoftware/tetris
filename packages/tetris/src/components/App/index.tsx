@@ -1,7 +1,5 @@
 import * as React from "react";
-import { Tetris } from "src/actions/Tetris";
-import { merge } from "../../actions";
-import { Game, GameState } from "../../models";
+import { Functions, Models, Tetris } from "tetris-core";
 import { Controls } from "../Controls";
 import { GameOver } from "../GameOver";
 import { NextPiece } from "../NextPiece";
@@ -12,7 +10,7 @@ import { Scoreboard } from "../Scoreboard";
 import { Stats } from "../Stats";
 import "./index.css";
 
-class App extends React.Component<{}, Game> {
+class App extends React.Component<{}, Models.Game> {
 
   private tetris: Tetris;
   
@@ -38,7 +36,7 @@ class App extends React.Component<{}, Game> {
   }
 
   public render() {
-    const result = merge(this.state.playfield, this.state.position, this.state.piece);
+    const result = Functions.merge(this.state.playfield, this.state.position, this.state.piece);
 
     return (
       <div className="App">
@@ -52,26 +50,26 @@ class App extends React.Component<{}, Game> {
         </div>
         <div className="main">
           <Playfield playfield={result.playfield} gameState={this.state.gameState} />
-          {this.state.gameState === GameState.Paused && <Paused /> }
-          {this.state.gameState === GameState.GameOver && <GameOver />}
+          {this.state.gameState === Models.GameState.Paused && <Paused /> }
+          {this.state.gameState === Models.GameState.GameOver && <GameOver />}
         </div>
       </div>
     );
   }
 
-  private handle(game: Game) {
-    if (game.gameState === GameState.GameOver) {
+  private handle(game: Models.Game) {
+    if (game.gameState === Models.GameState.GameOver) {
       localStorage.setItem("highscore", game.scoreboard.highscore.toString());
     }
     this.setState(game);
   }
 
   private handleKeyDown(event: KeyboardEvent) {
-    if (this.state.gameState === GameState.GameOver && event.keyCode === 82) {
+    if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {
       this.tetris.restart();
-    } else if (this.state.gameState !== GameState.GameOver && event.keyCode === 80) {
+    } else if (this.state.gameState !== Models.GameState.GameOver && event.keyCode === 80) {
       this.tetris.togglePause();
-    } else if (this.state.gameState !== GameState.Active) {
+    } else if (this.state.gameState !== Models.GameState.Active) {
       return;
     } else if (event.keyCode === 90) {
       this.tetris.rotateLeft();

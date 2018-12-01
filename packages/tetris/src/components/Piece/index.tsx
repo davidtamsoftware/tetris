@@ -1,10 +1,10 @@
 import * as React from "react";
-import { Piece as PieceModel } from "src/models";
+import { Models } from "tetris-core";
 import { BlockMatrix } from "../BlockMatrix";
 import "./index.css";
 
 interface Props {
-    piece: PieceModel;
+    piece: Models.Piece;
     size: "small" | "large";
 }
 

@@ -1,4 +1,4 @@
-import { Game, GameState, pieces, Playfield, playfield as initialPlayfield } from "src/models";
+import { Game, GameState, pieces, Playfield, playfield as initialPlayfield } from "../models";
 import { calculatePosition, generateRandomPiece, hasCollision, moveDown, moveLeft, moveRight, rotateLeft, rotateRight } from ".";
 
 type Handler = (game: Game) => void;
@@ -8,15 +8,17 @@ type Handler = (game: Game) => void;
  * @description Contains the logic for tetris actions and uses pure functions to transform playfield contents
  * and save state to memory.
  */
+
 export class Tetris {
 
     private subscribers: Set<Handler>;
-    private game: Game;
+    private game: Game | any;
     private freezeSemaphore: boolean;
-    private loop: NodeJS.Timeout;
-    private refreshLoop: NodeJS.Timeout;
+    private loop?: number;
+    private refreshLoop?: number;
 
     constructor() {
+        this.freezeSemaphore = false;
         this.incrementCount = this.incrementCount.bind(this);
         this.addLines = this.addLines.bind(this);
         this.addScore = this.addScore.bind(this);
@@ -179,7 +181,7 @@ export class Tetris {
             scoreboard: {
                 level: 1,
                 lines: 0,
-                highscore: Number(localStorage.getItem("highscore") || 0),
+                // highscore: Number(localStorage.getItem("highscore") || 0),
                 score: 0,
             },
             stats: pieces

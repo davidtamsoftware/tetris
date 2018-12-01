@@ -13,7 +13,8 @@
   "dependencies": {
     "core-js": "^2.5.7",
     "react": "^16.6.0",
-    "react-dom": "^16.6.0"
+    "react-dom": "^16.6.0",
+    "tetris-core": "^0.0.0"
   },
   "scripts": {
     "start": "react-scripts-ts start",

@@ -1,9 +1,9 @@
 import * as React from "react";
-import { Fill } from "src/models";
+import { Models } from "tetris-core";
 import { Block } from "../Block";
 
 interface Props {
-    matrix: Fill[][];
+    matrix: Models.Fill[][];
     size?: "small" | "large";
     className?: string;
     style?: React.CSSProperties;

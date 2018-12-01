@@ -1,20 +1,10 @@
-0 silly argv { _: [ 'import', 'HEAD' ],
+0 silly argv { _: [ 'add' ],
+0 silly argv   globs: [],
 0 silly argv   lernaVersion: '3.5.0',
 0 silly argv   '$0': 'lerna',
-0 silly argv   dir: '/mnt/c/Projects/tetris' }
+0 silly argv   pkg: 'tetris-server' }
 1 notice cli v3.5.0
 2 verbose rootPath /mnt/c/Projects/monorepo/tetris
-3 error Error: Command failed: git rev-parse HEAD
-3 error fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
-3 error Use '--' to separate paths from revisions, like this:
-3 error 'git <command> [<revision>...] -- [<file>...]'
-3 error
-3 error HEAD
-3 error
-3 error     at makeError (/usr/local/lib/node_modules/lerna/node_modules/execa/index.js:174:9)
-3 error     at Function.module.exports.sync (/usr/local/lib/node_modules/lerna/node_modules/execa/index.js:338:15)
-3 error     at Object.execSync (/usr/local/lib/node_modules/lerna/node_modules/@lerna/child-process/index.js:22:16)
-3 error     at ImportCommand.getCurrentSHA (/usr/local/lib/node_modules/lerna/node_modules/@lerna/import/index.js:128:34)
-3 error     at ImportCommand.initialize (/usr/local/lib/node_modules/lerna/node_modules/@lerna/import/index.js:97:31)
-3 error     at Promise.resolve.then (/usr/local/lib/node_modules/lerna/node_modules/@lerna/command/index.js:245:24)
+3 error Error: 404 Not Found - GET https://registry.npmjs.org/tetris-server - Not found
+3 error     at res.buffer.catch.then.body (/usr/local/lib/node_modules/lerna/node_modules/npm-registry-fetch/check-response.js:104:15)
 3 error     at <anonymous>

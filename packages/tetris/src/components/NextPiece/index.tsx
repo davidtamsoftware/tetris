@@ -1,8 +1,8 @@
 import * as React from "react";
-import { Piece as PieceModel } from "src/models";
+import { Models } from "tetris-core";
 import { Piece } from "../Piece";
 
-export const NextPiece = ({ piece }: { piece: PieceModel }) => (
+export const NextPiece = ({ piece }: { piece: Models.Piece }) => (
     <div>
         <h2>Next</h2>
         <Piece piece={piece} size={"large"} />

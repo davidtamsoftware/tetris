@@ -1,16 +1,21 @@
 import * as React from "react";
-import { merge } from "src/actions";
-import { MultiplayerState } from "src/actions/Multiplayer";
-import { Game, GameState } from "src/models";
+import { Functions, Models, Multiplayer as MultiplayerAction } from "tetris-core";
+// import { merge } from "src/actions";
+// import { MultiplayerState } from "src/actions/Multiplayer";
+// import { Game, GameState } from "src/models";
 import { GameOver } from "../GameOver";
 import { NextPiece } from "../NextPiece";
 import { Paused } from "../Paused";
 import Playfield from "../Playfield";
 import "./index.css";
 
-export const Multiplayer = (props: MultiplayerState) => {
-    const result1 = merge(props.player1.playfield, props.player1.position, props.player1.piece);
-    const result2 = merge(props.player2.playfield, props.player2.position, props.player2.piece);
+export const Multiplayer = (props: MultiplayerAction.MultiplayerState) => {
+    if (!props.player1 || !props.player2) {
+        return null;
+    }
+    
+    const result1 = Functions.merge(props.player1.playfield, props.player1.position, props.player1.piece);
+    const result2 = Functions.merge(props.player2.playfield, props.player2.position, props.player2.piece);
 
     return (
         <div className="App">
@@ -33,8 +38,8 @@ export const Multiplayer = (props: MultiplayerState) => {
                         <td><h2>Score<br /><br />{props.player2.scoreboard.score}</h2></td>
                     </tr>
                 </table>
-                {props.player1.gameState === GameState.Paused && <Paused />}
-                {props.player1.gameState === GameState.GameOver && <GameOver />}
+                {props.player1.gameState === Models.GameState.Paused && <Paused />}
+                {props.player1.gameState === Models.GameState.GameOver && <GameOver />}
                 {props.winner !== undefined ? `Player ${props.winner+1} wins!`:null}
             </div>
         </div>

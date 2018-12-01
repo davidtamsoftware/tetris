@@ -1,16 +1,17 @@
 import * as React from "react";
-import { Multiplayer as MultiplayerGame, MultiplayerState, Player } from "src/actions/Multiplayer";
-import { GameState } from "../../models";
+import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
+// import { Multiplayer as MultiplayerGame, MultiplayerState, Player } from "src/actions/Multiplayer";
+// import { GameState } from "../../models";
 import "./index.css";
 import { Multiplayer } from "./Multiplayer";
 
-class App extends React.Component<{}, MultiplayerState> {
+class App extends React.Component<{}, MultiplayerAction.MultiplayerState> {
 
-  private multiplayer: MultiplayerGame;
+  private multiplayer: MultiplayerAction.Multiplayer;
 
   constructor(props: {}) {
     super(props)
-    this.multiplayer = new MultiplayerGame();
+    this.multiplayer = new MultiplayerAction.Multiplayer();
     this.state = this.multiplayer.getState();
     this.handle = this.handle.bind(this);
   }
@@ -33,43 +34,43 @@ class App extends React.Component<{}, MultiplayerState> {
     return <Multiplayer {...this.state} />;
   }
 
-  private handle(multiplayerState: MultiplayerState) {
+  private handle(multiplayerState: MultiplayerAction.MultiplayerState) {
     this.setState({
       ...multiplayerState,
     });
   }
 
   private handleKeyDown(event: KeyboardEvent) {
-    if (this.state.gameState === GameState.GameOver && event.keyCode === 82) {
+    if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {
       this.multiplayer.restart();
-    } else if (this.state.gameState !== GameState.GameOver && event.keyCode === 80) {
+    } else if (this.state.gameState !== Models.GameState.GameOver && event.keyCode === 80) {
       this.multiplayer.togglePause();
-    } else if (this.state.gameState !== GameState.Active) {
+    } else if (this.state.gameState !== Models.GameState.Active) {
       return;
     } else if (event.keyCode === 90) {
-      this.multiplayer.rotateLeft(Player.One);
+      this.multiplayer.rotateLeft(MultiplayerAction.Player.One);
     } else if (event.keyCode === 38) {
-      this.multiplayer.rotateRight(Player.One);
+      this.multiplayer.rotateRight(MultiplayerAction.Player.One);
     } else if (event.keyCode === 39) {
-      this.multiplayer.moveRight(Player.One);
+      this.multiplayer.moveRight(MultiplayerAction.Player.One);
     } else if (event.keyCode === 37) {
-      this.multiplayer.moveLeft(Player.One);
+      this.multiplayer.moveLeft(MultiplayerAction.Player.One);
     } else if (event.keyCode === 40) {
-      this.multiplayer.drop(Player.One, false);
+      this.multiplayer.drop(MultiplayerAction.Player.One, false);
     } else if (event.keyCode === 32) {
-      this.multiplayer.drop(Player.One, false, true);
+      this.multiplayer.drop(MultiplayerAction.Player.One, false, true);
     } else if (event.keyCode === 69) {
-      this.multiplayer.rotateLeft(Player.Two);
+      this.multiplayer.rotateLeft(MultiplayerAction.Player.Two);
     } else if (event.keyCode === 38) {
-      this.multiplayer.rotateRight(Player.Two);
+      this.multiplayer.rotateRight(MultiplayerAction.Player.Two);
     } else if (event.keyCode === 70) {
-      this.multiplayer.moveRight(Player.Two);
+      this.multiplayer.moveRight(MultiplayerAction.Player.Two);
     } else if (event.keyCode === 83) {
-      this.multiplayer.moveLeft(Player.Two);
+      this.multiplayer.moveLeft(MultiplayerAction.Player.Two);
     } else if (event.keyCode === 68) {
-      this.multiplayer.drop(Player.Two, false);
+      this.multiplayer.drop(MultiplayerAction.Player.Two, false);
     } else if (event.keyCode === 65) {
-      this.multiplayer.drop(Player.Two, false, true);
+      this.multiplayer.drop(MultiplayerAction.Player.Two, false, true);
     }
   }
 }

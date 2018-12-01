@@ -1,8 +1,8 @@
 import * as React from "react";
-import { Scoreboard as ScoreboardModel } from "src/models";
+import { Models } from "tetris-core";
 
 interface Props {
-    scoreboard: ScoreboardModel;
+    scoreboard: Models.Scoreboard;
 }
 
 export const Scoreboard = (props: Props) => (

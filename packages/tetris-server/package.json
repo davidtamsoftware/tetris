@@ -1,0 +1,32 @@
+{
+  "name": "tetris-server",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "David Tam <david.tam.kc@gmail.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/tetris-server.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "start": "tsc && node dist/app.js",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.16.4",
+    "express-ws": "^4.0.0",
+    "tetris-core": "^0.0.0",
+    "ws": "^6.1.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.0",
+    "@types/express-ws": "^3.0.0",
+    "@types/ws": "^6.0.1",
+    "tslint": "^5.11.0"
+  }
+}

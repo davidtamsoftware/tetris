@@ -1,13 +1,13 @@
 import * as React from "react";
-import { pieces, Stats as StatsModel } from "../../models";
+import { Models } from "tetris-core";
 import { Piece } from "../Piece";
 
 interface Props {
-    stats: StatsModel;
+    stats: Models.Stats;
 }
 
 export const Stats = (props: Props) => {
-    const counts = pieces.map((piece) => (
+    const counts = Models.pieces.map((piece) => (
         <tr>
             <td>
                 <Piece piece={piece} size={"small"} />
