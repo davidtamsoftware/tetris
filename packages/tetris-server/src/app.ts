@@ -159,16 +159,6 @@ wss.on("connection", (ws, req) => {
         if (match) {
             match.quit(ws);
         }
-        // const match = wsTomatch.get(ws);
-        // if (match) {
-        //     if (match.player1 === ws) {
-        //         match.player1 = undefined;
-        //     } else if (match.player2 === ws) {
-        //         match.player2 = undefined;
-        //     }
-        //     match.game.endGame(getPlayerNumber(match, ws));
-        //     wsTomatch.delete(ws);
-        // }
     });
 
     ws.on("message", (message) => {
@@ -178,49 +168,12 @@ wss.on("connection", (ws, req) => {
             if (msg.action === Action.Joinmatch && msg.matchId) {
                 const match = matchService.getOrCreate(msg.matchId);
                 match.join(ws);
-            //     const matchId = msg.matchId;
-            //     let match = matchs[matchId];
-            //     if (wsTomatch.get(ws)) {
-            //         return;
-            //     }
-            //     if (!match) {
-            //         match = {
-            //             matchId,
-            //             game: new Multiplayer(),
-            //         };
-            //         matchs[matchId] = match;
-            //     }
-
-            //     let joined = false;
-
-            //     if (!match.player1) {
-            //         match.player1 = ws;
-            //         match.game.subscribe((state: any) => sendState(ws, JSON.stringify(state)));
-            //         wsTomatch.set(ws, match);
-            //         joined = true;
-            //     } else if (!match.player2) {
-            //         match.player2 = ws;
-            //         match.game.subscribe((state: any) => sendState(ws, JSON.stringify(state)));
-            //         wsTomatch.set(ws, match);
-            //         joined = true;
-            //     }
-
-            //     if (joined && match.player1 && match.player2) {
-            //         console.log("starting game");
-            //         match.game.start();
-            //     }
             } else {
                 const match = matchService.findMatch(ws);
                 if (!match) {
                     return;
                 }
                 const player = Match2.getPlayerNumber(match, ws);
-                // const match = wsTomatch.get(ws);
-                // if (!match) {
-                //     return;
-                // }
-                // const player = getPlayerNumber(match, ws);
-
                 if (msg.action === Action.MoveLeft) {
                     match.game.moveLeft(player);
                 } else if (msg.action === Action.MoveRight) {
@@ -248,24 +201,7 @@ const sendState = (ws: WebSocket, state: string) => {
     ws.send(state, (error) => {
         console.log("sent state");
         if (error) {
-
-
-            // const match = wsTomatch.get(ws);
-            // if (!match) {
-                console.log("error sending state");
-            //     return;
-            // }
-            // const player = getPlayerNumber(match, ws);
-            // match.game.endGame(player)
-            // console.log("error , game ended");
-
-            // msg was not sent
-            // retry for x
-            // remove player by ws to match lookup,
-            // then remove the right player and delete entry from lookup
-            // and ws.close();
-            // ws.close();
-            // terminate match
+            console.log("error sending state");
         }
     });
 };

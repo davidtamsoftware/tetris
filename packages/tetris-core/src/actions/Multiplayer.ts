@@ -19,6 +19,7 @@ export interface MultiplayerState {
 // use players array and get rid of player 1 and player 2 intance var
 
 export class Multiplayer {
+    private lastState: string
     private subscribers: Set<Handler>;
     private multiplayerState: MultiplayerState | any;
     private player1: Tetris;
@@ -33,6 +34,7 @@ export class Multiplayer {
         this.players = [this.player1, this.player2];
         this.subscribers = new Set<Handler>();
         this.initializeState();
+        this.lastState = JSON.stringify(this.multiplayerState);
         this.updatePlayer1State = this.updatePlayer1State.bind(this);
         this.updatePlayer2State = this.updatePlayer2State.bind(this);
         this.player1.subscribe(this.updatePlayer1State);
@@ -93,7 +95,7 @@ export class Multiplayer {
         this.players[Player.One].restart();
         this.players[Player.Two].restart();
         this.initializeState();
-        this.refreshLoop = setInterval(this.notify, 20);
+        this.refreshLoop = setInterval(this.notify, 35);
     }
 
     public getState() {
@@ -120,7 +122,12 @@ export class Multiplayer {
     }
 
     private notify = () => {
+        if (this.lastState === JSON.stringify(this.multiplayerState)) {
+            console.log("didn't notify");
+            return;
+        }
         this.subscribers.forEach((subscriber) => subscriber(this.multiplayerState));
+        this.lastState = JSON.stringify(this.multiplayerState);
     }
 
     private setState(state: any) {
