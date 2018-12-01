@@ -1,0 +1,26 @@
+{
+  "name": "tetris-core",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "David Tam <david.tam.kc@gmail.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/tetris-core.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "devDependencies": {
+    "tslint": "^5.11.0"
+  },
+  "dependencies": {
+    "core-js": "^2.5.7"
+  }
+}
