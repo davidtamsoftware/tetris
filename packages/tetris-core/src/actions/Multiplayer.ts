@@ -57,8 +57,15 @@ export class Multiplayer {
         this.players[Player.Two].togglePause();
     }
 
-    public drop(player: Player, tick: boolean, hardDrop?: boolean): Promise<void> {
-        return this.players[player].drop(tick, hardDrop);
+    public endGame() {
+        this.players[Player.One].endGame();
+        this.players[Player.Two].endGame();
+        this.notify();
+        clearInterval(this.refreshLoop);
+    }
+
+    public drop(player: Player, tick: boolean, hardDrop?: boolean) {
+        this.players[player].drop(tick, hardDrop);
     }
 
     // public endGame(player: Player) {
