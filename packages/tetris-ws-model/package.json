@@ -1,11 +1,11 @@
 {
-  "name": "tetris-core",
+  "name": "tetris-ws-model",
   "version": "0.0.0",
   "description": "> TODO: description",
   "author": "David Tam <david.tam.kc@gmail.com>",
   "homepage": "",
   "license": "ISC",
-  "main": "lib/tetris-core.js",
+  "main": "lib/tetris-ws-model.js",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -16,12 +16,5 @@
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: run tests from root\" && exit 1"
-  },
-  "devDependencies": {
-    "tslint": "^5.11.0"
-  },
-  "dependencies": {
-    "core-js": "^2.5.7",
-    "tetris-ws-model": "^0.0.0"
   }
 }

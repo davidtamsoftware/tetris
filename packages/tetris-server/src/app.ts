@@ -1,43 +1,48 @@
 import WebSocket from "ws";
 import { Multiplayer } from "tetris-core";
+import { Action, Message } from "tetris-ws-model";
 
 class MatchService {
 
-    private matches: Match2[];
+    private _matches: Match[];
     
     constructor() {
-        this.matches = [];
+        this._matches = [];
     }
 
-    public findMatch(ws: WebSocket): Match2 | undefined {
-        const results = this.matches.filter((match) => match.player1 === ws || match.player2 === ws);
+    get matches(): Match[] {
+        return this._matches
+    }
+
+    public findMatch(ws: WebSocket): Match | undefined {
+        const results = this._matches.filter((match) => match.player1 === ws || match.player2 === ws);
         if (results.length !==  1) {
             return undefined;
         }
         return results[0];
     }
 
-    public getOrCreate(matchId: string): Match2 {
-        const results = this.matches.filter((match) => match.matchId === matchId);    
+    public getOrCreate(matchId: string): Match {
+        const results = this._matches.filter((match) => match.matchId === matchId);    
         if (results.length !== 1 || !results[0]) {
-            const match = new Match2(matchId);
-            this.matches.push(match);
+            const match = new Match(matchId);
+            this._matches.push(match);
             return match;
         }
         return results[0];
     }
 
     private purgeOldMatches = () => {
-        // cleanup old matches 
+        // TODO: cleanup old matches 
     }
 }
 
-class Match2 {
+class Match {
     private _matchId: string;
     private _game: Multiplayer.Multiplayer;
     private _player1?: WebSocket;
     private _player2?: WebSocket;
-    // TODO add time for when not ready (ie. less than 2 players)
+    // TODO add time for when not ready (ie. less than 2 players), used by cleanup process
 
     public constructor(matchId: string) {
         this._matchId = matchId;
@@ -78,8 +83,8 @@ class Match2 {
     }
 
     public quit(ws: WebSocket) {
-        const player = Match2.getPlayerNumber(this, ws);
-        player === Player.One ? this._player1 = undefined : this._player2 = undefined;
+        const player = Match.getPlayerNumber(this, ws);
+        player === Multiplayer.Player.One ? this._player1 = undefined : this._player2 = undefined;
         this._game.endGame(player);
     }
 
@@ -92,11 +97,11 @@ class Match2 {
         }
     }
 
-    public static getPlayerNumber = (match: Match2, ws: WebSocket): Player => {
+    public static getPlayerNumber = (match: Match, ws: WebSocket): Multiplayer.Player => {
         if (match._player1 === ws) {
-            return Player.One;
+            return Multiplayer.Player.One;
         } else if (match._player2 === ws) {
-            return Player.Two;
+            return Multiplayer.Player.Two;
         }
     
         throw new Error("player not found");
@@ -106,48 +111,14 @@ class Match2 {
 
 const matchService = new MatchService();
 
-interface Match {
-    matchId: string;
-    game: Multiplayer.Multiplayer;
-    player1?: WebSocket;
-    player2?: WebSocket;
-}
-
-interface Matches {
-    [matchId: string]: Match;
-}
-const matchs: Matches = {};
-
-const wsTomatch: Map<WebSocket, Match> = new Map();
-
-enum Action {
-    Joinmatch,
-    MoveLeft,
-    MoveRight,
-    SoftDrop,
-    HardDrop,
-    RotateLeft,
-    RotateRight,
-    Restart,
-}
-
-interface Message {
-    action: Action;
-    matchId?: string;
-}
-
-export enum Player {
-    One,
-    Two,
-};
-
+// TODO: port config
 const wss = new WebSocket.Server({ port: 8080 });
 
-const getPlayerNumber = (match: Match, ws: WebSocket): Player => {
+const getPlayerNumber = (match: Match, ws: WebSocket): Multiplayer.Player => {
     if (match.player1 === ws) {
-        return Player.One;
+        return Multiplayer.Player.One;
     } else if (match.player2 === ws) {
-        return Player.Two;
+        return Multiplayer.Player.Two;
     }
 
     throw new Error("player not found");
@@ -162,7 +133,7 @@ wss.on("connection", (ws, req) => {
     });
 
     ws.on("message", (message) => {
-        console.log(matchs);
+        console.log("active matches: ", matchService.matches.length);
         try {
             const msg = JSON.parse(message.toString()) as Message;
             if (msg.action === Action.Joinmatch && msg.matchId) {
@@ -173,7 +144,7 @@ wss.on("connection", (ws, req) => {
                 if (!match) {
                     return;
                 }
-                const player = Match2.getPlayerNumber(match, ws);
+                const player = Match.getPlayerNumber(match, ws);
                 if (msg.action === Action.MoveLeft) {
                     match.game.moveLeft(player);
                 } else if (msg.action === Action.MoveRight) {

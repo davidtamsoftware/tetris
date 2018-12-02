@@ -1,12 +1,12 @@
 import * as React from "react";
-import { Models, Multiplayer as M } from "tetris-core";
+import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
 // import { Multiplayer as MultiplayerGame, MultiplayerState, Player } from "../../actions/Multiplayer";
 // import { GameState } from "../../models";
 import "./index.css";
 import { Multiplayer } from "./Multiplayer";
 import { MultiplayerRemoteClient } from "./Remote";
 
-class App extends React.Component<{}, M.MultiplayerState> {
+class App extends React.Component<{}, MultiplayerAction.MultiplayerState> {
 
   private multiplayer: MultiplayerRemoteClient;
 
@@ -35,7 +35,7 @@ class App extends React.Component<{}, M.MultiplayerState> {
     return <Multiplayer {...this.state} />;
   }
 
-  private handle(multiplayerState: M.MultiplayerState) {
+  private handle(multiplayerState: MultiplayerAction.MultiplayerState) {
     this.setState({
       ...multiplayerState,
     });

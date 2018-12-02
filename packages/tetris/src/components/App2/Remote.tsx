@@ -1,25 +1,26 @@
 import * as React from "react";
 import { Models, Multiplayer as MultiplayerAction} from "tetris-core";
+import { Action, Message } from "tetris-ws-model";
 // import { Handler, MultiplayerState } from "src/actions/Multiplayer";
 // import { GameState } from "../../models";
 import "./index.css";
 import { Multiplayer } from "./Multiplayer";
 
-enum Action {
-  Joinmatch,
-  MoveLeft,
-  MoveRight,
-  SoftDrop,
-  HardDrop,
-  RotateLeft,
-  RotateRight,
-  Restart,
-}
+// enum Action {
+//   Joinmatch,
+//   MoveLeft,
+//   MoveRight,
+//   SoftDrop,
+//   HardDrop,
+//   RotateLeft,
+//   RotateRight,
+//   Restart,
+// }
 
-interface Message {
-  action: Action;
-  matchId?: string;
-}
+// interface Message {
+//   action: Action;
+//   matchId?: string;
+// }
 
 type Handler = (game: any) => void;
 
@@ -29,11 +30,13 @@ export class MultiplayerRemoteClient {
   private client: WebSocket;
   // tslint:disable-next-line:no-empty
   constructor() {
+    // TODO: pull from configuration
     this.client = new WebSocket("ws://192.168.1.70:8080");
     this.subscribers = new Set<Handler>();
 
     const payload: Message = {
       action: Action.Joinmatch,
+      // TODO: prompt user for matchId
       matchId: "a1",
     };
     this.client.addEventListener("open", (event) => {
