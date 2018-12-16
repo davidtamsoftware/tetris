@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Functions, Models, Multiplayer as MultiplayerAction } from "tetris-core";
-import { GameOver } from "../GameOver";
-import { NextPiece } from "../NextPiece";
-import { Paused } from "../Paused";
-import Playfield from "../Playfield";
+import { GameOver } from "../../components/GameOver";
+import { NextPiece } from "../../components/NextPiece";
+import { Paused } from "../../components/Paused";
+import Playfield from "../../components/Playfield";
 import "./index.css";
 
 export const Multiplayer = (props: MultiplayerAction.MultiplayerState) => {

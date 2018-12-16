@@ -1,8 +1,5 @@
-import * as React from "react";
-import { Models, Multiplayer as MultiplayerAction} from "tetris-core";
+import { Multiplayer as MultiplayerAction} from "tetris-core";
 import { Action, ClientMessage } from "tetris-ws-model";
-import "./index.css";
-import { Multiplayer } from "./Multiplayer";
 
 type Handler = (game: any) => void;
 
@@ -21,7 +18,7 @@ export class MultiplayerRemoteClient {
       // TODO: prompt user for matchId
       matchId: "a1",
     };
-    this.client.addEventListener("open", (event) => {
+    this.client.addEventListener("open", () => {
       this.client.send(JSON.stringify(payload));
     });
     this.client.onmessage = (event) => {
