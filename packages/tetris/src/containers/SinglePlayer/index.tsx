@@ -1,12 +1,12 @@
 import * as React from "react";
 import { Functions, Models, Tetris } from "tetris-core";
-import { Controls } from "../Controls";
-import { GameOver } from "../GameOver";
-import { NextPiece } from "../NextPiece";
-import { Paused } from "../Paused";
-import { Playfield } from "../Playfield";
-import { Scoreboard } from "../Scoreboard";
-import { Stats } from "../Stats";
+import { Controls } from "../../components/Controls";
+import { GameOver } from "../../components/GameOver";
+import { NextPiece } from "../../components/NextPiece";
+import { Paused } from "../../components/Paused";
+import { Playfield } from "../../components/Playfield";
+import { Scoreboard } from "../../components/Scoreboard";
+import { Stats } from "../../components/Stats";
 import "./index.css";
 
 class App extends React.Component<{}, Models.Game> {

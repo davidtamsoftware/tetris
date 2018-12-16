@@ -1,7 +1,7 @@
 import "core-js/es6/array";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import App from "./containers/Multiplayer/Remote";
+import App from "./containers/SinglePlayer";
 import "./index.css";
 import registerServiceWorker from "./registerServiceWorker";
 
