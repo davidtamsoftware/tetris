@@ -1,6 +1,6 @@
 import WebSocket from "ws";
 import { Multiplayer } from "tetris-core";
-import { Action, Message } from "tetris-ws-model";
+import { Action, ClientMessage } from "tetris-ws-model";
 
 class MatchService {
 
@@ -22,6 +22,16 @@ class MatchService {
         return results[0];
     }
 
+    public playerExit(player: any) {
+        const match = this.findMatch(player);
+        if (match) {
+            match.quit(player);
+            if (!match.player1 && !match.player2) {
+                matchService.matches.splice(matchService.matches.indexOf(match));
+            }
+        }
+    }
+
     public getOrCreate(matchId: string): Match {
         const results = this._matches.filter((match) => match.matchId === matchId);    
         if (results.length !== 1 || !results[0]) {
@@ -40,8 +50,8 @@ class MatchService {
 class Match {
     private _matchId: string;
     private _game: Multiplayer.Multiplayer;
-    private _player1?: WebSocket;
-    private _player2?: WebSocket;
+    private _player1?: any;
+    private _player2?: any;
     // TODO add time for when not ready (ie. less than 2 players), used by cleanup process
 
     public constructor(matchId: string) {
@@ -58,21 +68,21 @@ class Match {
         return this._matchId;
     }
 
-    get player1(): WebSocket | undefined {
+    get player1(): any {
         return this._player1;
     }
 
-    get player2(): WebSocket | undefined {
+    get player2(): any {
         return this._player2;
     }
 
-    public join(ws: WebSocket) {
+    public join(player: any) {
         let joined = false;
         if (!this._player1) {
-            this._player1 = ws;
+            this._player1 = player;
             joined = true;
         } else if (!this._player2) {
-            this._player2 = ws;
+            this._player2 = player;
             joined = true;
         }
 
@@ -82,10 +92,10 @@ class Match {
         } 
     }
 
-    public quit(ws: WebSocket) {
-        const player = Match.getPlayerNumber(this, ws);
-        player === Multiplayer.Player.One ? this._player1 = undefined : this._player2 = undefined;
-        this._game.endGame(player);
+    public quit(player: any) {
+        const playerNumber = Match.getPlayerNumber(this, player);
+        playerNumber === Multiplayer.Player.One ? this._player1 = undefined : this._player2 = undefined;
+        this._game.endGame(playerNumber);        
     }
 
     private handle = (state: any) => {
@@ -126,16 +136,13 @@ const getPlayerNumber = (match: Match, ws: WebSocket): Multiplayer.Player => {
 
 wss.on("connection", (ws, req) => {
     ws.on("close", () => {
-        const match = matchService.findMatch(ws);
-        if (match) {
-            match.quit(ws);
-        }
+        matchService.playerExit(ws);
     });
 
     ws.on("message", (message) => {
         console.log("active matches: ", matchService.matches.length);
         try {
-            const msg = JSON.parse(message.toString()) as Message;
+            const msg = JSON.parse(message.toString()) as ClientMessage;
             if (msg.action === Action.Joinmatch && msg.matchId) {
                 const match = matchService.getOrCreate(msg.matchId);
                 match.join(ws);

@@ -1,26 +1,8 @@
 import * as React from "react";
 import { Models, Multiplayer as MultiplayerAction} from "tetris-core";
-import { Action, Message } from "tetris-ws-model";
-// import { Handler, MultiplayerState } from "src/actions/Multiplayer";
-// import { GameState } from "../../models";
+import { Action, ClientMessage } from "tetris-ws-model";
 import "./index.css";
 import { Multiplayer } from "./Multiplayer";
-
-// enum Action {
-//   Joinmatch,
-//   MoveLeft,
-//   MoveRight,
-//   SoftDrop,
-//   HardDrop,
-//   RotateLeft,
-//   RotateRight,
-//   Restart,
-// }
-
-// interface Message {
-//   action: Action;
-//   matchId?: string;
-// }
 
 type Handler = (game: any) => void;
 
@@ -31,10 +13,10 @@ export class MultiplayerRemoteClient {
   // tslint:disable-next-line:no-empty
   constructor() {
     // TODO: pull from configuration
-    this.client = new WebSocket("ws://192.168.1.70:8080");
+    this.client = new WebSocket("ws://192.168.1.72:8080");
     this.subscribers = new Set<Handler>();
 
-    const payload: Message = {
+    const payload: ClientMessage = {
       action: Action.Joinmatch,
       // TODO: prompt user for matchId
       matchId: "a1",
@@ -53,42 +35,42 @@ export class MultiplayerRemoteClient {
   }
 
   public moveLeft() {
-    const payload: Message = {
+    const payload: ClientMessage = {
       action: Action.MoveLeft,
     };
     this.client.send(JSON.stringify(payload));
   }
 
   public moveRight() {
-    const payload: Message = {
+    const payload: ClientMessage = {
       action: Action.MoveRight,
     };
     this.client.send(JSON.stringify(payload));
   }
 
   public rotateRight() {
-    const payload: Message = {
+    const payload: ClientMessage = {
       action: Action.RotateRight,
     };
     this.client.send(JSON.stringify(payload));
   }
 
   public rotateLeft() {
-    const payload: Message = {
+    const payload: ClientMessage = {
       action: Action.RotateLeft,
     };
     this.client.send(JSON.stringify(payload));
   }
 
   public togglePause() {
-    const payload: Message = {
+    const payload: ClientMessage = {
       action: Action.MoveRight, // TODO
     };
     this.client.send(JSON.stringify(payload));
   }
 
   public drop(hardDrop?: boolean) {
-    const payload: Message = {
+    const payload: ClientMessage = {
       action: hardDrop ? Action.HardDrop : Action.SoftDrop,
     };
     this.client.send(JSON.stringify(payload));
@@ -103,7 +85,7 @@ export class MultiplayerRemoteClient {
   }
 
   public restart() {
-    const payload: Message = {
+    const payload: ClientMessage = {
       action: Action.Restart,
     };
     this.client.send(JSON.stringify(payload));
@@ -135,64 +117,3 @@ export class MultiplayerRemoteClient {
     this.subscribers.forEach((subscriber) => subscriber(this.multiplayerState));
   }
 }
-
-// tslint:disable-next-line:max-classes-per-file
-class App extends React.Component<{}, MultiplayerAction.MultiplayerState> {
-
-  private multiplayer: MultiplayerRemoteClient;
-
-  constructor(props: {}) {
-    super(props)
-    this.multiplayer = new MultiplayerRemoteClient();
-    this.state = this.multiplayer.getState();
-    this.handle = this.handle.bind(this);
-  }
-
-  public componentWillMount() {
-    document.addEventListener("keydown", this.handleKeyDown.bind(this));
-    this.multiplayer.subscribe(this.handle);
-  }
-
-  public componentWillUnmount() {
-    document.removeEventListener("keydown", this.handleKeyDown.bind(this));
-    this.multiplayer.unsubscribe(this.handle);
-  }
-
-  public componentDidMount() {
-    this.multiplayer.start();
-  }
-
-  public render() {
-    return <Multiplayer {...this.state} />;
-  }
-
-  private handle(multiplayerState: MultiplayerAction.MultiplayerState) {
-    this.setState({
-      ...multiplayerState,
-    });
-  }
-
-  private handleKeyDown(event: KeyboardEvent) {
-    if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {
-      this.multiplayer.restart();
-    } else if (this.state.gameState !== Models.GameState.GameOver && event.keyCode === 80) {
-      this.multiplayer.togglePause();
-    } else if (this.state.gameState !== Models.GameState.Active) {
-      return;
-    } else if (event.keyCode === 90) {
-      this.multiplayer.rotateLeft();
-    } else if (event.keyCode === 38) {
-      this.multiplayer.rotateRight();
-    } else if (event.keyCode === 39) {
-      this.multiplayer.moveRight();
-    } else if (event.keyCode === 37) {
-      this.multiplayer.moveLeft();
-    } else if (event.keyCode === 40) {
-      this.multiplayer.drop();
-    } else if (event.keyCode === 32) {
-      this.multiplayer.drop();
-    }
-  }
-}
-
-export default App;

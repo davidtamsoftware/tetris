@@ -1,8 +1,5 @@
 import * as React from "react";
 import { Functions, Models, Multiplayer as MultiplayerAction } from "tetris-core";
-// import { merge } from "src/actions";
-// import { MultiplayerState } from "src/actions/Multiplayer";
-// import { Game, GameState } from "src/models";
 import { GameOver } from "../GameOver";
 import { NextPiece } from "../NextPiece";
 import { Paused } from "../Paused";

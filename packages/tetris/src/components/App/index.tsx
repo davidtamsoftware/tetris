@@ -4,7 +4,6 @@ import { Controls } from "../Controls";
 import { GameOver } from "../GameOver";
 import { NextPiece } from "../NextPiece";
 import { Paused } from "../Paused";
-import { Piece } from "../Piece";
 import { Playfield } from "../Playfield";
 import { Scoreboard } from "../Scoreboard";
 import { Stats } from "../Stats";

@@ -6,9 +6,10 @@ export declare enum Action {
     HardDrop = 4,
     RotateLeft = 5,
     RotateRight = 6,
-    Restart = 7
+    Restart = 7,
+    InstantMessage = 8
 }
-export interface Message {
+export interface ClientMessage {
     action: Action;
     matchId?: string;
 }

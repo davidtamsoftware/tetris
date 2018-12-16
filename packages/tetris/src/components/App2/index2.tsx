@@ -1,7 +1,5 @@
 import * as React from "react";
 import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
-// import { Multiplayer as MultiplayerGame, MultiplayerState, Player } from "../../actions/Multiplayer";
-// import { GameState } from "../../models";
 import "./index.css";
 import { Multiplayer } from "./Multiplayer";
 import { MultiplayerRemoteClient } from "./Remote";

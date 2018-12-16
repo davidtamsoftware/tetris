@@ -10,4 +10,9 @@ var Action;
     Action[Action["RotateLeft"] = 5] = "RotateLeft";
     Action[Action["RotateRight"] = 6] = "RotateRight";
     Action[Action["Restart"] = 7] = "Restart";
+    Action[Action["InstantMessage"] = 8] = "InstantMessage";
 })(Action = exports.Action || (exports.Action = {}));
+// main server
+// game server
+// no match id
+// create a game and invite
