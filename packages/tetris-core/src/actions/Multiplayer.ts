@@ -4,7 +4,7 @@ import { Tetris } from "./Tetris";
 export enum Player {
     One,
     Two,
-};
+}
 
 type Handler = (game: any) => void;
 
@@ -19,7 +19,7 @@ export interface MultiplayerState {
 // use players array and get rid of player 1 and player 2 intance var
 
 export class Multiplayer {
-    private lastState: string
+    private lastState: string;
     private subscribers: Set<Handler>;
     private multiplayerState: MultiplayerState | any;
     private player1: Tetris;
@@ -86,7 +86,7 @@ export class Multiplayer {
             });
         }
     }
-    
+
     public start() {
         this.restart();
     }
@@ -123,6 +123,7 @@ export class Multiplayer {
 
     private notify = () => {
         if (this.lastState === JSON.stringify(this.multiplayerState)) {
+            // tslint:disable-next-line:no-console
             console.log("didn't notify");
             return;
         }
@@ -135,7 +136,7 @@ export class Multiplayer {
         this.multiplayerState = {
             ...this.multiplayerState,
             ...state,
-        }
+        };
 
         // this.notify();
     }

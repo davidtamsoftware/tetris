@@ -8,7 +8,7 @@ export enum GameState {
     Paused,
     Active,
     GameOver,
-};
+}
 
 export interface Game {
     playfield: Playfield;

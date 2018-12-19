@@ -1,4 +1,4 @@
 export interface PiecePosition {
-    row: number,
-    col: number,
+    row: number;
+    col: number;
 }

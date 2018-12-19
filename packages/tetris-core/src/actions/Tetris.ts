@@ -1,5 +1,14 @@
+import {
+    calculatePosition,
+    generateRandomPiece,
+    hasCollision,
+    moveDown,
+    moveLeft,
+    moveRight,
+    rotateLeft,
+    rotateRight,
+} from ".";
 import { Game, GameState, pieces, Playfield, playfield as initialPlayfield } from "../models";
-import { calculatePosition, generateRandomPiece, hasCollision, moveDown, moveLeft, moveRight, rotateLeft, rotateRight } from ".";
 
 type Handler = (game: Game) => void;
 
@@ -134,7 +143,7 @@ export class Tetris {
 
         this.setState({
             gameState: GameState.GameOver,
-        })
+        });
         this.notify();
         clearInterval(this.refreshLoop);
         clearInterval(this.loop);
@@ -143,7 +152,7 @@ export class Tetris {
     public start() {
         this.restart();
     }
-    
+
     public restart() {
         this.tick(1);
         this.setState(this.initializeState());
@@ -154,7 +163,7 @@ export class Tetris {
         // TODO: deep copy
         return {
             ...this.game,
-        }
+        };
     }
 
     public subscribe(handler: Handler) {
@@ -181,7 +190,8 @@ export class Tetris {
             scoreboard: {
                 level: 1,
                 lines: 0,
-                // TODO: pass in score provider, client can implement in localstorage, server can implement in memory or persistent
+                // TODO: pass in score provider,
+                // client can implement in localstorage, server can implement in memory or persistent
                 // highscore: Number(localStorage.getItem("highscore") || 0),
                 score: 0,
             },
@@ -195,11 +205,11 @@ export class Tetris {
     private incrementCount(pieceKey: string) {
         const stats = {
             ...this.game.stats,
-            [pieceKey]: this.game.stats[pieceKey] + 1
+            [pieceKey]: this.game.stats[pieceKey] + 1,
         };
 
         this.setState({
-            stats
+            stats,
         });
     }
 
@@ -237,7 +247,7 @@ export class Tetris {
         this.setState({
             playfield,
             piece: [],
-        })
+        });
     }
 
     private notify = () => {
@@ -249,7 +259,7 @@ export class Tetris {
         this.game = {
             ...this.game,
             ...state,
-        }
+        };
 
         // this.notify();
     }
