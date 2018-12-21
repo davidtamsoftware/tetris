@@ -159,7 +159,7 @@ export class Tetris {
         this.refreshLoop = setInterval(this.notify, 20);
     }
 
-    public getState() {
+    public getState(): Game {
         // TODO: deep copy
         return {
             ...this.game,

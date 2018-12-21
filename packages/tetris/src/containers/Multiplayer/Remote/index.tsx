@@ -1,26 +1,28 @@
 import * as React from "react";
 import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
 import { Multiplayer } from "..";
+import { Key, Props } from "../../App";
 import { MultiplayerRemoteClient } from "./RemoteClient";
 
-class App extends React.Component<{}, MultiplayerAction.MultiplayerState> {
+class App extends React.Component<Props, MultiplayerAction.MultiplayerState> {
 
   private multiplayer: MultiplayerRemoteClient;
 
-  constructor(props: {}) {
-    super(props)
+  constructor(props: Props) {
+    super(props);
     this.multiplayer = new MultiplayerRemoteClient();
     this.state = this.multiplayer.getState() || {};
     this.handle = this.handle.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   public componentWillMount() {
-    document.addEventListener("keydown", this.handleKeyDown.bind(this));
+    document.addEventListener("keydown", this.handleKeyDown);
     this.multiplayer.subscribe(this.handle);
   }
 
   public componentWillUnmount() {
-    document.removeEventListener("keydown", this.handleKeyDown.bind(this));
+    document.removeEventListener("keydown", this.handleKeyDown);
     this.multiplayer.unsubscribe(this.handle);
   }
 
@@ -29,9 +31,22 @@ class App extends React.Component<{}, MultiplayerAction.MultiplayerState> {
   // }
 
   public render() {
-    return <Multiplayer {...this.state} />;
+    return <Multiplayer {...this.state} handle={this.handleMenuSelect}/>;
   }
 
+  private handleMenuSelect = (key: Key) => {
+    if (key === "HOME" || key === "QUIT_CONFIRM") {
+      this.multiplayer.endGame();
+      this.props.exit();
+    } else if (key === "QUIT_CANCEL") {
+      return;
+    } else if (key === "RESUME") {
+      this.multiplayer.togglePause();
+    } else if (key === "RESTART") {
+      this.multiplayer.restart();
+    }
+  }
+  
   private handle(multiplayerState: MultiplayerAction.MultiplayerState) {
     this.setState({
       ...multiplayerState,

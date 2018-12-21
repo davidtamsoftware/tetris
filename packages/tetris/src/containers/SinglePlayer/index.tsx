@@ -2,31 +2,34 @@ import * as React from "react";
 import { Functions, Models, Tetris } from "tetris-core";
 import { Controls } from "../../components/Controls";
 import { GameOver } from "../../components/GameOver";
+import Menu from "../../components/Menu";
 import { NextPiece } from "../../components/NextPiece";
 import { Paused } from "../../components/Paused";
 import { Playfield } from "../../components/Playfield";
 import { Scoreboard } from "../../components/Scoreboard";
 import { Stats } from "../../components/Stats";
+import { gameOverMenu, Key, pauseMenu, Props } from "../App";
 import "./index.css";
 
-class App extends React.Component<{}, Models.Game> {
+class App extends React.Component<Props, Models.Game> {
 
   private tetris: Tetris;
-  
-  constructor(props: {}) {
+
+  constructor(props: Props) {
     super(props)
     this.tetris = new Tetris();
     this.state = this.tetris.getState();
     this.handle = this.handle.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   public componentWillMount() {
-    document.addEventListener("keydown", this.handleKeyDown.bind(this));
+    document.addEventListener("keydown", this.handleKeyDown);
     this.tetris.subscribe(this.handle);
   }
 
   public componentWillUnmount() {
-    document.removeEventListener("keydown", this.handleKeyDown.bind(this));
+    document.removeEventListener("keydown", this.handleKeyDown);
     this.tetris.unsubscribe(this.handle);
   }
 
@@ -44,16 +47,44 @@ class App extends React.Component<{}, Models.Game> {
           <NextPiece piece={this.state.nextPiece} />
         </div>
         <div className="right">
-         <Scoreboard scoreboard={this.state.scoreboard} />
-         <Stats stats={this.state.stats} />
+          <Scoreboard scoreboard={this.state.scoreboard} />
+          <Stats stats={this.state.stats} />
         </div>
         <div className="main">
           <Playfield playfield={result.playfield} gameState={this.state.gameState} />
-          {this.state.gameState === Models.GameState.Paused && <Paused /> }
-          {this.state.gameState === Models.GameState.GameOver && <GameOver />}
+          {this.state.gameState === Models.GameState.Paused &&
+            <div>
+              <Paused />
+              <Menu menu={pauseMenu} notify={this.handleMenuSelect} menuClose={this.handleMenuClose} />
+            </div>
+          }
+          {this.state.gameState === Models.GameState.GameOver &&
+            <div>
+              <GameOver />
+              <Menu menu={gameOverMenu} notify={this.handleMenuSelect} />
+            </div>
+          }
         </div>
       </div>
     );
+  }
+
+  private handleMenuClose = () => {
+    this.tetris.togglePause();
+  }
+
+  private handleMenuSelect = (key: Key) => {
+    if (key === "HOME" || key === "QUIT_CONFIRM") {
+      this.tetris.endGame();
+      this.props.exit();
+    } else if (key === "QUIT_CANCEL") {
+      return false;
+    } else if (key === "RESUME") {
+      this.tetris.togglePause();
+    } else if (key === "RESTART") {
+      this.tetris.restart();
+    }
+    return true;
   }
 
   private handle(game: Models.Game) {
@@ -66,7 +97,7 @@ class App extends React.Component<{}, Models.Game> {
   private handleKeyDown(event: KeyboardEvent) {
     if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {
       this.tetris.restart();
-    } else if (this.state.gameState !== Models.GameState.GameOver && event.keyCode === 80) {
+    } else if (this.state.gameState === Models.GameState.Active && (event.keyCode === 80 || event.keyCode === 27)) {
       this.tetris.togglePause();
     } else if (this.state.gameState !== Models.GameState.Active) {
       return;

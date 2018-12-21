@@ -60,6 +60,9 @@ export class Multiplayer {
     public togglePause() {
         this.players[Player.One].togglePause();
         this.players[Player.Two].togglePause();
+        this.setState({
+            gameState: this.player1.getState().gameState,
+        });
     }
 
     // public endGame() {

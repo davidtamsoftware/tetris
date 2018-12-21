@@ -1,16 +1,18 @@
 import * as React from "react";
 import { Functions, Models, Multiplayer as MultiplayerAction } from "tetris-core";
 import { GameOver } from "../../components/GameOver";
+import Menu from "../../components/Menu";
 import { NextPiece } from "../../components/NextPiece";
 import { Paused } from "../../components/Paused";
 import Playfield from "../../components/Playfield";
+import { gameOverMenu, pauseMenu } from "../App";
 import "./index.css";
 
-export const Multiplayer = (props: MultiplayerAction.MultiplayerState) => {
+export const Multiplayer = (props: MultiplayerAction.MultiplayerState & { handle: any; menuClose?: any; }) => {
     if (!props.player1 || !props.player2) {
         return null;
     }
-    
+
     const result1 = Functions.merge(props.player1.playfield, props.player1.position, props.player1.piece);
     const result2 = Functions.merge(props.player2.playfield, props.player2.position, props.player2.piece);
 
@@ -35,9 +37,20 @@ export const Multiplayer = (props: MultiplayerAction.MultiplayerState) => {
                         <td><h2>Score<br /><br />{props.player2.scoreboard.score}</h2></td>
                     </tr>
                 </table>
-                {props.player1.gameState === Models.GameState.Paused && <Paused />}
-                {props.player1.gameState === Models.GameState.GameOver && <GameOver />}
-                {props.winner !== undefined ? `Player ${props.winner+1} wins!`:null}
+                {/* TODO: use game state instead of player1 gamestate */}
+                {props.gameState === Models.GameState.Paused &&
+                    <div>
+                        <Paused />
+                        <Menu menu={pauseMenu} notify={props.handle} menuClose={props.menuClose} />
+                    </div>
+                }
+                {props.gameState === Models.GameState.GameOver && 
+                    <div>
+                        <GameOver />
+                        <Menu menu={gameOverMenu} notify={props.handle}/>
+                    </div>
+                }
+                {props.winner !== undefined ? `Player ${props.winner + 1} wins!` : null}
             </div>
         </div>
     );

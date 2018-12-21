@@ -1,25 +1,27 @@
 import * as React from "react";
 import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
 import { Multiplayer } from "..";
+import { Key, Props } from "../../App";
 
-class App extends React.Component<{}, MultiplayerAction.MultiplayerState> {
+class App extends React.Component<Props, MultiplayerAction.MultiplayerState> {
 
   private multiplayer: MultiplayerAction.Multiplayer;
 
-  constructor(props: {}) {
+  constructor(props: Props) {
     super(props)
     this.multiplayer = new MultiplayerAction.Multiplayer();
     this.state = this.multiplayer.getState();
     this.handle = this.handle.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   public componentWillMount() {
-    document.addEventListener("keydown", this.handleKeyDown.bind(this));
+    document.addEventListener("keydown", this.handleKeyDown);
     this.multiplayer.subscribe(this.handle);
   }
 
   public componentWillUnmount() {
-    document.removeEventListener("keydown", this.handleKeyDown.bind(this));
+    document.removeEventListener("keydown", this.handleKeyDown);
     this.multiplayer.unsubscribe(this.handle);
   }
 
@@ -28,7 +30,25 @@ class App extends React.Component<{}, MultiplayerAction.MultiplayerState> {
   }
 
   public render() {
-    return <Multiplayer {...this.state} />;
+    return <Multiplayer {...this.state} handle={this.handleMenuSelect} menuClose={this.handleMenuClose}/>;
+  }
+
+  private handleMenuClose = () => {
+    this.multiplayer.togglePause();
+  }
+
+  private handleMenuSelect = (key: Key) => {
+    if (key === "HOME" || key === "QUIT_CONFIRM") {
+      this.multiplayer.endGame();
+      this.props.exit();
+    } else if (key === "QUIT_CANCEL") {
+      return false;
+    } else if (key === "RESUME") {
+      this.multiplayer.togglePause();
+    } else if (key === "RESTART") {
+      this.multiplayer.restart();
+    }
+    return true;
   }
 
   private handle(multiplayerState: MultiplayerAction.MultiplayerState) {
@@ -40,7 +60,7 @@ class App extends React.Component<{}, MultiplayerAction.MultiplayerState> {
   private handleKeyDown(event: KeyboardEvent) {
     if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {
       this.multiplayer.restart();
-    } else if (this.state.gameState !== Models.GameState.GameOver && event.keyCode === 80) {
+    } else if (this.state.gameState === Models.GameState.Active && (event.keyCode === 80 || event.keyCode === 27)) {
       this.multiplayer.togglePause();
     } else if (this.state.gameState !== Models.GameState.Active) {
       return;
