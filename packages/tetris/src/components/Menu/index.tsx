@@ -40,8 +40,9 @@ class Menu extends React.Component<Props, State> {
                 <h2>{currMenu.name}</h2>
                 {currMenu.children && currMenu.children.
                     map((child, index) =>
-                        // tslint:disable-next-line:jsx-no-lambda
-                        <div style={{ border: `${index === this.state.selection ? "1" : "0"}px solid green` }} onClick={this.select} key={index}>
+                    <div style={{ border: `${index === this.state.selection ? "1" : "0"}px solid green` }}
+                            // tslint:disable-next-line:jsx-no-lambda
+                            onClick={() => this.selection(index, true) } onMouseMove={() => this.selection(index)} key={index}>
                             {child.name}
                         </div>)}
             </div>;
@@ -85,6 +86,12 @@ class Menu extends React.Component<Props, State> {
         this.setState({
             selection: index > size - 1 ? 0 : index,
         });
+    }
+
+    private selection = (index: number, click?: boolean) => {
+        this.setState({
+            selection: index,
+        }, click ? this.select : undefined);
     }
 
     private select = () => {

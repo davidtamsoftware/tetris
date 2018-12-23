@@ -7,8 +7,9 @@ export class MultiplayerRemoteClient {
   private subscribers: Set<Handler>;
   private multiplayerState: MultiplayerAction.MultiplayerState;
   private client: WebSocket;
-  // tslint:disable-next-line:no-empty
+
   constructor() {
+    this.multiplayerState = {} as any;
     // TODO: pull from configuration
     this.client = new WebSocket("ws://192.168.1.72:8080");
     this.subscribers = new Set<Handler>();

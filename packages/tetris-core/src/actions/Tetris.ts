@@ -193,6 +193,7 @@ export class Tetris {
                 // TODO: pass in score provider,
                 // client can implement in localstorage, server can implement in memory or persistent
                 // highscore: Number(localStorage.getItem("highscore") || 0),
+                highscore: 0,
                 score: 0,
             },
             stats: pieces

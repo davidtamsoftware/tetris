@@ -11,7 +11,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState> {
   constructor(props: Props) {
     super(props);
     this.multiplayer = new MultiplayerRemoteClient();
-    this.state = this.multiplayer.getState() || {};
+    this.state = this.multiplayer.getState();
     this.handle = this.handle.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
   }

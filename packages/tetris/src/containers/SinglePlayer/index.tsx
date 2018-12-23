@@ -9,7 +9,7 @@ import { Playfield } from "../../components/Playfield";
 import { Scoreboard } from "../../components/Scoreboard";
 import { Stats } from "../../components/Stats";
 import { gameOverMenu, Key, pauseMenu, Props } from "../App";
-import "./index.css";
+import styles from "./index.module.css";
 
 class App extends React.Component<Props, Models.Game> {
 
@@ -41,16 +41,16 @@ class App extends React.Component<Props, Models.Game> {
     const result = Functions.merge(this.state.playfield, this.state.position, this.state.piece);
 
     return (
-      <div className="App">
-        <div className="left">
+      <div className={styles.App}>
+        <div className={styles.left}>
           <Controls />
           <NextPiece piece={this.state.nextPiece} />
         </div>
-        <div className="right">
+        <div className={styles.right}>
           <Scoreboard scoreboard={this.state.scoreboard} />
           <Stats stats={this.state.stats} />
         </div>
-        <div className="main">
+        <div className={styles.main}>
           <Playfield playfield={result.playfield} gameState={this.state.gameState} />
           {this.state.gameState === Models.GameState.Paused &&
             <div>
