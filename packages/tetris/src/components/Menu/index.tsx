@@ -36,11 +36,19 @@ class Menu extends React.Component<Props, State> {
     public render() {
         const currMenu = this.state.menuState[this.state.menuState.length - 1];
         const menu =
-            <div style={{ margin: "auto", border: "2px solid blue" }}>
-                <h2>{currMenu.name}</h2>
+            <div style={{ 
+                textAlign: "center",
+                width: "400px",
+                borderRadius: "5px",
+                margin: "auto",
+                border: "5px solid white",
+                // boxShadow: "5px 10px gray",
+                // outline: "5px solid red",
+                padding: "20px" }}>
+                <div style={{ fontSize: "1.7em", padding: "0 0 15px" }}>{currMenu.name}</div>
                 {currMenu.children && currMenu.children.
                     map((child, index) =>
-                    <div style={{ border: `${index === this.state.selection ? "1" : "0"}px solid green` }}
+                    <div style={{ borderRadius: "5px", border: `3px solid ${index === this.state.selection ? "green" : "transparent"}`, padding: "10px" }}
                             // tslint:disable-next-line:jsx-no-lambda
                             onClick={() => this.selection(index, true) } onMouseMove={() => this.selection(index)} key={index}>
                             {child.name}

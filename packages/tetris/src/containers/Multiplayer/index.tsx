@@ -39,15 +39,25 @@ export const Multiplayer = (props: MultiplayerAction.MultiplayerState & { handle
                 </table>
                 {/* TODO: use game state instead of player1 gamestate */}
                 {props.gameState === Models.GameState.Paused &&
-                    <div>
-                        <Paused />
+                    <div style={{
+                        position: "absolute",
+                        left: "calc(50% - 200px - 5px - 20px)",
+                        top: "200px",
+                        backgroundColor: "black"
+                    }}>
+                        {/* <Paused /> */}
                         <Menu menu={pauseMenu} notify={props.handle} menuClose={props.menuClose} />
                     </div>
                 }
-                {props.gameState === Models.GameState.GameOver && 
-                    <div>
-                        <GameOver />
-                        <Menu menu={gameOverMenu} notify={props.handle}/>
+                {props.gameState === Models.GameState.GameOver &&
+                    <div style={{
+                        position: "absolute",
+                        left: "calc(50% - 200px - 5px - 20px)",
+                        top: "200px",
+                        backgroundColor: "black"
+                    }}>
+                        {/* <GameOver /> */}
+                        <Menu menu={gameOverMenu} notify={props.handle} />
                     </div>
                 }
                 {props.winner !== undefined ? `Player ${props.winner + 1} wins!` : null}

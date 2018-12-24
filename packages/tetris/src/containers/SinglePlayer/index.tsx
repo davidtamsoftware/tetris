@@ -53,14 +53,20 @@ class App extends React.Component<Props, Models.Game> {
         <div className={styles.main}>
           <Playfield playfield={result.playfield} gameState={this.state.gameState} />
           {this.state.gameState === Models.GameState.Paused &&
-            <div>
-              <Paused />
+            <div style={{ position: "absolute", 
+            left: "calc(50% - 200px - 5px - 20px)",
+            top: "200px", 
+            backgroundColor: "black"}}>
+              {/* <Paused /> */}
               <Menu menu={pauseMenu} notify={this.handleMenuSelect} menuClose={this.handleMenuClose} />
             </div>
           }
           {this.state.gameState === Models.GameState.GameOver &&
-            <div>
-              <GameOver />
+            <div style={{ position: "absolute", 
+            left: "calc(50% - 200px - 5px - 20px)",
+            top: "200px", 
+            backgroundColor: "black"}}>
+              {/* <GameOver /> */}
               <Menu menu={gameOverMenu} notify={this.handleMenuSelect} />
             </div>
           }

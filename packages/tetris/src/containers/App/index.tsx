@@ -3,6 +3,7 @@ import Menu from "../../components/Menu";
 import MultiplayerLocal from "../Multiplayer/Local";
 import MultiplayerRemote from "../Multiplayer/Remote";
 import SinglePlayer from "../SinglePlayer";
+import linkedinLogo from "./In-2C-21px-R.png";
 
 interface State {
     gameMode?: Key;
@@ -23,17 +24,15 @@ class App extends React.Component<{}, State> {
         let game;
         if (!this.state.gameMode) {
             game = <div>
-                <div style={{ width: "500px", margin: "0 auto", border: "0px solid white" }}>
-                    {/* <BlockMatrix style={{ float: "left" }} matrix={[[1, 1, 1], [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]]} />
-                    <BlockMatrix style={{ float: "left" }} matrix={[[2, 2, 2], [2, 0, 0], [2, 2, 2], [2, 0, 0], [2, 2, 2]]} />
-                    <BlockMatrix style={{ float: "left" }} matrix={[[3, 3, 3], [0, 3, 0], [0, 3, 0], [0, 3, 0], [0, 3, 0]]} />
-                    <BlockMatrix style={{ float: "left" }} matrix={[[4, 4, 4], [4, 0, 4], [4, 4, 0], [4, 0, 4], [4, 0, 4]]} />
-                    <BlockMatrix style={{ float: "left" }} matrix={[[0, 5, 0], [0, 5, 0], [0, 5, 0], [0, 5, 0], [0, 5, 0]]} />
-                    <BlockMatrix style={{ float: "left" }} matrix={[[6, 6, 6], [6, 0, 0], [6, 6, 6], [0, 0, 6], [6, 6, 6]]} /> */}
-                    <h1><em>TETRIS</em></h1>
+                <div style={{ textAlign: "center", margin: "0 auto", border: "0px solid white" }}>
+                    <span style={{fontSize: "10em", textShadow: "8px 8px gray"}}>TETRIS</span>
                 </div>
-                <div style={{ clear: "both" }}>
+                <div style={{ clear: "both", paddingTop: "60px" }}>
                     <Menu menu={mainMenu} notify={this.handle} />
+                </div>
+                <div style={{ textAlign: "center", paddingTop: "100px"}}>
+                    <div style={{paddingBottom: "15px" }}>Implemented by David Tam</div>
+                    <div><a href="#"><img src={linkedinLogo} /></a></div>
                 </div>
             </div>;
         } else if (this.state.gameMode === "SINGLE_PLAYER") {
