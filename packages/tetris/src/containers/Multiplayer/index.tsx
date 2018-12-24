@@ -6,7 +6,7 @@ import { NextPiece } from "../../components/NextPiece";
 import { Paused } from "../../components/Paused";
 import Playfield from "../../components/Playfield";
 import { gameOverMenu, pauseMenu } from "../App";
-import "./index.css";
+import styles from "./index.module.css";
 
 export const Multiplayer = (props: MultiplayerAction.MultiplayerState & { handle: any; menuClose?: any; }) => {
     if (!props.player1 || !props.player2) {
@@ -17,14 +17,14 @@ export const Multiplayer = (props: MultiplayerAction.MultiplayerState & { handle
     const result2 = Functions.merge(props.player2.playfield, props.player2.position, props.player2.piece);
 
     return (
-        <div className="App">
-            <div className="left">
+        <div className={styles.App}>
+            <div className={styles.left}>
                 <Playfield playfield={result1.playfield} gameState={props.player1.gameState} />
             </div>
-            <div className="right">
+            <div className={styles.right}>
                 <Playfield playfield={result2.playfield} gameState={props.player2.gameState} />
             </div>
-            <div className="main">
+            <div className={styles.main}>
                 <table style={{ margin: "auto", width: "400px", border: "0px solid purple" }}>
                     <tr>
                         <td><NextPiece piece={props.player1.nextPiece} /></td>
