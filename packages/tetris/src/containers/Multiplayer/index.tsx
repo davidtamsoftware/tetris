@@ -26,16 +26,20 @@ export const Multiplayer = (props: MultiplayerAction.MultiplayerState & { handle
             </div>
             <div className={styles.main}>
                 <table style={{ margin: "auto", width: "400px", border: "0px solid purple" }}>
-                    <tr>
-                        <td><NextPiece piece={props.player1.nextPiece} /></td>
-                        <td><NextPiece piece={props.player2.nextPiece} /></td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <td><NextPiece piece={props.player1.nextPiece} /></td>
+                            <td><NextPiece piece={props.player2.nextPiece} /></td>
+                        </tr>
+                    </tbody>
                 </table>
-                <table style={{ position: "absolute", left: "35%", bottom: "55px", width: "400px", border: "0px solid purple" }}>
-                    <tr>
-                        <td><h2>Score<br /><br />{props.player1.scoreboard.score}</h2></td>
-                        <td><h2>Score<br /><br />{props.player2.scoreboard.score}</h2></td>
-                    </tr>
+                <table style={{ paddingTop: "295px", margin: "auto", width: "400px", border: "0px solid purple" }}>
+                    <tbody>
+                        <tr>
+                            <td><h2>Score<br /><br />{props.player1.scoreboard.score}</h2></td>
+                            <td><h2>Score<br /><br />{props.player2.scoreboard.score}</h2></td>
+                        </tr>
+                    </tbody>
                 </table>
                 {/* TODO: use game state instead of player1 gamestate */}
                 {props.gameState === Models.GameState.Paused &&
@@ -60,7 +64,9 @@ export const Multiplayer = (props: MultiplayerAction.MultiplayerState & { handle
                         <Menu menu={gameOverMenu} notify={props.handle} />
                     </div>
                 }
-                {props.winner !== undefined ? `Player ${props.winner + 1} wins!` : null}
+                <div style={{ position: "absolute", bottom: "353px", left: "calc(50% - 85px)", textShadow: "#af89f7 1px 1px 35px, blue 0px 0px 57px, #d4bec1 0px 0px 50px" }}>
+                    {props.winner !== undefined ? `Player ${props.winner + 1} wins!` : null}
+                </div>
             </div>
         </div>
     );

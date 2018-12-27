@@ -11,9 +11,11 @@ interface Props {
 
 export const BlockMatrix = (props: Props) => (
     <table className={props.className} style={props.style}>
-        {props.matrix.map((row) => (
-            <tr>
-                {row.map((col, index) => <td key={index}>{col ? <Block data={col} size={props.size} /> : null}</td>)}
-            </tr>
-        ))}
+        <tbody>
+            {props.matrix.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                    {row.map((col, colIndex) => <td key={colIndex}>{col ? <Block data={col} size={props.size} /> : null}</td>)}
+                </tr>
+            ))}
+        </tbody>
     </table>);

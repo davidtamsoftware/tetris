@@ -36,7 +36,7 @@ export const Controls = () => (<table style={{
     </tr>
     <tr>
       <td>Pause/Resume</td>
-      <td>P</td>
+      <td>Esc</td>
     </tr>
     <tr>
       <td><br /><br /></td>

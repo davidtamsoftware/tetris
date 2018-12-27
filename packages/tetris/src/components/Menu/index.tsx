@@ -22,14 +22,10 @@ class Menu extends React.Component<Props, State> {
     };
 
     public componentWillMount() {
-        // tslint:disable-next-line:no-console
-        console.log("mounted");
         document.addEventListener("keydown", this.handleKeyDown);
     }
 
     public componentWillUnmount() {
-        // tslint:disable-next-line:no-console
-        console.log("Unmounted");
         document.removeEventListener("keydown", this.handleKeyDown);
     }
 
@@ -102,7 +98,7 @@ class Menu extends React.Component<Props, State> {
         }, click ? this.select : undefined);
     }
 
-    private select = () => {
+    private select = () => {             
         const currMenu = this.state.menuState[this.state.menuState.length - 1];
         const size = currMenu.children && currMenu.children.length;
         if (!size) {
