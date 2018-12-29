@@ -13,15 +13,23 @@ export class MultiplayerRemoteClient {
     // TODO: pull from configuration
     this.client = new WebSocket("ws://192.168.1.72:8080");
     this.subscribers = new Set<Handler>();
+  }
 
+  public disconnect() {
+    this.client.close();
+  }
+
+  public join(matchId: string) {
+    // this.client = new WebSocket("ws://192.168.1.72:8080");
     const payload: ClientMessage = {
       action: Action.Joinmatch,
       // TODO: prompt user for matchId
-      matchId: "a1",
+      // matchId: "a1",
+      matchId,
     };
-    this.client.addEventListener("open", () => {
+    // this.client.addEventListener("open", () => {
       this.client.send(JSON.stringify(payload));
-    });
+    // });
     this.client.onmessage = (event) => {
       try {
         this.setState(JSON.parse(event.data));

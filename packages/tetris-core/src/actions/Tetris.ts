@@ -21,7 +21,7 @@ type Handler = (game: Game) => void;
 export class Tetris {
 
     private subscribers: Set<Handler>;
-    private game: Game | any;
+    private game?: Game;
     private freezeSemaphore: boolean;
     private loop?: number;
     private refreshLoop?: number;
@@ -33,15 +33,15 @@ export class Tetris {
         this.addScore = this.addScore.bind(this);
         this.updateGame = this.updateGame.bind(this);
         this.subscribers = new Set<Handler>();
-        this.initializeState();
+        // this.initializeState();
     }
 
     public moveLeft() {
-        if (this.game.gameState !== GameState.Active) {
+        if (this.game!.gameState !== GameState.Active) {
             return;
         }
 
-        const { position, piece } = moveLeft(this.game.playfield, this.game.position, this.game.piece);
+        const { position, piece } = moveLeft(this.game!.playfield, this.game!.position, this.game!.piece);
         this.setState({
             position,
             piece,
@@ -49,11 +49,11 @@ export class Tetris {
     }
 
     public moveRight() {
-        if (this.game.gameState !== GameState.Active) {
+        if (this.game!.gameState !== GameState.Active) {
             return;
         }
 
-        const { position, piece } = moveRight(this.game.playfield, this.game.position, this.game.piece);
+        const { position, piece } = moveRight(this.game!.playfield, this.game!.position, this.game!.piece);
         this.setState({
             position,
             piece,
@@ -61,11 +61,11 @@ export class Tetris {
     }
 
     public rotateRight() {
-        if (this.game.gameState !== GameState.Active) {
+        if (this.game!.gameState !== GameState.Active) {
             return;
         }
 
-        const { position, piece } = rotateRight(this.game.playfield, this.game.position, this.game.piece);
+        const { position, piece } = rotateRight(this.game!.playfield, this.game!.position, this.game!.piece);
         this.setState({
             position,
             piece,
@@ -73,11 +73,11 @@ export class Tetris {
     }
 
     public rotateLeft() {
-        if (this.game.gameState !== GameState.Active) {
+        if (this.game!.gameState !== GameState.Active) {
             return;
         }
 
-        const { position, piece } = rotateLeft(this.game.playfield, this.game.position, this.game.piece);
+        const { position, piece } = rotateLeft(this.game!.playfield, this.game!.position, this.game!.piece);
         this.setState({
             position,
             piece,
@@ -85,22 +85,22 @@ export class Tetris {
     }
 
     public togglePause() {
-        if (this.game.gameState === GameState.GameOver) {
+        if (this.game!.gameState === GameState.GameOver) {
             return;
         }
 
         this.setState({
-            gameState: this.game.gameState === GameState.Paused ? GameState.Active : GameState.Paused,
+            gameState: this.game!.gameState === GameState.Paused ? GameState.Active : GameState.Paused,
         });
     }
 
     public async drop(tick: boolean, hardDrop?: boolean) {
-        if (this.game.gameState === GameState.Active && !this.freezeSemaphore) {
+        if (this.game!.gameState === GameState.Active && !this.freezeSemaphore) {
             this.freezeSemaphore = true;
             const result = await moveDown(
-                this.game.playfield,
-                this.game.position,
-                this.game.piece,
+                this.game!.playfield,
+                this.game!.position,
+                this.game!.piece,
                 this.addScore,
                 this.addLines,
                 this.updateGame,
@@ -111,8 +111,8 @@ export class Tetris {
 
             let nextPiece;
             if (!result.piece) {
-                const position = calculatePosition(this.game.playfield, this.game.nextPiece);
-                result.piece = this.game.nextPiece;
+                const position = calculatePosition(this.game!.playfield, this.game!.nextPiece);
+                result.piece = this.game!.nextPiece;
                 result.position = position;
                 nextPiece = generateRandomPiece();
                 this.incrementCount(result.piece.toString());
@@ -125,7 +125,7 @@ export class Tetris {
 
             this.setState({
                 ...result,
-                nextPiece: nextPiece ? nextPiece : this.game.nextPiece,
+                nextPiece: nextPiece ? nextPiece : this.game!.nextPiece,
                 // gameState: result.gameover ? GameState.GameOver : GameState.Active,
             });
 
@@ -137,7 +137,7 @@ export class Tetris {
     }
 
     public endGame() {
-        if (this.getState().gameState === GameState.GameOver) {
+        if ((this.getState() as Game).gameState === GameState.GameOver) {
             return;
         }
 
@@ -162,8 +162,8 @@ export class Tetris {
     public getState(): Game {
         // TODO: deep copy
         return {
-            ...this.game,
-        };
+            ...(this.game || {}),
+        } as Game;
     }
 
     public subscribe(handler: Handler) {
@@ -205,8 +205,8 @@ export class Tetris {
 
     private incrementCount(pieceKey: string) {
         const stats = {
-            ...this.game.stats,
-            [pieceKey]: this.game.stats[pieceKey] + 1,
+            ...this.game!.stats,
+            [pieceKey]: this.game!.stats[pieceKey] + 1,
         };
 
         this.setState({
@@ -217,8 +217,8 @@ export class Tetris {
     private addScore(score: number) {
         this.setState({
             scoreboard: {
-                ...this.game.scoreboard,
-                score: this.game.scoreboard.score + score,
+                ...this.game!.scoreboard,
+                score: this.game!.scoreboard.score + score,
             },
         });
     }
@@ -226,18 +226,18 @@ export class Tetris {
     private addLines(lines: number) {
         const pts = [0, 40, 100, 300, 400];
 
-        const level = Math.floor((this.game.scoreboard.lines + lines) / 10) + 1;
-        const score = this.game.scoreboard.score + this.game.scoreboard.level * pts[lines];
+        const level = Math.floor((this.game!.scoreboard.lines + lines) / 10) + 1;
+        const score = this.game!.scoreboard.score + this.game!.scoreboard.level * pts[lines];
 
-        if (this.game.scoreboard.level !== level) {
+        if (this.game!.scoreboard.level !== level) {
             this.tick(level);
         }
 
         this.setState({
             scoreboard: {
-                ...this.game.scoreboard,
-                highscore: this.game.scoreboard.highscore > score ? this.game.scoreboard.highscore : score,
-                lines: this.game.scoreboard.lines + lines,
+                ...this.game!.scoreboard,
+                highscore: this.game!.scoreboard.highscore > score ? this.game!.scoreboard.highscore : score,
+                lines: this.game!.scoreboard.lines + lines,
                 score,
                 level,
             },
@@ -252,7 +252,7 @@ export class Tetris {
     }
 
     private notify = () => {
-        this.subscribers.forEach((subscriber) => subscriber(this.game));
+        this.subscribers.forEach((subscriber) => subscriber(this.game!));
     }
 
     private setState(state: any) {

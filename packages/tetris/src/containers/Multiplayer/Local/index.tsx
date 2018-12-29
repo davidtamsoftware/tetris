@@ -60,7 +60,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState> {
   private handleKeyDown(event: KeyboardEvent) {
     if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {
       this.multiplayer.restart();
-    } else if (this.state.gameState === Models.GameState.Active && (event.keyCode === 80 || event.keyCode === 27)) {
+    } else if (this.state.gameState === Models.GameState.Active && event.keyCode === 27) {
       this.multiplayer.togglePause();
     } else if (this.state.gameState !== Models.GameState.Active) {
       return;

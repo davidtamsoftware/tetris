@@ -21,7 +21,7 @@ export interface MultiplayerState {
 export class Multiplayer {
     private lastState: string;
     private subscribers: Set<Handler>;
-    private multiplayerState: MultiplayerState | any;
+    private multiplayerState?: MultiplayerState;
     private player1: Tetris;
     private player2: Tetris;
     private players: Tetris[];
@@ -33,13 +33,17 @@ export class Multiplayer {
         this.player2 = new Tetris();
         this.players = [this.player1, this.player2];
         this.subscribers = new Set<Handler>();
-        this.initializeState();
+        // this.initializeState();
         this.lastState = JSON.stringify(this.multiplayerState);
         this.updatePlayer1State = this.updatePlayer1State.bind(this);
         this.updatePlayer2State = this.updatePlayer2State.bind(this);
         this.player1.subscribe(this.updatePlayer1State);
         this.player2.subscribe(this.updatePlayer2State);
     }
+
+    // TODO: refactor to have player 1 and 2 join the game
+    // local to make them join and leave
+    // online is same but controlled by the human player
 
     public moveLeft(player: Player) {
         return this.players[player].moveLeft();
@@ -101,8 +105,10 @@ export class Multiplayer {
         this.refreshLoop = setInterval(this.notify, 35);
     }
 
-    public getState() {
-        return this.multiplayerState;
+    public getState(): MultiplayerState {
+        return {
+            ...(this.multiplayerState || {}),
+        } as MultiplayerState;
     }
 
     public subscribe(handler: Handler) {
@@ -127,7 +133,7 @@ export class Multiplayer {
     private notify = () => {
         if (this.lastState === JSON.stringify(this.multiplayerState)) {
             // tslint:disable-next-line:no-console
-            console.log("didn't notify");
+            // console.log("didn't notify");
             return;
         }
         this.subscribers.forEach((subscriber) => subscriber(this.multiplayerState));

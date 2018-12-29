@@ -18,7 +18,7 @@ class Menu extends React.Component<Props, State> {
             menuState: [props.menu],
             selection: 0,
         };
-        this.handleKeyDown = this.handleKeyDown.bind(this);
+        // this.handleKeyDown = this.handleKeyDown.bind(this);
     };
 
     public componentWillMount() {
@@ -56,13 +56,13 @@ class Menu extends React.Component<Props, State> {
         </div>
     }
 
-    private handleKeyDown(event: KeyboardEvent) {
+    private handleKeyDown = (event: KeyboardEvent) => {
         if (event.keyCode === 38) {
             this.up();
         } else if (event.keyCode === 40) {
             this.down();
         } else if (event.keyCode === 13) {
-            this.select();
+            this.selection(this.state.selection, true);
         } else if (event.keyCode === 27 || event.keyCode === 8) {
             this.back();
         }

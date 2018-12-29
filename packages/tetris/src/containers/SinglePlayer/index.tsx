@@ -38,6 +38,10 @@ class App extends React.Component<Props, Models.Game> {
   }
 
   public render() {
+    if (!this.state.playfield) {
+      return null;
+    }
+
     const result = Functions.merge(this.state.playfield, this.state.position, this.state.piece);
 
     return (
@@ -103,7 +107,7 @@ class App extends React.Component<Props, Models.Game> {
   private handleKeyDown(event: KeyboardEvent) {
     if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {
       this.tetris.restart();
-    } else if (this.state.gameState === Models.GameState.Active && (event.keyCode === 80 || event.keyCode === 27)) {
+    } else if (this.state.gameState === Models.GameState.Active && event.keyCode === 27) {
       this.tetris.togglePause();
     } else if (this.state.gameState !== Models.GameState.Active) {
       return;

@@ -177,7 +177,7 @@ wss.on("connection", (ws, req) => {
 
 const sendState = (ws: WebSocket, state: string) => {
     ws.send(state, (error) => {
-        console.log("sent state");
+        // console.log("sent state");
         if (error) {
             console.log("error sending state");
         }

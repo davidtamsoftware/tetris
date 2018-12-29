@@ -3,7 +3,7 @@ import Menu from "../../components/Menu";
 import MultiplayerLocal from "../Multiplayer/Local";
 import MultiplayerRemote from "../Multiplayer/Remote";
 import SinglePlayer from "../SinglePlayer";
-import linkedinLogo from "./In-2C-21px-R.png";
+// import linkedinLogo from "./In-2C-21px-R.png";
 
 interface State {
     gameMode?: Key;
@@ -25,14 +25,21 @@ class App extends React.Component<{}, State> {
         if (!this.state.gameMode) {
             game = <div>
                 <div style={{ textAlign: "center", margin: "0 auto", border: "0px solid white" }}>
-                    <span style={{fontSize: "10em", textShadow: "8px 8px gray"}}>TETRIS</span>
+                    <span style={{
+                        fontSize: "5em",
+                        textShadow: "3px 3px gray" }}>TETRIS</span>
                 </div>
                 <div style={{ clear: "both", paddingTop: "60px" }}>
                     <Menu menu={mainMenu} notify={this.handle} />
                 </div>
-                <div style={{ textAlign: "center", paddingTop: "100px"}}>
-                    <div style={{paddingBottom: "15px" }}>Implemented by David Tam</div>
-                    <div><a href="#"><img src={linkedinLogo} /></a></div>
+                <div style={{ textAlign: "center", paddingTop: "100px" }}>
+                    <div style={{ paddingBottom: "15px" }}>Implemented by David Tam</div>
+                    <div style={{ fontFamily: "sans-serif" }}>
+                        {/* <a href="#"><img src={linkedinLogo} /></a> */}
+                        {/* <a href="#">linkedin</a>&#09; */}
+                        {/* <a className="github-button" href="https://github.com/davidtamsoftware" aria-label="Follow @davidtamsoftware on GitHub">Follow @davidtamsoftware</a> */}
+                        {/* GitHub <a href="#">@davidtamsoftware</a> */}
+                    </div>
                 </div>
             </div>;
         } else if (this.state.gameMode === "SINGLE_PLAYER") {
@@ -94,6 +101,21 @@ export const gameOverMenu: Node = {
         key: "HOME",
     }]
 };
+
+// TODO add match over?
+
+export const matchMenu: Node = {
+    name: "Exit to Main Menu",
+    children: [{
+        name: "OK",
+        key: "QUIT_CONFIRM"
+    },
+    {
+        name: "Cancel",
+        key: "QUIT_CANCEL",
+    }]
+};
+
 
 export type Key = "HOME" | "RESTART" | "RESUME" | "QUIT_CONFIRM" | "QUIT_CANCEL" | "SINGLE_PLAYER" | "MULTIPLAYER_LOCAL" | "MULTIPLAYER_REMOTE";
 
