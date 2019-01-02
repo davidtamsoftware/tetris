@@ -12,6 +12,21 @@ import { Game, GameState, pieces, Playfield, playfield as initialPlayfield } fro
 
 type Handler = (game: Game) => void;
 
+type EventHandler = (event: Event) => void;
+
+export enum Event {
+    Single,
+    Double,
+    Triple,
+    Tetris,
+    Drop,
+    GameOver,
+    RotateLeft,
+    RotateRight,
+    PauseIn,
+    PauseOut,
+}
+
 /**
  * @class Tetris
  * @description Contains the logic for tetris actions and uses pure functions to transform playfield contents
@@ -21,6 +36,7 @@ type Handler = (game: Game) => void;
 export class Tetris {
 
     private subscribers: Set<Handler>;
+    private eventSubscribers: Set<EventHandler>;
     private game?: Game;
     private freezeSemaphore: boolean;
     private loop?: number;
@@ -33,6 +49,7 @@ export class Tetris {
         this.addScore = this.addScore.bind(this);
         this.updateGame = this.updateGame.bind(this);
         this.subscribers = new Set<Handler>();
+        this.eventSubscribers = new Set<EventHandler>();
         // this.initializeState();
     }
 
@@ -104,6 +121,7 @@ export class Tetris {
                 this.addScore,
                 this.addLines,
                 this.updateGame,
+                this.publishEvent,
                 tick,
                 hardDrop);
 
@@ -114,6 +132,7 @@ export class Tetris {
                 const position = calculatePosition(this.game!.playfield, this.game!.nextPiece);
                 result.piece = this.game!.nextPiece;
                 result.position = position;
+
                 nextPiece = generateRandomPiece();
                 this.incrementCount(result.piece.toString());
 
@@ -144,6 +163,7 @@ export class Tetris {
         this.setState({
             gameState: GameState.GameOver,
         });
+        this.publishEvent(Event.GameOver);
         this.notify();
         clearInterval(this.refreshLoop);
         clearInterval(this.loop);
@@ -172,6 +192,14 @@ export class Tetris {
 
     public unsubscribe(handler: Handler) {
         this.subscribers.delete(handler);
+    }
+
+    public subscribeToEvent(handler: EventHandler) {
+        this.eventSubscribers.add(handler);
+    }
+
+    public unsubscribeToEvent(handler: EventHandler) {
+        this.eventSubscribers.delete(handler);
     }
 
     private tick(level: number) {
@@ -244,6 +272,7 @@ export class Tetris {
         });
     }
 
+    // used for animating line removal
     private updateGame(playfield: Playfield) {
         this.setState({
             playfield,
@@ -253,6 +282,10 @@ export class Tetris {
 
     private notify = () => {
         this.subscribers.forEach((subscriber) => subscriber(this.game!));
+    }
+
+    private publishEvent = (event: Event) => {
+        this.eventSubscribers.forEach((eventSubscribers) => eventSubscribers(event));
     }
 
     private setState(state: any) {

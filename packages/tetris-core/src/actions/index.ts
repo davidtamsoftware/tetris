@@ -1,5 +1,6 @@
 import { pieces } from "../models";
 import { Fill, Piece, PiecePosition, Playfield } from "../models";
+import { Event } from "./Tetris";
 
 export const rotate = (rotatePiece: (p: Piece) => Piece, playfield: Playfield, position: PiecePosition, p: Piece) => {
     const piece: Piece = rotatePiece(p);
@@ -101,6 +102,7 @@ export const moveDown = async (
     addScore: (score: number) => void,
     addLines: (lines: number) => void,
     updateGame: (game: Playfield) => void,
+    publishEvent: (event: Event) => void,
     tick: boolean,
     hardDrop?: boolean) => {
 
@@ -118,7 +120,8 @@ export const moveDown = async (
     addScore(!tick ? count : 0);
 
     if (collision) {
-        const newState = await removeCompletedLines(merge(playfield, prevPosition, piece).playfield, updateGame);
+        const newState = await removeCompletedLines(
+            merge(playfield, prevPosition, piece).playfield, updateGame, publishEvent);
         const result: any = {
             playfield: newState.playfield,
         };
@@ -134,7 +137,8 @@ export const moveDown = async (
     };
 };
 
-export const removeCompletedLines = (playfield: Playfield, updateGame: (game: Playfield) => void) => {
+export const removeCompletedLines =
+    (playfield: Playfield, updateGame: (game: Playfield) => void, publishEvent: (event: Event) => void) => {
     const animateDeletionState1 =
         playfield.map((row) => row.every((col) => !!col) ? row.map(() => Fill.White) : row) as Playfield;
     const animateDeletionState2 =
@@ -147,7 +151,11 @@ export const removeCompletedLines = (playfield: Playfield, updateGame: (game: Pl
         newState.unshift(...lines);
     }
 
+    // TODO: callback for line dropping audio
+    publishEvent(Event.Drop);
     if (padEmptyLines) {
+        // TODO: callback for line removal audio
+        publishEvent(Event.Single);
         updateGame(animateDeletionState1);
         setTimeout(() => updateGame(animateDeletionState2), 50);
         setTimeout(() => updateGame(animateDeletionState1), 100);
