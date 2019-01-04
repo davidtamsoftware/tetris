@@ -3,6 +3,7 @@ import Menu from "../../components/Menu";
 import MultiplayerLocal from "../Multiplayer/Local";
 import MultiplayerRemote from "../Multiplayer/Remote";
 import SinglePlayer from "../SinglePlayer";
+import { Event } from "tetris-core";
 // import linkedinLogo from "./In-2C-21px-R.png";
 
 interface State {
@@ -27,7 +28,8 @@ class App extends React.Component<{}, State> {
                 <div style={{ textAlign: "center", margin: "0 auto", border: "0px solid white" }}>
                     <span style={{
                         fontSize: "5em",
-                        textShadow: "3px 3px gray" }}>TETRIS</span>
+                        textShadow: "3px 3px gray"
+                    }}>TETRIS</span>
                 </div>
                 <div style={{ clear: "both", paddingTop: "60px" }}>
                     <Menu menu={mainMenu} notify={this.handle} />
@@ -147,5 +149,30 @@ const mainMenu: Node = {
         }
     ]
 };
+
+export const handleEvent = (event: Event) => {
+    if (event === Event.Drop) {
+        const audio = new Audio("/drop.mp3");
+        audio.play();
+    } else if (event === Event.Single) {
+        const audio = new Audio("/single.mp3");
+        audio.play();
+    } else if (event === Event.GameOver) {
+        const audio = new Audio("/gameover.mp3");
+        audio.play();
+    } else if (event === Event.RotateLeft) {
+        const audio = new Audio("/rotate_left.mp3");
+        audio.play();
+    } else if (event === Event.RotateRight) {
+        const audio = new Audio("/rotate_right.mp3");
+        audio.play();
+    } else if (event === Event.PauseIn) {
+        const audio = new Audio("/pause_in.mp3");
+        audio.play();
+    } else if (event === Event.PauseOut) {
+        const audio = new Audio("/pause_out.mp3");
+        audio.play();
+    }
+}
 
 export default App;

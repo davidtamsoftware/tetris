@@ -12,7 +12,7 @@ import { Game, GameState, pieces, Playfield, playfield as initialPlayfield } fro
 
 type Handler = (game: Game) => void;
 
-type EventHandler = (event: Event) => void;
+export type EventHandler = (event: Event) => void;
 
 export enum Event {
     Single,
@@ -36,7 +36,7 @@ export enum Event {
 export class Tetris {
 
     private subscribers: Set<Handler>;
-    private eventSubscribers: Set<EventHandler>;
+    private eventSubscribers: Map<EventHandler, Event[]>;
     private game?: Game;
     private freezeSemaphore: boolean;
     private loop?: number;
@@ -49,7 +49,7 @@ export class Tetris {
         this.addScore = this.addScore.bind(this);
         this.updateGame = this.updateGame.bind(this);
         this.subscribers = new Set<Handler>();
-        this.eventSubscribers = new Set<EventHandler>();
+        this.eventSubscribers = new Map<EventHandler, Event[]>();
         // this.initializeState();
     }
 
@@ -87,6 +87,8 @@ export class Tetris {
             position,
             piece,
         });
+
+        this.publishEvent(Event.RotateRight);
     }
 
     public rotateLeft() {
@@ -99,6 +101,8 @@ export class Tetris {
             position,
             piece,
         });
+
+        this.publishEvent(Event.RotateLeft);
     }
 
     public togglePause() {
@@ -109,6 +113,8 @@ export class Tetris {
         this.setState({
             gameState: this.game!.gameState === GameState.Paused ? GameState.Active : GameState.Paused,
         });
+
+        this.publishEvent(this.game!.gameState === GameState.Paused ? Event.PauseOut : Event.PauseIn);
     }
 
     public async drop(tick: boolean, hardDrop?: boolean) {
@@ -194,8 +200,16 @@ export class Tetris {
         this.subscribers.delete(handler);
     }
 
-    public subscribeToEvent(handler: EventHandler) {
-        this.eventSubscribers.add(handler);
+    /**
+     * Subscribe to events that are published.
+     *
+     * @param {EventHandler} handler
+     * @param {...Event[]} event specific events to subscribe to. If left empty,
+     * then handler will subscribe to all events
+     * @memberof Tetris
+     */
+    public subscribeToEvent(handler: EventHandler, ...events: Event[]) {
+        this.eventSubscribers.set(handler, events);
     }
 
     public unsubscribeToEvent(handler: EventHandler) {
@@ -285,7 +299,11 @@ export class Tetris {
     }
 
     private publishEvent = (event: Event) => {
-        this.eventSubscribers.forEach((eventSubscribers) => eventSubscribers(event));
+        this.eventSubscribers.forEach((events, handler) => {
+            if (events.length === 0 || events.indexOf(event) >= 0) {
+                handler(event);
+            }
+        });
     }
 
     private setState(state: any) {

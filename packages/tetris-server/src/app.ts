@@ -1,6 +1,8 @@
 import WebSocket from "ws";
 import { Multiplayer } from "tetris-core";
-import { Action, ClientMessage } from "tetris-ws-model";
+import { Action, ClientMessage, ServerMessage, ResponseType } from "tetris-ws-model";
+import { ServerResponse } from "http";
+import { Event } from "tetris-core/lib/actions/Tetris";
 
 class MatchService {
 
@@ -58,6 +60,13 @@ class Match {
         this._matchId = matchId;
         this._game = new Multiplayer.Multiplayer();
         this._game.subscribe(this.handle);
+        // Subscribe to only a subset of the events that are triggered by server
+        // game calculation logic. This is to reduce the number of web socket 
+        // messages. Events that are triggered by user button action can be
+        // captured on the client.
+        this._game.subscribeToEvent(this.handleEvent, 
+            Event.Drop, Event.GameOver, Event.Single,
+            Event.Double, Event.Triple, Event.Tetris);
     }
 
     get game(): Multiplayer.Multiplayer {
@@ -100,10 +109,32 @@ class Match {
 
     private handle = (state: any) => {
         if (this._player1) {
-            sendState(this._player1, JSON.stringify(state));
+            sendState(this._player1, JSON.stringify({
+                    type: ResponseType.GameState,
+                    payload: state,
+                } as ServerMessage));
         }
         if (this._player2) {
-            sendState(this._player2, JSON.stringify(state));
+            sendState(this._player2, JSON.stringify({
+                type: ResponseType.GameState,
+                payload: state,
+            } as ServerMessage));
+        }
+    }
+
+    
+    private handleEvent = (event: Event) => {
+        if (this._player1) {
+            sendState(this._player1, JSON.stringify({
+                type: ResponseType.GameEvent,
+                payload: event,
+            } as ServerMessage));
+        }
+        if (this._player2) {
+            sendState(this._player2, JSON.stringify({
+                type: ResponseType.GameEvent,
+                payload: event,
+            } as ServerMessage));
         }
     }
 
@@ -134,13 +165,18 @@ const getPlayerNumber = (match: Match, ws: WebSocket): Multiplayer.Player => {
     throw new Error("player not found");
 };
 
+setInterval(() => console.log("active matches: ", matchService.matches.length), 5000);
+setInterval(() => {
+    console.log("avg messages sent per 10 seconds: ", count);
+    count = 0;
+}, 10000);
+
 wss.on("connection", (ws, req) => {
     ws.on("close", () => {
         matchService.playerExit(ws);
     });
 
     ws.on("message", (message) => {
-        console.log("active matches: ", matchService.matches.length);
         try {
             const msg = JSON.parse(message.toString()) as ClientMessage;
             if (msg.action === Action.Joinmatch && msg.matchId) {
@@ -174,8 +210,9 @@ wss.on("connection", (ws, req) => {
     });
 });
 
-
+let count = 0;
 const sendState = (ws: WebSocket, state: string) => {
+    count++;
     ws.send(state, (error) => {
         // console.log("sent state");
         if (error) {

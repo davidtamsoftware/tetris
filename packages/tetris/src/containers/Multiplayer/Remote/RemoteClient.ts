@@ -1,10 +1,14 @@
-import { Multiplayer as MultiplayerAction} from "tetris-core";
-import { Action, ClientMessage } from "tetris-ws-model";
+import { Multiplayer as MultiplayerAction } from "tetris-core";
+import { Action, ClientMessage, ServerMessage, ResponseType } from "tetris-ws-model";
+import { EventHandler, Event } from "tetris-core/lib/actions/Tetris";
 
 type Handler = (game: any) => void;
 
 export class MultiplayerRemoteClient {
   private subscribers: Set<Handler>;
+  // private eventSubscribers: Set<EventHandler>;
+  private eventSubscribers: Map<EventHandler, Event[]>;
+
   private multiplayerState: MultiplayerAction.MultiplayerState;
   private client: WebSocket;
 
@@ -13,6 +17,7 @@ export class MultiplayerRemoteClient {
     // TODO: pull from configuration
     this.client = new WebSocket("ws://192.168.1.72:8080");
     this.subscribers = new Set<Handler>();
+    this.eventSubscribers = new Map<EventHandler, Event[]>();
   }
 
   public disconnect() {
@@ -28,11 +33,17 @@ export class MultiplayerRemoteClient {
       matchId,
     };
     // this.client.addEventListener("open", () => {
-      this.client.send(JSON.stringify(payload));
+    this.client.send(JSON.stringify(payload));
     // });
     this.client.onmessage = (event) => {
       try {
-        this.setState(JSON.parse(event.data));
+        const message: ServerMessage = JSON.parse(event.data);
+        if (message.type === ResponseType.GameState) {
+          this.setState(message.payload);
+        }
+        else if (message.type === ResponseType.GameEvent) {
+          this.publishEvent(message.payload);
+        }
       } catch (error) {
         // tslint:disable-next-line:no-console
         console.log("error parsing: ", event);
@@ -59,6 +70,7 @@ export class MultiplayerRemoteClient {
       action: Action.RotateRight,
     };
     this.client.send(JSON.stringify(payload));
+    this.publishEvent(Event.RotateRight);
   }
 
   public rotateLeft() {
@@ -66,6 +78,7 @@ export class MultiplayerRemoteClient {
       action: Action.RotateLeft,
     };
     this.client.send(JSON.stringify(payload));
+    this.publishEvent(Event.RotateLeft);
   }
 
   public togglePause() {
@@ -73,6 +86,8 @@ export class MultiplayerRemoteClient {
       action: Action.MoveRight, // TODO
     };
     this.client.send(JSON.stringify(payload));
+    // this.publishEvent(Event.PauseIn);
+    // TODO: determine when to publish pause out
   }
 
   public drop(hardDrop?: boolean) {
@@ -109,6 +124,14 @@ export class MultiplayerRemoteClient {
     this.subscribers.delete(handler);
   }
 
+  public subscribeToEvent(handler: EventHandler, ...events: Event[]) {
+    this.eventSubscribers.set(handler, events);
+  }
+
+  public unsubscribeToEvent(handler: EventHandler) {
+    this.eventSubscribers.delete(handler);
+  }
+
   private setState(state: any) {
     // mutate state
     this.multiplayerState = {
@@ -121,5 +144,17 @@ export class MultiplayerRemoteClient {
 
   private notify = () => {
     this.subscribers.forEach((subscriber) => subscriber(this.multiplayerState));
+  }
+
+  // private publishEvent = (event: Event) => {
+  //   this.eventSubscribers.forEach((eventSubscribers) => eventSubscribers(event));
+  // }
+
+  private publishEvent = (event: Event) => {
+    this.eventSubscribers.forEach((events, handler) => {
+      if (events.length === 0 || events.indexOf(event) >= 0) {
+        handler(event);
+      }
+    });
   }
 }

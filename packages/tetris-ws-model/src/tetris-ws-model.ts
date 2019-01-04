@@ -10,9 +10,19 @@ export enum Action {
     InstantMessage,
 }
 
+export enum ResponseType {
+    GameState,
+    GameEvent,
+}
+
 export interface ClientMessage {
     action: Action;
     matchId?: string;
+}
+
+export interface ServerMessage {
+    type: ResponseType;
+    payload: any;
 }
 
 // main server

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
 import { Multiplayer } from "..";
-import { Key, Props, matchMenu } from "../../App";
+import { Key, Props, matchMenu, handleEvent } from "../../App";
 import { MultiplayerRemoteClient } from "./RemoteClient";
 import styles from "./index.module.css";
 import Menu from "../../../components/Menu";
@@ -23,11 +23,13 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & { 
   public componentWillMount() {
     document.addEventListener("keydown", this.handleKeyDown);
     this.multiplayer.subscribe(this.handle);
+    this.multiplayer.subscribeToEvent(handleEvent);
   }
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
     this.multiplayer.unsubscribe(this.handle);
+    this.multiplayer.unsubscribeToEvent(handleEvent);
     this.multiplayer.disconnect();
   }
 

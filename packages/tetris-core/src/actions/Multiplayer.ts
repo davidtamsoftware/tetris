@@ -1,5 +1,5 @@
 import { Game, GameState } from "../models";
-import { Tetris } from "./Tetris";
+import { EventHandler, Tetris, Event } from "./Tetris";
 
 export enum Player {
     One,
@@ -39,6 +39,16 @@ export class Multiplayer {
         this.updatePlayer2State = this.updatePlayer2State.bind(this);
         this.player1.subscribe(this.updatePlayer1State);
         this.player2.subscribe(this.updatePlayer2State);
+    }
+
+    public subscribeToEvent(handler: EventHandler, ...events: Event[]) {
+        this.player1.subscribeToEvent(handler, ...events);
+        this.player2.subscribeToEvent(handler, ...events);
+    }
+
+    public unsubscribeToEvent(handler: EventHandler) {
+        this.player1.unsubscribeToEvent(handler);
+        this.player2.unsubscribeToEvent(handler);
     }
 
     // TODO: refactor to have player 1 and 2 join the game
@@ -102,7 +112,8 @@ export class Multiplayer {
         this.players[Player.One].restart();
         this.players[Player.Two].restart();
         this.initializeState();
-        this.refreshLoop = setInterval(this.notify, 35);
+        // TODO: add constructor arg to control local vs remote refresh interval
+        this.refreshLoop = setInterval(this.notify, 50); // 35
     }
 
     public getState(): MultiplayerState {

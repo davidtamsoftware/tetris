@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
 import { Multiplayer } from "..";
-import { Key, Props } from "../../App";
+import { Key, Props, handleEvent } from "../../App";
+import { Event } from "tetris-core/lib/actions/Tetris";
 
 class App extends React.Component<Props, MultiplayerAction.MultiplayerState> {
 
@@ -18,11 +19,13 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState> {
   public componentWillMount() {
     document.addEventListener("keydown", this.handleKeyDown);
     this.multiplayer.subscribe(this.handle);
+    this.multiplayer.subscribeToEvent(handleEvent);
   }
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
     this.multiplayer.unsubscribe(this.handle);
+    this.multiplayer.subscribeToEvent(handleEvent);
   }
 
   public componentDidMount() {
@@ -56,6 +59,19 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState> {
       ...multiplayerState,
     });
   }
+
+  // private handleEvent = (event: Event) => {
+  //   if (event === Event.Drop) {
+  //     const audio = new Audio("/drop.mp3");
+  //     audio.play();
+  //   } else if (event === Event.Single) {
+  //     const audio = new Audio("/single.mp3");
+  //     audio.play();
+  //   } else if (event === Event.GameOver) {
+  //     const audio = new Audio("/gameover.mp3");
+  //     audio.play();
+  //   }
+  // }
 
   private handleKeyDown(event: KeyboardEvent) {
     if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {

@@ -6,9 +6,8 @@ import { NextPiece } from "../../components/NextPiece";
 import { Playfield } from "../../components/Playfield";
 import { Scoreboard } from "../../components/Scoreboard";
 import { Stats } from "../../components/Stats";
-import { gameOverMenu, Key, pauseMenu, Props } from "../App";
+import { gameOverMenu, Key, pauseMenu, Props, handleEvent } from "../App";
 import styles from "./index.module.css";
-import { Event } from "tetris-core/lib/actions/Tetris";
 
 class App extends React.Component<Props, Models.Game> {
 
@@ -22,19 +21,19 @@ class App extends React.Component<Props, Models.Game> {
     this.handle = this.handle.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.theme = new Audio("/tetris_theme.mp3");
+    this.theme.loop = true;
   }
 
   public componentWillMount() {
     document.addEventListener("keydown", this.handleKeyDown);
     this.tetris.subscribe(this.handle);
-    this.tetris.subscribeToEvent(this.handleEvent);
-    this.theme.loop = true;
+    this.tetris.subscribeToEvent(handleEvent);
     this.theme.play();
   }
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
-    this.tetris.unsubscribeToEvent(this.handleEvent);
+    this.tetris.unsubscribeToEvent(handleEvent);
     this.theme.remove();
   }
 
@@ -49,9 +48,8 @@ class App extends React.Component<Props, Models.Game> {
 
     const result = Functions.merge(this.state.playfield, this.state.position, this.state.piece);
 
-    if (this.state.gameState === Models.GameState.Paused) {
-      this.theme.pause();
-    } else if (this.state.gameState === Models.GameState.GameOver) {
+    if (this.state.gameState === Models.GameState.Paused ||
+      this.state.gameState === Models.GameState.GameOver) {
       this.theme.pause();
     } else {
       this.theme.play();
@@ -73,7 +71,6 @@ class App extends React.Component<Props, Models.Game> {
             left: "calc(50% - 200px - 5px - 20px)",
             top: "200px", 
             backgroundColor: "black"}}>
-              {/* <Paused /> */}
               <Menu menu={pauseMenu} notify={this.handleMenuSelect} menuClose={this.handleMenuClose} />
             </div>
           }
@@ -82,7 +79,6 @@ class App extends React.Component<Props, Models.Game> {
             left: "calc(50% - 200px - 5px - 20px)",
             top: "200px", 
             backgroundColor: "black"}}>
-              {/* <GameOver /> */}
               <Menu menu={gameOverMenu} notify={this.handleMenuSelect} />
             </div>
           }
@@ -93,8 +89,6 @@ class App extends React.Component<Props, Models.Game> {
 
   private handleMenuClose = () => {
     this.tetris.togglePause();
-    const audio = new Audio("/pause_out.mp3");
-    audio.play();
   }
 
   private handleMenuSelect = (key: Key) => {
@@ -105,11 +99,9 @@ class App extends React.Component<Props, Models.Game> {
       return false;
     } else if (key === "RESUME") {
       this.tetris.togglePause();
-      const audio = new Audio("/unpause.mp3");
-      audio.play();
     } else if (key === "RESTART") {
       this.tetris.restart();
-      this.theme.currentTime = 0
+      this.theme.currentTime = 0;
     }
     return true;
   }
@@ -126,18 +118,12 @@ class App extends React.Component<Props, Models.Game> {
       this.tetris.restart();
     } else if (this.state.gameState === Models.GameState.Active && event.keyCode === 27) {
       this.tetris.togglePause();
-      const audio = new Audio("/pause_in.mp3");
-      audio.play();
     } else if (this.state.gameState !== Models.GameState.Active) {
       return;
     } else if (event.keyCode === 90) {
       this.tetris.rotateLeft();
-      const audio = new Audio("/rotate_left.mp3");
-      audio.play();
     } else if (event.keyCode === 38) {
       this.tetris.rotateRight();
-      const audio = new Audio("/rotate_right.mp3");
-      audio.play();
     } else if (event.keyCode === 39) {
       this.tetris.moveRight();
     } else if (event.keyCode === 37) {
@@ -146,20 +132,6 @@ class App extends React.Component<Props, Models.Game> {
       this.tetris.drop(false);
     } else if (event.keyCode === 32) {
       this.tetris.drop(false, true);
-
-    }
-  }
-
-  private handleEvent = (event: Event) => {
-    if (event === Event.Drop) {
-      const audio = new Audio("/drop.mp3");
-      audio.play();
-    } else if (event === Event.Single) {
-      const audio = new Audio("/single.mp3");
-      audio.play();
-    } else if (event === Event.GameOver) {
-      const audio = new Audio("/gameover.mp3");
-      audio.play();
     }
   }
 }
