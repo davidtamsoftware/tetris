@@ -15,7 +15,9 @@ export class MultiplayerRemoteClient {
   constructor() {
     this.multiplayerState = {} as any;
     // TODO: pull from configuration
-    this.client = new WebSocket("ws://192.168.1.72:8080");
+    // const wsUrl = "ws://192.168.1.72:8080";
+    const wsUrl = "ws://hidden-tundra-30225.herokuapp.com";
+    this.client = new WebSocket(wsUrl);
     this.subscribers = new Set<Handler>();
     this.eventSubscribers = new Map<EventHandler, Event[]>();
   }
