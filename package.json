@@ -1,9 +1,21 @@
 {
   "name": "root",
   "private": true,
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "clean": "lerna clean",
+    "build": "lerna run build",
+    "postinstall": "npm run bootstrap && npm run build",
+    "test": "lerna run test"
+  },
+  "engines": {
+    "node": "8.11.4"
+  },
+  "author": "David Tam",
   "devDependencies": {
     "lerna": "^3.5.0",
     "tslint": "^5.11.0",
     "typescript": "^3.2.1"
-  }
+  },
+  "dependencies": {}
 }

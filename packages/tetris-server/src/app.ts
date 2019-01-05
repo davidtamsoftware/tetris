@@ -1,7 +1,6 @@
 import WebSocket from "ws";
 import { Multiplayer } from "tetris-core";
 import { Action, ClientMessage, ServerMessage, ResponseType } from "tetris-ws-model";
-import { ServerResponse } from "http";
 import { Event } from "tetris-core/lib/actions/Tetris";
 
 class MatchService {
@@ -153,7 +152,7 @@ class Match {
 const matchService = new MatchService();
 
 // TODO: port config
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: process.env.PORT as any || 8080 });
 
 const getPlayerNumber = (match: Match, ws: WebSocket): Multiplayer.Player => {
     if (match.player1 === ws) {
