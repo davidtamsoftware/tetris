@@ -1,5 +1,5 @@
 import { Game, GameState } from "../models";
-import { EventHandler, Tetris, Event } from "./Tetris";
+import { Event, EventHandler, Tetris } from "./Tetris";
 
 export enum Player {
     One,
@@ -43,7 +43,14 @@ export class Multiplayer {
 
     public subscribeToEvent(handler: EventHandler, ...events: Event[]) {
         this.player1.subscribeToEvent(handler, ...events);
-        this.player2.subscribeToEvent(handler, ...events);
+        // make sure that we dont handle 2 restart/gameover events
+        const filteredEvents = events.filter(
+            (event) =>
+                event !== Event.Start &&
+                event !== Event.GameOver &&
+                event !== Event.PauseIn &&
+                event !== Event.PauseOut);
+        this.player2.subscribeToEvent(handler, ...filteredEvents);
     }
 
     public unsubscribeToEvent(handler: EventHandler) {

@@ -150,6 +150,9 @@ const mainMenu: Node = {
     ]
 };
 
+const theme = new Audio("/tetris_theme.mp3");
+theme.loop = true;
+
 export const handleEvent = (event: Event) => {
     if (event === Event.Drop) {
         const audio = new Audio("/drop.mp3");
@@ -157,9 +160,13 @@ export const handleEvent = (event: Event) => {
     } else if (event === Event.Single) {
         const audio = new Audio("/single.mp3");
         audio.play();
+    } else if (event === Event.Start) {
+        theme.currentTime = 0;
+        theme.play();
     } else if (event === Event.GameOver) {
         const audio = new Audio("/gameover.mp3");
         audio.play();
+        theme.pause();
     } else if (event === Event.RotateLeft) {
         const audio = new Audio("/rotate_left.mp3");
         audio.play();
@@ -169,9 +176,11 @@ export const handleEvent = (event: Event) => {
     } else if (event === Event.PauseIn) {
         const audio = new Audio("/pause_in.mp3");
         audio.play();
+        theme.pause();
     } else if (event === Event.PauseOut) {
         const audio = new Audio("/pause_out.mp3");
         audio.play();
+        theme.play();
     }
 }
 

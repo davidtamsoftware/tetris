@@ -25,6 +25,7 @@ export enum Event {
     RotateRight,
     PauseIn,
     PauseOut,
+    Start,
 }
 
 /**
@@ -110,11 +111,11 @@ export class Tetris {
             return;
         }
 
+        this.publishEvent(this.game!.gameState === GameState.Paused ? Event.PauseOut : Event.PauseIn);
         this.setState({
             gameState: this.game!.gameState === GameState.Paused ? GameState.Active : GameState.Paused,
         });
 
-        this.publishEvent(this.game!.gameState === GameState.Paused ? Event.PauseOut : Event.PauseIn);
     }
 
     public async drop(tick: boolean, hardDrop?: boolean) {
@@ -183,6 +184,7 @@ export class Tetris {
         this.tick(1);
         this.setState(this.initializeState());
         this.refreshLoop = setInterval(this.notify, 20);
+        this.publishEvent(Event.Start);
     }
 
     public getState(): Game {

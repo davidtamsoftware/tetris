@@ -73,7 +73,9 @@ class Match {
         // captured on the client.
         this._game.subscribeToEvent(this.handleEvent, 
             Event.Drop, Event.GameOver, Event.Single,
-            Event.Double, Event.Triple, Event.Tetris);
+            Event.Double, Event.Triple, Event.Tetris,
+            Event.PauseIn, Event.PauseOut, Event.Start,
+            Event.GameOver);
     }
 
     get game(): Multiplayer.Multiplayer {

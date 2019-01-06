@@ -12,7 +12,7 @@ import styles from "./index.module.css";
 class App extends React.Component<Props, Models.Game> {
 
   private tetris: Tetris;
-  private theme: HTMLAudioElement;
+  // private theme: HTMLAudioElement;
 
   constructor(props: Props) {
     super(props)
@@ -20,21 +20,21 @@ class App extends React.Component<Props, Models.Game> {
     this.state = this.tetris.getState();
     this.handle = this.handle.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.theme = new Audio("/tetris_theme.mp3");
-    this.theme.loop = true;
+    // this.theme = new Audio("/tetris_theme.mp3");
+    // this.theme.loop = true;
   }
 
   public componentWillMount() {
     document.addEventListener("keydown", this.handleKeyDown);
     this.tetris.subscribe(this.handle);
     this.tetris.subscribeToEvent(handleEvent);
-    this.theme.play();
+    // this.theme.play();
   }
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
     this.tetris.unsubscribeToEvent(handleEvent);
-    this.theme.remove();
+    // this.theme.remove();
   }
 
   public componentDidMount() {
@@ -48,12 +48,12 @@ class App extends React.Component<Props, Models.Game> {
 
     const result = Functions.merge(this.state.playfield, this.state.position, this.state.piece);
 
-    if (this.state.gameState === Models.GameState.Paused ||
-      this.state.gameState === Models.GameState.GameOver) {
-      this.theme.pause();
-    } else {
-      this.theme.play();
-    }
+    // if (this.state.gameState === Models.GameState.Paused ||
+    //   this.state.gameState === Models.GameState.GameOver) {
+    //   this.theme.pause();
+    // } else {
+    //   this.theme.play();
+    // }
     return (
       <div className={styles.App}>
         <div className={styles.left}>
@@ -101,7 +101,7 @@ class App extends React.Component<Props, Models.Game> {
       this.tetris.togglePause();
     } else if (key === "RESTART") {
       this.tetris.restart();
-      this.theme.currentTime = 0;
+      // this.theme.currentTime = 0;
     }
     return true;
   }
