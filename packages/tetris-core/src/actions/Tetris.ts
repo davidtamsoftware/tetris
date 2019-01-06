@@ -8,7 +8,7 @@ import {
     rotateLeft,
     rotateRight,
 } from ".";
-import { Game, GameState, pieces, Playfield, playfield as initialPlayfield } from "../models";
+import { Fill, Game, GameState, pieces, Playfield, playfield as initialPlayfield } from "../models";
 
 type Handler = (game: Game) => void;
 
@@ -42,8 +42,9 @@ export class Tetris {
     private freezeSemaphore: boolean;
     private loop?: number;
     private refreshLoop?: number;
+    private pieceGenerator?: () => Fill[][];
 
-    constructor() {
+    constructor(pieceGenerator?: () => Fill[][]) {
         this.freezeSemaphore = false;
         this.incrementCount = this.incrementCount.bind(this);
         this.addLines = this.addLines.bind(this);
@@ -52,6 +53,7 @@ export class Tetris {
         this.subscribers = new Set<Handler>();
         this.eventSubscribers = new Map<EventHandler, Event[]>();
         // this.initializeState();
+        this.pieceGenerator = pieceGenerator;
     }
 
     public moveLeft() {
@@ -140,7 +142,7 @@ export class Tetris {
                 result.piece = this.game!.nextPiece;
                 result.position = position;
 
-                nextPiece = generateRandomPiece();
+                nextPiece = this.pieceGenerator ? this.pieceGenerator() : generateRandomPiece();
                 this.incrementCount(result.piece.toString());
 
                 // check if new piece has collision with new playfield, if so then game over
@@ -224,11 +226,11 @@ export class Tetris {
     }
 
     private initializeState() {
-        const randomPiece = generateRandomPiece();
+        const randomPiece = this.pieceGenerator ? this.pieceGenerator() : generateRandomPiece();
         const state = {
             playfield: initialPlayfield,
             piece: randomPiece,
-            nextPiece: generateRandomPiece(),
+            nextPiece: this.pieceGenerator ? this.pieceGenerator() : generateRandomPiece(),
             position: calculatePosition(initialPlayfield, randomPiece),
             gameState: GameState.Active,
             scoreboard: {

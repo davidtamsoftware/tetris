@@ -1,4 +1,5 @@
-import { Game, GameState } from "../models";
+import { generateRandomPiece } from ".";
+import { Fill, Game, GameState } from "../models";
 import { Event, EventHandler, Tetris } from "./Tetris";
 
 export enum Player {
@@ -28,9 +29,14 @@ export class Multiplayer {
 
     private refreshLoop?: number;
 
+    private nextPiecesPlayer1: Fill[][][];
+    private nextPiecesPlayer2: Fill[][][];
+
     constructor() {
-        this.player1 = new Tetris();
-        this.player2 = new Tetris();
+        this.nextPiecesPlayer1 = [];
+        this.nextPiecesPlayer2 = [];
+        this.player1 = new Tetris(this.generatePiecePlayer1);
+        this.player2 = new Tetris(this.generatePiecePlayer2);
         this.players = [this.player1, this.player2];
         this.subscribers = new Set<Handler>();
         // this.initializeState();
@@ -116,6 +122,8 @@ export class Multiplayer {
     }
 
     public restart() {
+        this.nextPiecesPlayer1 = [];
+        this.nextPiecesPlayer2 = [];
         this.players[Player.One].restart();
         this.players[Player.Two].restart();
         this.initializeState();
@@ -200,5 +208,25 @@ export class Multiplayer {
             this.notify();
             clearInterval(this.refreshLoop);
         }
+    }
+
+    private generatePiecePlayer1 = () => {
+        if (this.nextPiecesPlayer1.length === 0) {
+            this.generatePiece();
+        }
+        return this.nextPiecesPlayer1.shift()!;
+    }
+
+    private generatePiecePlayer2 = () => {
+        if (this.nextPiecesPlayer2.length === 0) {
+            this.generatePiece();
+        }
+        return this.nextPiecesPlayer2.shift()!;
+    }
+
+    private generatePiece = () => {
+        const piece = generateRandomPiece();
+        this.nextPiecesPlayer1.push(piece);
+        this.nextPiecesPlayer2.push(piece);
     }
 }
