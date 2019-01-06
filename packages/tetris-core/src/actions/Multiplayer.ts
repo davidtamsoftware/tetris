@@ -7,6 +7,11 @@ export enum Player {
     Two,
 }
 
+export enum MultiplayerMode {
+    HighScoreBattle,
+    AttackMode,
+}
+
 type Handler = (game: any) => void;
 
 export interface MultiplayerState {
@@ -22,6 +27,7 @@ export interface MultiplayerState {
 export class Multiplayer {
     private lastState: string;
     private subscribers: Set<Handler>;
+    private eventSubscribers: Map<EventHandler, Event[]>;
     private multiplayerState?: MultiplayerState;
     private player1: Tetris;
     private player2: Tetris;
@@ -32,6 +38,8 @@ export class Multiplayer {
     private nextPiecesPlayer1: Fill[][][];
     private nextPiecesPlayer2: Fill[][][];
 
+    private mode: MultiplayerMode;
+
     constructor() {
         this.nextPiecesPlayer1 = [];
         this.nextPiecesPlayer2 = [];
@@ -39,29 +47,44 @@ export class Multiplayer {
         this.player2 = new Tetris(this.generatePiecePlayer2);
         this.players = [this.player1, this.player2];
         this.subscribers = new Set<Handler>();
+        this.eventSubscribers = new Map<EventHandler, Event[]>();
         // this.initializeState();
         this.lastState = JSON.stringify(this.multiplayerState);
         this.updatePlayer1State = this.updatePlayer1State.bind(this);
         this.updatePlayer2State = this.updatePlayer2State.bind(this);
         this.player1.subscribe(this.updatePlayer1State);
         this.player2.subscribe(this.updatePlayer2State);
+        this.mode = MultiplayerMode.HighScoreBattle;
     }
 
     public subscribeToEvent(handler: EventHandler, ...events: Event[]) {
-        this.player1.subscribeToEvent(handler, ...events);
-        // make sure that we dont handle 2 restart/gameover events
-        const filteredEvents = events.filter(
-            (event) =>
-                event !== Event.Start &&
-                event !== Event.GameOver &&
-                event !== Event.PauseIn &&
-                event !== Event.PauseOut);
+        const tempEvents: any[] = events.length === 0 ?
+            Object.keys(Event)
+            .map((key: any) => Event[key])
+            .filter((value) => typeof value === "number") : events;
+
+        const filteredEvents = tempEvents.filter((event) =>
+            event !== Event.Start &&
+            event !== Event.GameOver &&
+            event !== Event.PauseIn &&
+            event !== Event.PauseOut);
+
+        // make sure we dont publish duplicate events
+        this.player1.subscribeToEvent(handler, ...filteredEvents);
         this.player2.subscribeToEvent(handler, ...filteredEvents);
+
+        this.eventSubscribers.set(handler, tempEvents.filter((event) =>
+            event === Event.Start ||
+            event === Event.GameOver ||
+            event === Event.PauseIn ||
+            event === Event.PauseOut));
+
     }
 
     public unsubscribeToEvent(handler: EventHandler) {
         this.player1.unsubscribeToEvent(handler);
         this.player2.unsubscribeToEvent(handler);
+        this.eventSubscribers.delete(handler);
     }
 
     // TODO: refactor to have player 1 and 2 join the game
@@ -87,8 +110,13 @@ export class Multiplayer {
     public togglePause() {
         this.players[Player.One].togglePause();
         this.players[Player.Two].togglePause();
+        // this.setState({
+        //     gameState: this.getState().gameState,
+        // });
+
+        this.publishEvent(this.getState().gameState === GameState.Paused ? Event.PauseOut : Event.PauseIn);
         this.setState({
-            gameState: this.player1.getState().gameState,
+            gameState: this.getState().gameState === GameState.Paused ? GameState.Active : GameState.Paused,
         });
     }
 
@@ -104,6 +132,10 @@ export class Multiplayer {
     }
 
     public endGame(player?: Player) {
+        if (this.getState().gameState === GameState.GameOver) {
+            return;
+        }
+
         clearInterval(this.refreshLoop);
         if (player) {
             this.players[player].endGame();
@@ -114,6 +146,7 @@ export class Multiplayer {
                 gameState: GameState.GameOver,
                 winner: undefined,
             });
+            this.publishEvent(Event.GameOver);
         }
     }
 
@@ -129,6 +162,7 @@ export class Multiplayer {
         this.initializeState();
         // TODO: add constructor arg to control local vs remote refresh interval
         this.refreshLoop = setInterval(this.notify, 50); // 35
+        this.publishEvent(Event.Start);
     }
 
     public getState(): MultiplayerState {
@@ -158,8 +192,6 @@ export class Multiplayer {
 
     private notify = () => {
         if (this.lastState === JSON.stringify(this.multiplayerState)) {
-            // tslint:disable-next-line:no-console
-            // console.log("didn't notify");
             return;
         }
         this.subscribers.forEach((subscriber) => subscriber(this.multiplayerState));
@@ -181,13 +213,26 @@ export class Multiplayer {
             player1,
         });
 
-        if (player1.gameState === GameState.GameOver &&
+        if (this.mode === MultiplayerMode.AttackMode &&
+            player1.gameState === GameState.GameOver &&
             this.player2.getState().gameState !== GameState.GameOver) {
             this.setState({
                 gameState: GameState.GameOver,
                 winner: Player.Two,
             });
+            this.publishEvent(Event.GameOver);
             this.player2.endGame();
+            this.notify();
+            clearInterval(this.refreshLoop);
+        } else if (player1.gameState === GameState.GameOver &&
+            this.player2.getState().gameState === GameState.GameOver) {
+            this.setState({
+                gameState: GameState.GameOver,
+                winner:
+                    this.player1.getState().scoreboard.score >
+                        this.player2.getState().scoreboard.score ? Player.One : Player.Two,
+            });
+            this.publishEvent(Event.GameOver);
             this.notify();
             clearInterval(this.refreshLoop);
         }
@@ -198,13 +243,26 @@ export class Multiplayer {
             player2,
         });
 
-        if (player2.gameState === GameState.GameOver &&
+        if (this.mode === MultiplayerMode.AttackMode &&
+            player2.gameState === GameState.GameOver &&
             this.player1.getState().gameState !== GameState.GameOver) {
             this.setState({
                 gameState: GameState.GameOver,
                 winner: Player.One,
             });
+            this.publishEvent(Event.GameOver);
             this.player1.endGame();
+            this.notify();
+            clearInterval(this.refreshLoop);
+        } else if (player2.gameState === GameState.GameOver &&
+            this.player1.getState().gameState === GameState.GameOver) {
+            this.setState({
+                gameState: GameState.GameOver,
+                winner:
+                    this.player1.getState().scoreboard.score >
+                        this.player2.getState().scoreboard.score ? Player.One : Player.Two,
+            });
+            this.publishEvent(Event.GameOver);
             this.notify();
             clearInterval(this.refreshLoop);
         }
@@ -228,5 +286,13 @@ export class Multiplayer {
         const piece = generateRandomPiece();
         this.nextPiecesPlayer1.push(piece);
         this.nextPiecesPlayer2.push(piece);
+    }
+
+    private publishEvent = (event: Event) => {
+        this.eventSubscribers.forEach((events, handler) => {
+            if (events.length === 0 || events.indexOf(event) >= 0) {
+                handler(event);
+            }
+        });
     }
 }
