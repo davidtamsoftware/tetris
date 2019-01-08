@@ -120,13 +120,6 @@ export class Multiplayer {
         });
     }
 
-    // public endGame() {
-    //     this.players[Player.One].endGame();
-    //     // this.players[Player.Two].endGame();
-    //     // this.notify();
-    //     // clearInterval(this.refreshLoop);
-    // }
-
     public drop(player: Player, tick: boolean, hardDrop?: boolean): Promise<void> {
         return this.players[player].drop(tick, hardDrop);
     }
@@ -136,8 +129,13 @@ export class Multiplayer {
             return;
         }
 
-        clearInterval(this.refreshLoop);
-        if (player) {
+        if (this.mode === MultiplayerMode.AttackMode) {
+            // tslint:disable-next-line:no-console
+            console.log("clearing interval 1");
+            clearInterval(this.refreshLoop);
+        }
+
+        if (player !== undefined) {
             this.players[player].endGame();
         } else {
             this.player1.endGame();
@@ -209,62 +207,86 @@ export class Multiplayer {
     }
 
     private updatePlayer1State(player1: Game) {
-        this.setState({
-            player1,
-        });
-
         if (this.mode === MultiplayerMode.AttackMode &&
             player1.gameState === GameState.GameOver &&
             this.player2.getState().gameState !== GameState.GameOver) {
             this.setState({
+                player1,
                 gameState: GameState.GameOver,
                 winner: Player.Two,
             });
             this.publishEvent(Event.GameOver);
             this.player2.endGame();
             this.notify();
+            // tslint:disable-next-line:no-console
+            console.log("clearing interval 2");
             clearInterval(this.refreshLoop);
         } else if (player1.gameState === GameState.GameOver &&
             this.player2.getState().gameState === GameState.GameOver) {
+
+            let winner;
+            if (this.player1.getState().scoreboard &&
+                this.player2.getState().scoreboard) {
+                winner = this.player1.getState().scoreboard.score >
+                            this.player2.getState().scoreboard.score ? Player.One : Player.Two;
+            }
+
             this.setState({
+                player1,
                 gameState: GameState.GameOver,
-                winner:
-                    this.player1.getState().scoreboard.score >
-                        this.player2.getState().scoreboard.score ? Player.One : Player.Two,
+                winner,
             });
             this.publishEvent(Event.GameOver);
             this.notify();
+            // tslint:disable-next-line:no-console
+            console.log("clearing interval 3");
             clearInterval(this.refreshLoop);
+        } else {
+            this.setState({
+                player1,
+            });
         }
     }
 
     private updatePlayer2State(player2: Game) {
-        this.setState({
-            player2,
-        });
-
         if (this.mode === MultiplayerMode.AttackMode &&
             player2.gameState === GameState.GameOver &&
             this.player1.getState().gameState !== GameState.GameOver) {
             this.setState({
+                player2,
                 gameState: GameState.GameOver,
                 winner: Player.One,
             });
             this.publishEvent(Event.GameOver);
             this.player1.endGame();
             this.notify();
+            // tslint:disable-next-line:no-console
+            console.log("clearing interval 4");
             clearInterval(this.refreshLoop);
         } else if (player2.gameState === GameState.GameOver &&
             this.player1.getState().gameState === GameState.GameOver) {
+
+            let winner;
+            if (this.player1.getState().scoreboard &&
+                this.player2.getState().scoreboard) {
+                winner = this.player1.getState().scoreboard.score >
+                            this.player2.getState().scoreboard.score ? Player.One : Player.Two;
+            }
+
             this.setState({
+                player2,
                 gameState: GameState.GameOver,
-                winner:
-                    this.player1.getState().scoreboard.score >
-                        this.player2.getState().scoreboard.score ? Player.One : Player.Two,
+                winner,
             });
             this.publishEvent(Event.GameOver);
             this.notify();
+            // tslint:disable-next-line:no-console
+            console.log("clearing interval 5");
             clearInterval(this.refreshLoop);
+        } else {
+            this.setState({
+                player2,
+            });
         }
     }
 

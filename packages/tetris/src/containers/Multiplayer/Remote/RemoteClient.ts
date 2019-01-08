@@ -10,34 +10,36 @@ export class MultiplayerRemoteClient {
   private eventSubscribers: Map<EventHandler, Event[]>;
 
   private multiplayerState: MultiplayerAction.MultiplayerState;
-  private client: WebSocket;
+  private client?: WebSocket;
 
   constructor() {
     this.multiplayerState = {} as any;
     // TODO: pull from configuration
-    // const wsUrl = "ws://192.168.1.72:8080";
-    const wsUrl = "wss://hidden-tundra-30225.herokuapp.com";
-    this.client = new WebSocket(wsUrl);
+
     this.subscribers = new Set<Handler>();
     this.eventSubscribers = new Map<EventHandler, Event[]>();
   }
 
   public disconnect() {
-    this.client.close();
+    this.client!.close();
   }
 
   public join(matchId: string) {
-    // this.client = new WebSocket("ws://192.168.1.72:8080");
+    const wsUrl = "ws://192.168.1.72:8080";
+    // const wsUrl = "wss://hidden-tundra-30225.herokuapp.com";
+    this.client = new WebSocket(wsUrl);
     const payload: ClientMessage = {
       action: Action.Joinmatch,
       // TODO: prompt user for matchId
       // matchId: "a1",
       matchId,
     };
-    // this.client.addEventListener("open", () => {
-    this.client.send(JSON.stringify(payload));
-    // });
-    this.client.onmessage = (event) => {
+    
+    this.client.addEventListener("open", () => {
+      this.client!.send(JSON.stringify(payload));
+    });
+
+    this.client!.onmessage = (event) => {
       try {
         const message: ServerMessage = JSON.parse(event.data);
         if (message.type === ResponseType.GameState) {
@@ -57,21 +59,21 @@ export class MultiplayerRemoteClient {
     const payload: ClientMessage = {
       action: Action.MoveLeft,
     };
-    this.client.send(JSON.stringify(payload));
+    this.client!.send(JSON.stringify(payload));
   }
 
   public moveRight() {
     const payload: ClientMessage = {
       action: Action.MoveRight,
     };
-    this.client.send(JSON.stringify(payload));
+    this.client!.send(JSON.stringify(payload));
   }
 
   public rotateRight() {
     const payload: ClientMessage = {
       action: Action.RotateRight,
     };
-    this.client.send(JSON.stringify(payload));
+    this.client!.send(JSON.stringify(payload));
     this.publishEvent(Event.RotateRight);
   }
 
@@ -79,7 +81,7 @@ export class MultiplayerRemoteClient {
     const payload: ClientMessage = {
       action: Action.RotateLeft,
     };
-    this.client.send(JSON.stringify(payload));
+    this.client!.send(JSON.stringify(payload));
     this.publishEvent(Event.RotateLeft);
   }
 
@@ -87,7 +89,7 @@ export class MultiplayerRemoteClient {
     const payload: ClientMessage = {
       action: Action.MoveRight, // TODO
     };
-    this.client.send(JSON.stringify(payload));
+    this.client!.send(JSON.stringify(payload));
     // this.publishEvent(Event.PauseIn);
     // TODO: determine when to publish pause out
   }
@@ -96,7 +98,7 @@ export class MultiplayerRemoteClient {
     const payload: ClientMessage = {
       action: hardDrop ? Action.HardDrop : Action.SoftDrop,
     };
-    this.client.send(JSON.stringify(payload));
+    this.client!.send(JSON.stringify(payload));
   }
 
   public endGame() {
@@ -111,7 +113,7 @@ export class MultiplayerRemoteClient {
     const payload: ClientMessage = {
       action: Action.Restart,
     };
-    this.client.send(JSON.stringify(payload));
+    this.client!.send(JSON.stringify(payload));
   }
 
   public getState() {

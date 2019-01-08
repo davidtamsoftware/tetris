@@ -14,7 +14,7 @@ server.listen(process.env.PORT || 8080);
 class MatchService {
 
     private _matches: Match[];
-    
+
     constructor() {
         this._matches = [];
     }
@@ -25,7 +25,7 @@ class MatchService {
 
     public findMatch(ws: WebSocket): Match | undefined {
         const results = this._matches.filter((match) => match.player1 === ws || match.player2 === ws);
-        if (results.length !==  1) {
+        if (results.length !== 1) {
             return undefined;
         }
         return results[0];
@@ -42,7 +42,7 @@ class MatchService {
     }
 
     public getOrCreate(matchId: string): Match {
-        const results = this._matches.filter((match) => match.matchId === matchId);    
+        const results = this._matches.filter((match) => match.matchId === matchId);
         if (results.length !== 1 || !results[0]) {
             const match = new Match(matchId);
             this._matches.push(match);
@@ -71,7 +71,7 @@ class Match {
         // game calculation logic. This is to reduce the number of web socket 
         // messages. Events that are triggered by user button action can be
         // captured on the client.
-        this._game.subscribeToEvent(this.handleEvent, 
+        this._game.subscribeToEvent(this.handleEvent,
             Event.Drop, Event.GameOver, Event.Single,
             Event.Double, Event.Triple, Event.Tetris,
             Event.PauseIn, Event.PauseOut, Event.Start,
@@ -107,21 +107,22 @@ class Match {
         if (joined && this._player1 && this._player2) {
             console.log("starting game");
             this._game.start();
-        } 
+        }
     }
 
     public quit(player: any) {
         const playerNumber = Match.getPlayerNumber(this, player);
+        console.log("player quit: ", playerNumber);
         playerNumber === Multiplayer.Player.One ? this._player1 = undefined : this._player2 = undefined;
-        this._game.endGame(playerNumber);        
+        this._game.endGame(playerNumber);
     }
 
     private handle = (state: any) => {
         if (this._player1) {
             sendState(this._player1, JSON.stringify({
-                    type: ResponseType.GameState,
-                    payload: state,
-                } as ServerMessage));
+                type: ResponseType.GameState,
+                payload: state,
+            } as ServerMessage));
         }
         if (this._player2) {
             sendState(this._player2, JSON.stringify({
@@ -131,7 +132,7 @@ class Match {
         }
     }
 
-    
+
     private handleEvent = (event: Event) => {
         if (this._player1) {
             sendState(this._player1, JSON.stringify({
@@ -153,10 +154,10 @@ class Match {
         } else if (match._player2 === ws) {
             return Multiplayer.Player.Two;
         }
-    
+
         throw new Error("player not found");
     };
-    
+
 }
 
 const matchService = new MatchService();
