@@ -25,8 +25,8 @@ export class MultiplayerRemoteClient {
   }
 
   public join(matchId: string) {
-    const wsUrl = "ws://192.168.1.72:8080";
-    // const wsUrl = "wss://hidden-tundra-30225.herokuapp.com";
+    // const wsUrl = "ws://192.168.1.72:8080";
+    const wsUrl = "wss://hidden-tundra-30225.herokuapp.com";
     this.client = new WebSocket(wsUrl);
     const payload: ClientMessage = {
       action: Action.Joinmatch,
