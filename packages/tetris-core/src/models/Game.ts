@@ -11,6 +11,7 @@ export enum GameState {
 }
 
 export interface Game {
+    pendingDamage: number;
     playfield: Playfield;
     position: PiecePosition;
     piece: Piece;

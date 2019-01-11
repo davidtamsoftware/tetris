@@ -7,8 +7,10 @@ import { Paused } from "../../components/Paused";
 import Playfield from "../../components/Playfield";
 import { gameOverMenu, pauseMenu } from "../App";
 import styles from "./index.module.css";
+import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
 
-export const Multiplayer = (props: MultiplayerAction.MultiplayerState & { handle: any; menuClose?: any; }) => {
+export const Multiplayer = (
+    props: MultiplayerAction.MultiplayerState & { mode?: MultiplayerMode; handle: any; menuClose?: any; }) => {
     if (!props.player1 || !props.player2) {
         return null;
     }
@@ -18,6 +20,13 @@ export const Multiplayer = (props: MultiplayerAction.MultiplayerState & { handle
 
     return (
         <div className={styles.App}>
+{/* TODO allow user to select which mode and pass into this component */}
+            { (!props.mode || props.mode === MultiplayerMode.AttackMode) &&
+                <div>
+                <span style={{ padding: "5px"}}>{ props.player1.pendingDamage }</span>
+                <span style={{ padding: "5px"}}>{ props.player2.pendingDamage }</span>
+                </div>
+            }
             <div className={styles.left}>
                 <Playfield playfield={result1.playfield} gameState={props.player1.gameState} />
             </div>
@@ -65,7 +74,8 @@ export const Multiplayer = (props: MultiplayerAction.MultiplayerState & { handle
                     </div>
                 }
                 <div style={{ position: "absolute", bottom: "353px", left: "calc(50% - 85px)", textShadow: "#af89f7 1px 1px 35px, blue 0px 0px 57px, #d4bec1 0px 0px 50px" }}>
-                    {props.winner !== undefined ? `Player ${props.winner + 1} wins!` : null}
+                    {props.winner === null && "Tie Game"}
+                    {props.winner !== undefined && props.winner !== null && `Player ${props.winner + 1} wins!`}
                 </div>
             </div>
         </div>

@@ -25,6 +25,8 @@ export interface MultiplayerState {
 // use players array and get rid of player 1 and player 2 intance var
 
 export class Multiplayer {
+
+    public readonly mode: MultiplayerMode;
     private lastState: string;
     private subscribers: Set<Handler>;
     private eventSubscribers: Map<EventHandler, Event[]>;
@@ -38,9 +40,7 @@ export class Multiplayer {
     private nextPiecesPlayer1: Fill[][][];
     private nextPiecesPlayer2: Fill[][][];
 
-    private mode: MultiplayerMode;
-
-    constructor() {
+    constructor(mode?: MultiplayerMode) {
         this.nextPiecesPlayer1 = [];
         this.nextPiecesPlayer2 = [];
         this.player1 = new Tetris(this.generatePiecePlayer1);
@@ -48,13 +48,17 @@ export class Multiplayer {
         this.players = [this.player1, this.player2];
         this.subscribers = new Set<Handler>();
         this.eventSubscribers = new Map<EventHandler, Event[]>();
-        // this.initializeState();
         this.lastState = JSON.stringify(this.multiplayerState);
         this.updatePlayer1State = this.updatePlayer1State.bind(this);
         this.updatePlayer2State = this.updatePlayer2State.bind(this);
         this.player1.subscribe(this.updatePlayer1State);
         this.player2.subscribe(this.updatePlayer2State);
-        this.mode = MultiplayerMode.HighScoreBattle;
+        this.mode = mode || MultiplayerMode.AttackMode;
+
+        if (this.mode === MultiplayerMode.AttackMode) {
+            this.player1.subscribeToEvent(this.player2.damage, Event.Single, Event.Double, Event.Triple, Event.Tetris);
+            this.player2.subscribeToEvent(this.player1.damage, Event.Single, Event.Double, Event.Triple, Event.Tetris);
+        }
     }
 
     public subscribeToEvent(handler: EventHandler, ...events: Event[]) {
@@ -84,6 +88,8 @@ export class Multiplayer {
     public unsubscribeToEvent(handler: EventHandler) {
         this.player1.unsubscribeToEvent(handler);
         this.player2.unsubscribeToEvent(handler);
+        this.player1.unsubscribeToEvent(this.player2.damage);
+        this.player2.unsubscribeToEvent(this.player1.damage);
         this.eventSubscribers.delete(handler);
     }
 
@@ -130,8 +136,6 @@ export class Multiplayer {
         }
 
         if (this.mode === MultiplayerMode.AttackMode) {
-            // tslint:disable-next-line:no-console
-            console.log("clearing interval 1");
             clearInterval(this.refreshLoop);
         }
 
@@ -218,8 +222,6 @@ export class Multiplayer {
             this.publishEvent(Event.GameOver);
             this.player2.endGame();
             this.notify();
-            // tslint:disable-next-line:no-console
-            console.log("clearing interval 2");
             clearInterval(this.refreshLoop);
         } else if (player1.gameState === GameState.GameOver &&
             this.player2.getState().gameState === GameState.GameOver) {
@@ -238,8 +240,6 @@ export class Multiplayer {
             });
             this.publishEvent(Event.GameOver);
             this.notify();
-            // tslint:disable-next-line:no-console
-            console.log("clearing interval 3");
             clearInterval(this.refreshLoop);
         } else {
             this.setState({
@@ -260,8 +260,6 @@ export class Multiplayer {
             this.publishEvent(Event.GameOver);
             this.player1.endGame();
             this.notify();
-            // tslint:disable-next-line:no-console
-            console.log("clearing interval 4");
             clearInterval(this.refreshLoop);
         } else if (player2.gameState === GameState.GameOver &&
             this.player1.getState().gameState === GameState.GameOver) {
@@ -269,8 +267,14 @@ export class Multiplayer {
             let winner;
             if (this.player1.getState().scoreboard &&
                 this.player2.getState().scoreboard) {
-                winner = this.player1.getState().scoreboard.score >
-                            this.player2.getState().scoreboard.score ? Player.One : Player.Two;
+
+                if (this.player1.getState().scoreboard.score === this.player2.getState().scoreboard.score) {
+                    winner = null;
+                } else if (this.player1.getState().scoreboard.score > this.player2.getState().scoreboard.score) {
+                    winner = Player.One;
+                } else  {
+                    winner = Player.Two;
+                }
             }
 
             this.setState({
@@ -280,8 +284,6 @@ export class Multiplayer {
             });
             this.publishEvent(Event.GameOver);
             this.notify();
-            // tslint:disable-next-line:no-console
-            console.log("clearing interval 5");
             clearInterval(this.refreshLoop);
         } else {
             this.setState({

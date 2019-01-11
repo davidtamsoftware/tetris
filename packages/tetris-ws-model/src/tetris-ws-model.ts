@@ -24,8 +24,3 @@ export interface ServerMessage {
     type: ResponseType;
     payload: any;
 }
-
-// main server
-// game server
-// no match id
-// create a game and invite

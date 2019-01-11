@@ -1,4 +1,5 @@
 import {
+    appendRandomLines,
     calculatePosition,
     generateRandomPiece,
     hasCollision,
@@ -52,7 +53,6 @@ export class Tetris {
         this.updateGame = this.updateGame.bind(this);
         this.subscribers = new Set<Handler>();
         this.eventSubscribers = new Map<EventHandler, Event[]>();
-        // this.initializeState();
         this.pieceGenerator = pieceGenerator;
     }
 
@@ -134,10 +134,18 @@ export class Tetris {
                 tick,
                 hardDrop);
 
-            this.freezeSemaphore = false;
-
             let nextPiece;
             if (!result.piece) {
+                if (this.getState().pendingDamage) {
+                    const playfield =
+                        await appendRandomLines(result.playfield, this.getState().pendingDamage, this.updateGame);
+                    this.setState({
+                        pendingDamage: 0,
+                    });
+
+                    result.playfield = playfield;
+                }
+
                 const position = calculatePosition(this.game!.playfield, this.game!.nextPiece);
                 result.piece = this.game!.nextPiece;
                 result.position = position;
@@ -154,13 +162,12 @@ export class Tetris {
             this.setState({
                 ...result,
                 nextPiece: nextPiece ? nextPiece : this.game!.nextPiece,
-                // gameState: result.gameover ? GameState.GameOver : GameState.Active,
             });
 
             if (result.gameover) {
-                // clearInterval(this.loop);
                 this.endGame();
             }
+            this.freezeSemaphore = false;
         }
     }
 
@@ -220,6 +227,28 @@ export class Tetris {
         this.eventSubscribers.delete(handler);
     }
 
+    // TODO make this more hidden so it cannot be invoked from a client.
+    public damage = (event: Event) => {
+        // set pending damage in lines
+        if (event === Event.Single) {
+            this.setState({
+                pendingDamage: this.getState().pendingDamage + 1,
+            });
+        } else if (event === Event.Double) {
+            this.setState({
+                pendingDamage: this.getState().pendingDamage + 2,
+            });
+        } else if (event === Event.Triple) {
+            this.setState({
+                pendingDamage: this.getState().pendingDamage + 3,
+            });
+        } else if (event === Event.Tetris) {
+            this.setState({
+                pendingDamage: this.getState().pendingDamage + 4,
+            });
+        }
+    }
+
     private tick(level: number) {
         clearInterval(this.loop);
         this.loop = setInterval(() => this.drop(true), 1000 / level);
@@ -228,6 +257,7 @@ export class Tetris {
     private initializeState() {
         const randomPiece = this.pieceGenerator ? this.pieceGenerator() : generateRandomPiece();
         const state = {
+            pendingDamage: 0,
             playfield: initialPlayfield,
             piece: randomPiece,
             nextPiece: this.pieceGenerator ? this.pieceGenerator() : generateRandomPiece(),
@@ -319,4 +349,5 @@ export class Tetris {
 
         // this.notify();
     }
+
 }

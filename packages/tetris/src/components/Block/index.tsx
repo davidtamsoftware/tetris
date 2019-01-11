@@ -9,5 +9,5 @@ interface Props {
 const colors = ["black", "orange", "yellow", "green", "blue", "gray", "red", "purple", "white"];
 
 export const Block = (props: Props) => (
-    <div className={`block ${colors[props.data].split(" ")[0]} ${props.size || "large"}`}/>
+    <div className={`block ${colors[props.data]} ${props.size || "large"}`}/>
 );

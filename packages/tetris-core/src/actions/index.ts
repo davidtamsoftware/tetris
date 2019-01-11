@@ -13,6 +13,8 @@ export const rotate = (rotatePiece: (p: Piece) => Piece, playfield: Playfield, p
         };
     }
 
+    // this will shift the piece over if rotation doesn't immediately fit
+    // similar auto move left/right and rotate
     const shiftedPosition = [-1, 1, -2, 2, -3, 3]
         .map((val) => ({ row: position.row, col: position.col + val } as PiecePosition))
         .filter((newPos) => !hasCollision(playfield, newPos, piece));
@@ -139,40 +141,53 @@ export const moveDown = async (
 
 export const removeCompletedLines =
     (playfield: Playfield, updateGame: (game: Playfield) => void, publishEvent: (event: Event) => void) => {
-    const animateDeletionState1 =
-        playfield.map((row) => row.every((col) => !!col) ? row.map(() => Fill.White) : row) as Playfield;
-    const animateDeletionState2 =
-        playfield.map((row) => row.every((col) => !!col) ? row.map(() => Fill.Gray) : row) as Playfield;
-    const newState = playfield.filter((row) => !row.every((col) => !!col));
-    const padEmptyLines = playfield.length - newState.length;
-    if (!!padEmptyLines) {
-        const lines = new Array(padEmptyLines);
-        lines.fill(new Array(playfield[0].length).fill(0));
-        newState.unshift(...lines);
-    }
+        const animateDeletionState1 =
+            playfield.map((row) => row.every((col) => !!col) ? row.map(() => Fill.White) : row) as Playfield;
+        const animateDeletionState2 =
+            playfield.map((row) => row.every((col) => !!col) ? row.map(() => Fill.Gray) : row) as Playfield;
+        const newState = playfield.filter((row) => !row.every((col) => !!col));
+        const padEmptyLines = playfield.length - newState.length;
+        if (!!padEmptyLines) {
+            const lines = new Array(padEmptyLines);
+            lines.fill(new Array(playfield[0].length).fill(0));
+            newState.unshift(...lines);
+        }
 
-    // TODO: callback for line dropping audio
-    publishEvent(Event.Drop);
-    if (padEmptyLines) {
-        // TODO: callback for line removal audio
-        publishEvent(Event.Single);
-        updateGame(animateDeletionState1);
-        setTimeout(() => updateGame(animateDeletionState2), 50);
-        setTimeout(() => updateGame(animateDeletionState1), 100);
-        setTimeout(() => updateGame(animateDeletionState2), 150);
-        return new Promise<{ playfield: Playfield; linesRemoved: number; }>((resolve, reject) => {
-            setTimeout(() => resolve({
-                playfield: newState,
-                linesRemoved: padEmptyLines,
-            } as any), 200);
+        // TODO: callback for line dropping audio
+        publishEvent(Event.Drop);
+        if (padEmptyLines) {
+            // TODO: callback for line removal audio
+            switch (padEmptyLines) {
+                case 1:
+                    publishEvent(Event.Single);
+                    break;
+                case 2:
+                    publishEvent(Event.Double);
+                    break;
+                case 3:
+                    publishEvent(Event.Triple);
+                    break;
+                case 4:
+                    publishEvent(Event.Tetris);
+                    break;
+            }
+            updateGame(animateDeletionState1);
+            setTimeout(() => updateGame(animateDeletionState2), 50);
+            setTimeout(() => updateGame(animateDeletionState1), 100);
+            setTimeout(() => updateGame(animateDeletionState2), 150);
+            return new Promise<{ playfield: Playfield; linesRemoved: number; }>((resolve, reject) => {
+                setTimeout(() => resolve({
+                    playfield: newState,
+                    linesRemoved: padEmptyLines,
+                } as any), 200);
+            });
+        }
+
+        return Promise.resolve({
+            playfield: newState,
+            linesRemoved: padEmptyLines,
         });
-    }
-
-    return Promise.resolve({
-        playfield: newState,
-        linesRemoved: padEmptyLines,
-    });
-};
+    };
 
 export const hasCollision = (playfield: Playfield, position: PiecePosition, piece: Piece) => {
 
@@ -182,6 +197,7 @@ export const hasCollision = (playfield: Playfield, position: PiecePosition, piec
                 n + position.col < 0 ||
                 n + position.col >= playfield[m].length ||
                 m + position.row >= playfield.length ||
+                // collision with playfield
                 (position.row + m >= 0 && playfield[m + position.row][n + position.col]))) {
                 return true;
             }
@@ -192,6 +208,7 @@ export const hasCollision = (playfield: Playfield, position: PiecePosition, piec
 
 export const generateRandomPiece = () => pieces[Math.floor(Math.random() * pieces.length)];
 
+// calculates starting position for a new piece within the playfield
 export const calculatePosition = (playfield: Playfield, piece: Piece) => ({
     row: 0 - piece.findIndex((row) => !row.every((col) => col === Fill.Blank)),
     col: Math.floor(playfield[0].length / 2) - Math.floor(piece[0].length / 2),
@@ -210,4 +227,41 @@ export const merge = (playfield: Playfield, position: PiecePosition, p: Piece): 
     return {
         playfield: clonedPlayfield,
     };
+};
+
+export const appendRandomLines = (playfield: Playfield, count: number, updateGame: (game: Playfield) => void) => {
+    if (!count) {
+        return;
+    }
+
+    const clonedPlayfield = playfield.map((row) => [...row]) as Playfield;
+    for (let i = 0; i < count; i++) {
+        clonedPlayfield.shift();
+    }
+    const lines = [];
+    for (let row = 0; row < count; row++) {
+        const line = [];
+        // tslint:disable-next-line:prefer-for-of
+        for (let col = 0; col < playfield[0].length; col++) {
+            line.push(Math.round(Math.random()));
+        }
+        lines.push(line);
+    }
+
+    const animateState1 = clonedPlayfield
+        .concat(new Array(count).fill(new Array(playfield[0].length).fill(Fill.White)));
+    const animateState2 = clonedPlayfield
+        .concat(new Array(count).fill(new Array(playfield[0].length).fill(Fill.Gray)));
+
+    updateGame(animateState1);
+    setTimeout(() => updateGame(animateState2), 50);
+    setTimeout(() => updateGame(animateState1), 100);
+    setTimeout(() => updateGame(animateState2), 150);
+
+    // TODO: ensure that there is at least 1 zero and at least 1 non-zero
+    const result = clonedPlayfield.concat(lines);
+
+    return new Promise<Playfield>((resolve) => {
+        setTimeout(() => resolve(result), 200);
+    });
 };

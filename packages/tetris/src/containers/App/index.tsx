@@ -160,6 +160,18 @@ export const handleEvent = (event: Event) => {
     } else if (event === Event.Single) {
         const audio = new Audio("/single.mp3");
         audio.play();
+    } else if (event === Event.Double) {
+        console.log("double");
+        const audio = new Audio("/single.mp3");
+        audio.play();
+    } else if (event === Event.Triple) {
+        console.log("triple");
+        const audio = new Audio("/single.mp3");
+        audio.play();
+    } else if (event === Event.Tetris) {
+        console.log("tetris");
+        const audio = new Audio("/single.mp3");
+        audio.play();
     } else if (event === Event.Start) {
         theme.currentTime = 0;
         theme.play();
