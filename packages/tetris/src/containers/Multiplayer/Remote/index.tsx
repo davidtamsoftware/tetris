@@ -30,7 +30,9 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & { 
     document.removeEventListener("keydown", this.handleKeyDown);
     this.multiplayer.unsubscribe(this.handle);
     this.multiplayer.unsubscribeToEvent(handleEvent);
-    this.multiplayer.disconnect();
+    if (this.state.matchId !== undefined) {
+      this.multiplayer.disconnect();
+    }
   }
 
   public componentDidMount() {

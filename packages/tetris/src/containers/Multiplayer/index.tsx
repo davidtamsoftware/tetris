@@ -21,7 +21,7 @@ export const Multiplayer = (
     return (
         <div className={styles.App}>
 {/* TODO allow user to select which mode and pass into this component */}
-            { (!props.mode || props.mode === MultiplayerMode.AttackMode) &&
+            { (props.mode === undefined || props.mode === MultiplayerMode.AttackMode) &&
                 <div>
                 <span style={{ padding: "5px"}}>{ props.player1.pendingDamage }</span>
                 <span style={{ padding: "5px"}}>{ props.player2.pendingDamage }</span>

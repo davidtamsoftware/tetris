@@ -53,11 +53,11 @@ export class Multiplayer {
         this.updatePlayer2State = this.updatePlayer2State.bind(this);
         this.player1.subscribe(this.updatePlayer1State);
         this.player2.subscribe(this.updatePlayer2State);
-        this.mode = mode || MultiplayerMode.AttackMode;
+        this.mode = mode === undefined ? MultiplayerMode.AttackMode : mode;
 
         if (this.mode === MultiplayerMode.AttackMode) {
-            this.player1.subscribeToEvent(this.player2.damage, Event.Single, Event.Double, Event.Triple, Event.Tetris);
-            this.player2.subscribeToEvent(this.player1.damage, Event.Single, Event.Double, Event.Triple, Event.Tetris);
+            this.player1.subscribeToEvent(this.player2.damage, Event.Attack);
+            this.player2.subscribeToEvent(this.player1.damage, Event.Attack);
         }
     }
 
@@ -223,14 +223,21 @@ export class Multiplayer {
             this.player2.endGame();
             this.notify();
             clearInterval(this.refreshLoop);
-        } else if (player1.gameState === GameState.GameOver &&
+        } else if (this.mode === MultiplayerMode.HighScoreBattle &&
+            player1.gameState === GameState.GameOver &&
             this.player2.getState().gameState === GameState.GameOver) {
 
             let winner;
             if (this.player1.getState().scoreboard &&
                 this.player2.getState().scoreboard) {
-                winner = this.player1.getState().scoreboard.score >
-                            this.player2.getState().scoreboard.score ? Player.One : Player.Two;
+
+                if (this.player1.getState().scoreboard.score === this.player2.getState().scoreboard.score) {
+                    winner = null;
+                } else if (this.player1.getState().scoreboard.score > this.player2.getState().scoreboard.score) {
+                    winner = Player.One;
+                } else  {
+                    winner = Player.Two;
+                }
             }
 
             this.setState({
@@ -262,6 +269,7 @@ export class Multiplayer {
             this.notify();
             clearInterval(this.refreshLoop);
         } else if (player2.gameState === GameState.GameOver &&
+            this.mode === MultiplayerMode.HighScoreBattle &&
             this.player1.getState().gameState === GameState.GameOver) {
 
             let winner;

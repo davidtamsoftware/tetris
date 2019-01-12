@@ -13,9 +13,10 @@ import { Fill, Game, GameState, pieces, Playfield, playfield as initialPlayfield
 
 type Handler = (game: Game) => void;
 
-export type EventHandler = (event: Event) => void;
+export type EventHandler = (event: Event, payload?: any) => void;
 
 export enum Event {
+    Damage,
     Single,
     Double,
     Triple,
@@ -27,6 +28,7 @@ export enum Event {
     PauseIn,
     PauseOut,
     Start,
+    Attack,
 }
 
 /**
@@ -137,6 +139,7 @@ export class Tetris {
             let nextPiece;
             if (!result.piece) {
                 if (this.getState().pendingDamage) {
+                    this.publishEvent(Event.Damage);
                     const playfield =
                         await appendRandomLines(result.playfield, this.getState().pendingDamage, this.updateGame);
                     this.setState({
@@ -228,25 +231,10 @@ export class Tetris {
     }
 
     // TODO make this more hidden so it cannot be invoked from a client.
-    public damage = (event: Event) => {
-        // set pending damage in lines
-        if (event === Event.Single) {
-            this.setState({
-                pendingDamage: this.getState().pendingDamage + 1,
-            });
-        } else if (event === Event.Double) {
-            this.setState({
-                pendingDamage: this.getState().pendingDamage + 2,
-            });
-        } else if (event === Event.Triple) {
-            this.setState({
-                pendingDamage: this.getState().pendingDamage + 3,
-            });
-        } else if (event === Event.Tetris) {
-            this.setState({
-                pendingDamage: this.getState().pendingDamage + 4,
-            });
-        }
+    public damage = (event: Event, count: number) => {
+        this.setState({
+            pendingDamage: this.getState().pendingDamage + count,
+        });
     }
 
     private tick(level: number) {
@@ -309,7 +297,17 @@ export class Tetris {
             this.tick(level);
         }
 
+        const damageLines = [0, 0, 0, 1, 2];
+        const damage = {} as any;
+        if (lines <= this.game!.pendingDamage) {
+            damage.pendingDamage = this.game!.pendingDamage - damageLines[lines];
+        } else {
+            damage.pendingDamage = 0;
+            this.publishEvent(Event.Attack, damageLines[lines] - this.game!.pendingDamage);
+        }
+
         this.setState({
+            ...damage,
             scoreboard: {
                 ...this.game!.scoreboard,
                 highscore: this.game!.scoreboard.highscore > score ? this.game!.scoreboard.highscore : score,
@@ -332,10 +330,10 @@ export class Tetris {
         this.subscribers.forEach((subscriber) => subscriber(this.game!));
     }
 
-    private publishEvent = (event: Event) => {
+    private publishEvent = (event: Event, payload?: any) => {
         this.eventSubscribers.forEach((events, handler) => {
             if (events.length === 0 || events.indexOf(event) >= 0) {
-                handler(event);
+                handler(event, payload);
             }
         });
     }

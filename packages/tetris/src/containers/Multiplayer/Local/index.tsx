@@ -3,14 +3,15 @@ import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
 import { Multiplayer } from "..";
 import { Key, Props, handleEvent } from "../../App";
 import { Event } from "tetris-core/lib/actions/Tetris";
+import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
 
-class App extends React.Component<Props, MultiplayerAction.MultiplayerState> {
+class App extends React.Component<Props & { mode: MultiplayerMode }, MultiplayerAction.MultiplayerState> {
 
   private multiplayer: MultiplayerAction.Multiplayer;
 
-  constructor(props: Props) {
+  constructor(props: Props & { mode: MultiplayerMode}) {
     super(props)
-    this.multiplayer = new MultiplayerAction.Multiplayer();
+    this.multiplayer = new MultiplayerAction.Multiplayer(props.mode);
     this.state = this.multiplayer.getState();
     this.handle = this.handle.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -33,7 +34,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState> {
   }
 
   public render() {
-    return <Multiplayer {...this.state} handle={this.handleMenuSelect} menuClose={this.handleMenuClose}/>;
+    return <Multiplayer {...this.state} mode={this.props.mode} handle={this.handleMenuSelect} menuClose={this.handleMenuClose}/>;
   }
 
   private handleMenuClose = () => {

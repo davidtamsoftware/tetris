@@ -156,7 +156,6 @@ export const removeCompletedLines =
         // TODO: callback for line dropping audio
         publishEvent(Event.Drop);
         if (padEmptyLines) {
-            // TODO: callback for line removal audio
             switch (padEmptyLines) {
                 case 1:
                     publishEvent(Event.Single);

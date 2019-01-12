@@ -4,6 +4,7 @@ import MultiplayerLocal from "../Multiplayer/Local";
 import MultiplayerRemote from "../Multiplayer/Remote";
 import SinglePlayer from "../SinglePlayer";
 import { Event } from "tetris-core";
+import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
 // import linkedinLogo from "./In-2C-21px-R.png";
 
 interface State {
@@ -46,8 +47,10 @@ class App extends React.Component<{}, State> {
             </div>;
         } else if (this.state.gameMode === "SINGLE_PLAYER") {
             game = <SinglePlayer exit={this.returnToMain} />;
-        } else if (this.state.gameMode === "MULTIPLAYER_LOCAL") {
-            game = <MultiplayerLocal exit={this.returnToMain} />;
+        } else if (this.state.gameMode === "MULTIPLAYER_LOCAL_HIGH_SCORE_BATTLE") {
+            game = <MultiplayerLocal exit={this.returnToMain} mode={MultiplayerMode.HighScoreBattle} />;
+        } else if (this.state.gameMode === "MULTIPLAYER_LOCAL_ATTACK_MODE") {
+            game = <MultiplayerLocal exit={this.returnToMain} mode={MultiplayerMode.AttackMode}/>;
         } else if (this.state.gameMode === "MULTIPLAYER_REMOTE") {
             game = <MultiplayerRemote exit={this.returnToMain} />;
         }
@@ -119,7 +122,9 @@ export const matchMenu: Node = {
 };
 
 
-export type Key = "HOME" | "RESTART" | "RESUME" | "QUIT_CONFIRM" | "QUIT_CANCEL" | "SINGLE_PLAYER" | "MULTIPLAYER_LOCAL" | "MULTIPLAYER_REMOTE";
+export type Key = "HOME" | "RESTART" | "RESUME" | "QUIT_CONFIRM" | "QUIT_CANCEL" | "SINGLE_PLAYER" |
+    "MULTIPLAYER_LOCAL" | "MULTIPLAYER_REMOTE" | "MULTIPLAYER_LOCAL_HIGH_SCORE_BATTLE" | "MULTIPLAYER_LOCAL_ATTACK_MODE" |
+    "MULTIPLAYER_REMOTE_HIGH_SCORE_BATTLE" | "MULTIPLAYER_REMOTE_ATTACK_MODE";
 
 interface Node {
     name: string;
@@ -139,7 +144,16 @@ const mainMenu: Node = {
             children: [
                 {
                     name: "Local",
-                    key: "MULTIPLAYER_LOCAL",
+                    children: [
+                        {
+                            name: "High Score Battle",
+                            key: "MULTIPLAYER_LOCAL_HIGH_SCORE_BATTLE",
+                        },
+                        {
+                            name: "Attack Mode",
+                            key: "MULTIPLAYER_LOCAL_ATTACK_MODE"
+                        }
+                    ]
                 },
                 {
                     name: "Remote",
@@ -171,6 +185,9 @@ export const handleEvent = (event: Event) => {
     } else if (event === Event.Tetris) {
         console.log("tetris");
         const audio = new Audio("/single.mp3");
+        audio.play();
+    } else if (event === Event.Damage) {
+        const audio = new Audio("/damage.mp3");
         audio.play();
     } else if (event === Event.Start) {
         theme.currentTime = 0;
