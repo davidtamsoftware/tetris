@@ -21,7 +21,7 @@ class Menu extends React.Component<Props, State> {
         // this.handleKeyDown = this.handleKeyDown.bind(this);
     };
 
-    public componentWillMount() {
+    public componentDidMount() {
         document.addEventListener("keydown", this.handleKeyDown);
     }
 

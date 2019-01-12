@@ -17,20 +17,17 @@ class App extends React.Component<Props & { mode: MultiplayerMode }, Multiplayer
     this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
-  public componentWillMount() {
+  public componentDidMount() {
     document.addEventListener("keydown", this.handleKeyDown);
     this.multiplayer.subscribe(this.handle);
     this.multiplayer.subscribeToEvent(handleEvent);
+    this.multiplayer.start();
   }
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
     this.multiplayer.unsubscribe(this.handle);
     this.multiplayer.subscribeToEvent(handleEvent);
-  }
-
-  public componentDidMount() {
-    this.multiplayer.start();
   }
 
   public render() {

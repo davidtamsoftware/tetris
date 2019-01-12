@@ -20,7 +20,8 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & { 
     this.matchIdInput = null;
   }
 
-  public componentWillMount() {
+  public componentDidMount() {
+    this.matchIdInput!.focus();
     document.addEventListener("keydown", this.handleKeyDown);
     this.multiplayer.subscribe(this.handle);
     this.multiplayer.subscribeToEvent(handleEvent);
@@ -33,11 +34,6 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & { 
     if (this.state.matchId !== undefined) {
       this.multiplayer.disconnect();
     }
-  }
-
-  public componentDidMount() {
-    // this.multiplayer.start();
-    this.matchIdInput!.focus();
   }
 
   public render() {

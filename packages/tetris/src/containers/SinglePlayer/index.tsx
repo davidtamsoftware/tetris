@@ -20,25 +20,18 @@ class App extends React.Component<Props, Models.Game> {
     this.state = this.tetris.getState();
     this.handle = this.handle.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
-    // this.theme = new Audio("/tetris_theme.mp3");
-    // this.theme.loop = true;
   }
 
-  public componentWillMount() {
+  public componentDidMount() {
     document.addEventListener("keydown", this.handleKeyDown);
     this.tetris.subscribe(this.handle);
     this.tetris.subscribeToEvent(handleEvent);
-    // this.theme.play();
+    this.tetris.start();
   }
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
     this.tetris.unsubscribeToEvent(handleEvent);
-    // this.theme.remove();
-  }
-
-  public componentDidMount() {
-    this.tetris.start();
   }
 
   public render() {
@@ -48,12 +41,6 @@ class App extends React.Component<Props, Models.Game> {
 
     const result = Functions.merge(this.state.playfield, this.state.position, this.state.piece);
 
-    // if (this.state.gameState === Models.GameState.Paused ||
-    //   this.state.gameState === Models.GameState.GameOver) {
-    //   this.theme.pause();
-    // } else {
-    //   this.theme.play();
-    // }
     return (
       <div className={styles.App}>
         <div className={styles.left}>
