@@ -13,6 +13,13 @@ export enum Action {
 export enum ResponseType {
     GameState,
     GameEvent,
+    MatchEvent,
+}
+
+export enum MatchEvent {
+    PLAYER_JOIN,
+    PLAYER_EXIT,
+    MATCH_FULL,
 }
 
 export interface ClientMessage {

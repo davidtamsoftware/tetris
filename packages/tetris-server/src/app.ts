@@ -1,9 +1,11 @@
 import WebSocket from "ws";
 import { Multiplayer } from "tetris-core";
-import { Action, ClientMessage, ServerMessage, ResponseType } from "tetris-ws-model";
+import { Action, ClientMessage, ServerMessage, ResponseType, MatchEvent } from "tetris-ws-model";
 import { Event } from "tetris-core/lib/actions/Tetris";
 import express from "express";
 import http from "http";
+import { GameState } from "tetris-core/lib/models";
+import { Server } from "connect";
 
 const app = express();
 app.use(express.static(__dirname + "/../../tetris/build"));
@@ -23,10 +25,11 @@ class MatchService {
         return this._matches
     }
 
-    public findMatch(ws: WebSocket): Match | undefined {
+    public findMatch(ws: WebSocket): Match | null {
         const results = this._matches.filter((match) => match.player1 === ws || match.player2 === ws);
         if (results.length !== 1) {
-            return undefined;
+            // throw new Error("Cannot find match from provided ws connection");
+            return null;
         }
         return results[0];
     }
@@ -75,7 +78,7 @@ class Match {
             Event.Drop, Event.GameOver, Event.Single,
             Event.Double, Event.Triple, Event.Tetris,
             Event.PauseIn, Event.PauseOut, Event.Start,
-            Event.GameOver);
+            Event.GameOver, Event.Damage);
     }
 
     get game(): Multiplayer.Multiplayer {
@@ -94,7 +97,7 @@ class Match {
         return this._player2;
     }
 
-    public join(player: any) {
+    public join(player: any): boolean {
         let joined = false;
         if (!this._player1) {
             this._player1 = player;
@@ -105,9 +108,15 @@ class Match {
         }
 
         if (joined && this._player1 && this._player2) {
-            console.log("starting game");
-            this._game.start();
+            console.log("starting game...");
+            // TODO: this would restart the game if there is one already in
+            // progress and one of the players quit
+            if (this._game.getState().gameState !== GameState.Active) {
+                this._game.start();
+            }
         }
+        
+        return joined;
     }
 
     public quit(player: any) {
@@ -165,16 +174,6 @@ const matchService = new MatchService();
 // TODO: port config
 const wss = new WebSocket.Server({ server });
 
-const getPlayerNumber = (match: Match, ws: WebSocket): Multiplayer.Player => {
-    if (match.player1 === ws) {
-        return Multiplayer.Player.One;
-    } else if (match.player2 === ws) {
-        return Multiplayer.Player.Two;
-    }
-
-    throw new Error("player not found");
-};
-
 setInterval(() => console.log("active matches: ", matchService.matches.length), 5000);
 setInterval(() => {
     console.log("avg messages sent per 10 seconds: ", count);
@@ -183,7 +182,19 @@ setInterval(() => {
 
 wss.on("connection", (ws, req) => {
     ws.on("close", () => {
+        const match = matchService.findMatch(ws);
+        if (!match) {
+            return;
+        }
+        const otherConnection: WebSocket = ws === match.player2 ? match.player1 : match.player2;
         matchService.playerExit(ws);
+        if (otherConnection) {
+            console.log("*player has exit the game*");
+            sendState(otherConnection, JSON.stringify({
+                type: ResponseType.MatchEvent,
+                payload: MatchEvent.PLAYER_EXIT,
+            } as ServerMessage));
+        }
     });
 
     ws.on("message", (message) => {
@@ -191,7 +202,23 @@ wss.on("connection", (ws, req) => {
             const msg = JSON.parse(message.toString()) as ClientMessage;
             if (msg.action === Action.Joinmatch && msg.matchId) {
                 const match = matchService.getOrCreate(msg.matchId);
-                match.join(ws);
+                const success = match.join(ws);
+
+                if (success) {
+                    const otherConnection: WebSocket = ws === match.player2 ? match.player1 : match.player2;
+                    if (otherConnection) {
+                        console.log("player has joined the game");
+                        sendState(otherConnection, JSON.stringify({
+                            type: ResponseType.MatchEvent,
+                            payload: MatchEvent.PLAYER_JOIN,
+                        } as ServerMessage));
+                    }
+                } else {
+                    sendState(ws, JSON.stringify({
+                        type: ResponseType.MatchEvent,
+                        payload: MatchEvent.MATCH_FULL,
+                    }))
+                }
             } else {
                 const match = matchService.findMatch(ws);
                 if (!match) {
@@ -224,7 +251,6 @@ let count = 0;
 const sendState = (ws: WebSocket, state: string) => {
     count++;
     ws.send(state, (error) => {
-        // console.log("sent state");
         if (error) {
             console.log("error sending state");
         }

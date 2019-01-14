@@ -5,6 +5,7 @@ import { Key, Props, matchMenu, handleEvent } from "../../App";
 import { MultiplayerRemoteClient } from "./RemoteClient";
 import styles from "./index.module.css";
 import Menu from "../../../components/Menu";
+import { MatchEvent } from "tetris-ws-model";
 
 class App extends React.Component<Props, MultiplayerAction.MultiplayerState & { matchId?: string, matchMenu?: boolean }> {
 
@@ -25,12 +26,14 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & { 
     document.addEventListener("keydown", this.handleKeyDown);
     this.multiplayer.subscribe(this.handle);
     this.multiplayer.subscribeToEvent(handleEvent);
+    this.multiplayer.subscribeToMatchEvent(this.handleMatchEvent);
   }
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
     this.multiplayer.unsubscribe(this.handle);
     this.multiplayer.unsubscribeToEvent(handleEvent);
+    this.multiplayer.unsubscribeToMatchEvent(this.handleMatchEvent);
     if (this.state.matchId !== undefined) {
       this.multiplayer.disconnect();
     }
@@ -123,6 +126,16 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & { 
     this.setState({
       ...multiplayerState,
     });
+  }
+
+  private handleMatchEvent = (event: MatchEvent) => {
+    if (event === MatchEvent.PLAYER_JOIN) {
+      console.log("player has joined the game");
+    } else if (event === MatchEvent.PLAYER_EXIT) {
+      console.log("player has left the game");
+    } else if (event === MatchEvent.MATCH_FULL) {
+      console.log("match is full");
+    }
   }
 
   private handleKeyDown(event: KeyboardEvent) {

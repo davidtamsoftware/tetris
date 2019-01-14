@@ -1,9 +1,7 @@
 import * as React from "react";
 import { Functions, Models, Multiplayer as MultiplayerAction } from "tetris-core";
-import { GameOver } from "../../components/GameOver";
 import Menu from "../../components/Menu";
 import { NextPiece } from "../../components/NextPiece";
-import { Paused } from "../../components/Paused";
 import Playfield from "../../components/Playfield";
 import { gameOverMenu, pauseMenu } from "../App";
 import styles from "./index.module.css";
@@ -20,11 +18,10 @@ export const Multiplayer = (
 
     return (
         <div className={styles.App}>
-{/* TODO allow user to select which mode and pass into this component */}
             { (props.mode === undefined || props.mode === MultiplayerMode.AttackMode) &&
                 <div>
-                <span style={{ padding: "5px"}}>{ props.player1.pendingDamage }</span>
-                <span style={{ padding: "5px"}}>{ props.player2.pendingDamage }</span>
+                <span style={{ padding: "5px", border: "1px solid red" }}>{ props.player1.pendingDamage }</span>
+                <span style={{ padding: "5px", border: "1px solid red" }}>{ props.player2.pendingDamage }</span>
                 </div>
             }
             <div className={styles.left}>
@@ -50,7 +47,6 @@ export const Multiplayer = (
                         </tr>
                     </tbody>
                 </table>
-                {/* TODO: use game state instead of player1 gamestate */}
                 {props.gameState === Models.GameState.Paused &&
                     <div style={{
                         position: "absolute",
@@ -58,7 +54,6 @@ export const Multiplayer = (
                         top: "200px",
                         backgroundColor: "black"
                     }}>
-                        {/* <Paused /> */}
                         <Menu menu={pauseMenu} notify={props.handle} menuClose={props.menuClose} />
                     </div>
                 }
@@ -69,7 +64,6 @@ export const Multiplayer = (
                         top: "200px",
                         backgroundColor: "black"
                     }}>
-                        {/* <GameOver /> */}
                         <Menu menu={gameOverMenu} notify={props.handle} />
                     </div>
                 }

@@ -1,23 +1,23 @@
 import { Multiplayer as MultiplayerAction } from "tetris-core";
-import { Action, ClientMessage, ServerMessage, ResponseType } from "tetris-ws-model";
+import { Action, ClientMessage, ServerMessage, ResponseType, MatchEvent } from "tetris-ws-model";
 import { EventHandler, Event } from "tetris-core/lib/actions/Tetris";
 
 type Handler = (game: any) => void;
+type MatchEventHandler = (event: MatchEvent) => void;
 
 export class MultiplayerRemoteClient {
   private subscribers: Set<Handler>;
-  // private eventSubscribers: Set<EventHandler>;
   private eventSubscribers: Map<EventHandler, Event[]>;
+  private matchEventSubscribers: Set<MatchEventHandler>;
 
   private multiplayerState: MultiplayerAction.MultiplayerState;
   private client?: WebSocket;
 
   constructor() {
     this.multiplayerState = {} as any;
-    // TODO: pull from configuration
-
     this.subscribers = new Set<Handler>();
     this.eventSubscribers = new Map<EventHandler, Event[]>();
+    this.matchEventSubscribers = new Set<Handler>();
   }
 
   public disconnect() {
@@ -28,14 +28,14 @@ export class MultiplayerRemoteClient {
     // const wsUrl = "ws://192.168.1.72:8080";
     const wsUrl = "wss://hidden-tundra-30225.herokuapp.com";
     this.client = new WebSocket(wsUrl);
+
+    this.client!.onerror = (event) => alert(JSON.stringify(event));
     const payload: ClientMessage = {
       action: Action.Joinmatch,
-      // TODO: prompt user for matchId
-      // matchId: "a1",
       matchId,
     };
-    
-    this.client.addEventListener("open", () => {
+
+    this.client!.addEventListener("open", () => {
       this.client!.send(JSON.stringify(payload));
     });
 
@@ -44,14 +44,20 @@ export class MultiplayerRemoteClient {
         const message: ServerMessage = JSON.parse(event.data);
         if (message.type === ResponseType.GameState) {
           this.setState(message.payload);
-        }
-        else if (message.type === ResponseType.GameEvent) {
+        } else if (message.type === ResponseType.GameEvent) {
           this.publishEvent(message.payload);
+        } else if (message.type === ResponseType.MatchEvent) {
+          this.publishMatchEvent(message.payload) 
         }
       } catch (error) {
         // tslint:disable-next-line:no-console
         console.log("error parsing: ", event);
       }
+    }
+
+    this.client!.onclose = (event) => {
+      // set state that client has disconnected
+      // TODO alert and only allow exit option
     }
   }
 
@@ -136,6 +142,14 @@ export class MultiplayerRemoteClient {
     this.eventSubscribers.delete(handler);
   }
 
+  public subscribeToMatchEvent(handler: MatchEventHandler) {
+    this.matchEventSubscribers.add(handler);
+  }
+
+  public unsubscribeToMatchEvent(handler: MatchEventHandler) {
+    this.matchEventSubscribers.delete(handler);
+  }
+
   private setState(state: any) {
     // mutate state
     this.multiplayerState = {
@@ -150,15 +164,15 @@ export class MultiplayerRemoteClient {
     this.subscribers.forEach((subscriber) => subscriber(this.multiplayerState));
   }
 
-  // private publishEvent = (event: Event) => {
-  //   this.eventSubscribers.forEach((eventSubscribers) => eventSubscribers(event));
-  // }
-
   private publishEvent = (event: Event) => {
     this.eventSubscribers.forEach((events, handler) => {
       if (events.length === 0 || events.indexOf(event) >= 0) {
         handler(event);
       }
     });
+  }
+
+  private publishMatchEvent = (event: MatchEvent) => {
+    this.matchEventSubscribers.forEach((handler) => handler(event));
   }
 }
