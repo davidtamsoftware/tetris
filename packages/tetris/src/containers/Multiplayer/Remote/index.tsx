@@ -1,13 +1,16 @@
 import * as React from "react";
 import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
 import { Multiplayer } from "..";
-import { Key, Props, matchMenu, handleEvent } from "../../App";
+import { Key, Props, matchMenu, handleEvent, pauseMenu, gameOverMenu, gameOverNoRestartMenu } from "../../App";
 import { MultiplayerRemoteClient } from "./RemoteClient";
 import styles from "./index.module.css";
 import Menu from "../../../components/Menu";
 import { MatchEvent } from "tetris-ws-model";
+import { GameState } from "tetris-core/lib/models";
 
-class App extends React.Component<Props, MultiplayerAction.MultiplayerState & { matchId?: string, matchMenu?: boolean }> {
+class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
+  matchId?: string, matchMenu?: boolean, matchEvent?: MatchEvent
+}> {
 
   private multiplayer: MultiplayerRemoteClient;
   private matchIdInput: HTMLInputElement | null;
@@ -15,7 +18,9 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & { 
   constructor(props: Props) {
     super(props);
     this.multiplayer = new MultiplayerRemoteClient();
-    this.state = this.multiplayer.getState();
+    this.state = {
+      ...this.multiplayer.getState(),
+    };
     this.handle = this.handle.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.matchIdInput = null;
@@ -70,14 +75,27 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & { 
       </div>;
     } else if (!this.state.player1 || !this.state.player2) {
       return <div>
-      Waiting for challenger to join...
+        Waiting for challenger to join...
       {this.state.matchMenu &&
-        <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMenuClose} />
-      }
-      </div>
+          <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMenuClose} />
+        }
+      </div>;
     }
     else {
-      return <Multiplayer {...this.state} handle={this.handleMenuSelect} />;
+      const gameOverMenuElement = <Menu menu={gameOverMenu} notify={this.handleMenuSelect} />;
+      const gameOverNoRestartMenuElement = <Menu menu={gameOverNoRestartMenu} notify={this.handleMenuSelect} />;
+      let menu = gameOverMenuElement;
+      if (this.state.matchEvent === MatchEvent.PLAYER_EXIT || this.state.matchEvent === MatchEvent.DISCONNECTED) {
+        menu = gameOverNoRestartMenuElement;
+      }
+      return <>
+        Match event: {this.state.matchEvent}
+        <Multiplayer
+          {...this.state}
+          pauseMenu={<Menu menu={pauseMenu} notify={this.handleMenuSelect} menuClose={this.handleMenuClose} />}
+          gameOverMenu={menu}
+        />
+      </>;
     }
   }
 
@@ -128,14 +146,22 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & { 
     });
   }
 
-  private handleMatchEvent = (event: MatchEvent) => {
-    if (event === MatchEvent.PLAYER_JOIN) {
+  private handleMatchEvent = (matchEvent: MatchEvent) => {
+    if (matchEvent === MatchEvent.PLAYER_JOIN) {
       console.log("player has joined the game");
-    } else if (event === MatchEvent.PLAYER_EXIT) {
+    } else if (matchEvent === MatchEvent.PLAYER_EXIT) {
       console.log("player has left the game");
-    } else if (event === MatchEvent.MATCH_FULL) {
+    } else if (matchEvent === MatchEvent.MATCH_FULL) {
       console.log("match is full");
+    } else if (matchEvent === MatchEvent.DISCONNECTED) {
+      console.log("disconnected");
     }
+
+    this.setState({
+      matchEvent,
+      gameState: matchEvent === MatchEvent.DISCONNECTED ? GameState.GameOver : this.state.gameState,
+    });
+
   }
 
   private handleKeyDown(event: KeyboardEvent) {

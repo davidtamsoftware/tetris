@@ -1,15 +1,16 @@
 import * as React from "react";
 import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
 import { Multiplayer } from "..";
-import { Key, Props, handleEvent } from "../../App";
+import { Key, Props, handleEvent, pauseMenu, gameOverMenu } from "../../App";
 import { Event } from "tetris-core/lib/actions/Tetris";
 import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
+import Menu from "../../../components/Menu";
 
 class App extends React.Component<Props & { mode: MultiplayerMode }, MultiplayerAction.MultiplayerState> {
 
   private multiplayer: MultiplayerAction.Multiplayer;
 
-  constructor(props: Props & { mode: MultiplayerMode}) {
+  constructor(props: Props & { mode: MultiplayerMode }) {
     super(props)
     this.multiplayer = new MultiplayerAction.Multiplayer(props.mode);
     this.state = this.multiplayer.getState();
@@ -31,7 +32,12 @@ class App extends React.Component<Props & { mode: MultiplayerMode }, Multiplayer
   }
 
   public render() {
-    return <Multiplayer {...this.state} mode={this.props.mode} handle={this.handleMenuSelect} menuClose={this.handleMenuClose}/>;
+    return <Multiplayer
+      {...this.state}
+      mode={this.props.mode}
+      pauseMenu={<Menu menu={pauseMenu} notify={this.handleMenuSelect} menuClose={this.handleMenuClose} />}
+      gameOverMenu={<Menu menu={gameOverMenu} notify={this.handleMenuSelect} />}
+    />;
   }
 
   private handleMenuClose = () => {
@@ -57,19 +63,6 @@ class App extends React.Component<Props & { mode: MultiplayerMode }, Multiplayer
       ...multiplayerState,
     });
   }
-
-  // private handleEvent = (event: Event) => {
-  //   if (event === Event.Drop) {
-  //     const audio = new Audio("/drop.mp3");
-  //     audio.play();
-  //   } else if (event === Event.Single) {
-  //     const audio = new Audio("/single.mp3");
-  //     audio.play();
-  //   } else if (event === Event.GameOver) {
-  //     const audio = new Audio("/gameover.mp3");
-  //     audio.play();
-  //   }
-  // }
 
   private handleKeyDown(event: KeyboardEvent) {
     if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {

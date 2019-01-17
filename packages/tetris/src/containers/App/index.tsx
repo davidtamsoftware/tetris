@@ -107,6 +107,15 @@ export const gameOverMenu: Node = {
     }]
 };
 
+export const gameOverNoRestartMenu: Node = {
+    name: "Game Over",
+    children: [{
+        name: "Home",
+        key: "HOME",
+    }]
+};
+
+
 // TODO add match over?
 
 export const matchMenu: Node = {

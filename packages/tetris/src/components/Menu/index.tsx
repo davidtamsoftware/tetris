@@ -18,8 +18,17 @@ class Menu extends React.Component<Props, State> {
             menuState: [props.menu],
             selection: 0,
         };
-        // this.handleKeyDown = this.handleKeyDown.bind(this);
     };
+
+    public componentWillReceiveProps(nextProps: Props) {
+        if (this.props.menu !== nextProps.menu) {
+            console.log("setting");
+            this.setState({
+                menuState: [nextProps.menu],
+                selection: 0,
+            });
+        }
+    }
 
     public componentDidMount() {
         document.addEventListener("keydown", this.handleKeyDown);
@@ -32,7 +41,7 @@ class Menu extends React.Component<Props, State> {
     public render() {
         const currMenu = this.state.menuState[this.state.menuState.length - 1];
         const menu =
-            <div style={{ 
+            <div style={{
                 textAlign: "center",
                 width: "400px",
                 borderRadius: "5px",
@@ -40,13 +49,14 @@ class Menu extends React.Component<Props, State> {
                 border: "5px solid white",
                 // boxShadow: "5px 10px gray",
                 // outline: "5px solid red",
-                padding: "20px" }}>
+                padding: "20px"
+            }}>
                 <div style={{ fontSize: "1.7em", padding: "0 0 15px" }}>{currMenu.name}</div>
                 {currMenu.children && currMenu.children.
                     map((child, index) =>
-                    <div style={{ borderRadius: "5px", border: `3px solid ${index === this.state.selection ? "green" : "transparent"}`, padding: "10px" }}
+                        <div style={{ borderRadius: "5px", border: `3px solid ${index === this.state.selection ? "green" : "transparent"}`, padding: "10px" }}
                             // tslint:disable-next-line:jsx-no-lambda
-                            onClick={() => this.selection(index, true) } onMouseMove={() => this.selection(index)} key={index}>
+                            onClick={() => this.selection(index, true)} onMouseMove={() => this.selection(index)} key={index}>
                             {child.name}
                         </div>)}
             </div>;
@@ -98,7 +108,7 @@ class Menu extends React.Component<Props, State> {
         }, click ? this.select : undefined);
     }
 
-    private select = () => {             
+    private select = () => {
         const currMenu = this.state.menuState[this.state.menuState.length - 1];
         const size = currMenu.children && currMenu.children.length;
         if (!size) {

@@ -6,9 +6,10 @@ import Playfield from "../../components/Playfield";
 import { gameOverMenu, pauseMenu } from "../App";
 import styles from "./index.module.css";
 import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
+import { MatchEvent } from "../../../../tetris-ws-model/lib/tetris-ws-model";
 
 export const Multiplayer = (
-    props: MultiplayerAction.MultiplayerState & { mode?: MultiplayerMode; handle: any; menuClose?: any; }) => {
+    props: MultiplayerAction.MultiplayerState & { mode?: MultiplayerMode; pauseMenu: JSX.Element; gameOverMenu: JSX.Element }) => {
     if (!props.player1 || !props.player2) {
         return null;
     }
@@ -54,7 +55,7 @@ export const Multiplayer = (
                         top: "200px",
                         backgroundColor: "black"
                     }}>
-                        <Menu menu={pauseMenu} notify={props.handle} menuClose={props.menuClose} />
+                    { props.pauseMenu }
                     </div>
                 }
                 {props.gameState === Models.GameState.GameOver &&
@@ -64,7 +65,7 @@ export const Multiplayer = (
                         top: "200px",
                         backgroundColor: "black"
                     }}>
-                        <Menu menu={gameOverMenu} notify={props.handle} />
+                    { props.gameOverMenu }
                     </div>
                 }
                 <div style={{ position: "absolute", bottom: "353px", left: "calc(50% - 85px)", textShadow: "#af89f7 1px 1px 35px, blue 0px 0px 57px, #d4bec1 0px 0px 50px" }}>

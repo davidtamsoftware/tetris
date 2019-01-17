@@ -56,8 +56,7 @@ export class MultiplayerRemoteClient {
     }
 
     this.client!.onclose = (event) => {
-      // set state that client has disconnected
-      // TODO alert and only allow exit option
+      this.publishMatchEvent(MatchEvent.DISCONNECTED);
     }
   }
 
