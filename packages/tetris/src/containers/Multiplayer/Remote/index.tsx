@@ -75,6 +75,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
       </div>;
     } else if (!this.state.player1 || !this.state.player2) {
       return <div>
+        Match event: {this.state.matchEvent} <br/>
         Waiting for challenger to join...
       {this.state.matchMenu &&
           <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMenuClose} />

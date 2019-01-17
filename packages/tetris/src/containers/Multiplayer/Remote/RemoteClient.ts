@@ -56,6 +56,9 @@ export class MultiplayerRemoteClient {
     }
 
     this.client!.onclose = (event) => {
+      if (this.getState().gameState && this.getState().gameState !== GameState.GameOver) {
+        this.publishEvent(Event.GameOver);
+      }
       this.publishMatchEvent(MatchEvent.DISCONNECTED);
     }
   }
