@@ -1,6 +1,7 @@
 import { Multiplayer as MultiplayerAction } from "tetris-core";
 import { Action, ClientMessage, ServerMessage, ResponseType, MatchEvent } from "tetris-ws-model";
 import { EventHandler, Event } from "tetris-core/lib/actions/Tetris";
+import { GameState } from "tetris-core/lib/models";
 
 type Handler = (game: any) => void;
 type MatchEventHandler = (event: MatchEvent) => void;
