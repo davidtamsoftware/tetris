@@ -20,6 +20,7 @@ export enum MatchEvent {
     PLAYER_JOIN,
     PLAYER_EXIT,
     MATCH_FULL,
+    DISCONNECTED,
 }
 
 export interface ClientMessage {
