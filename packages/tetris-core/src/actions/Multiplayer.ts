@@ -15,7 +15,7 @@ export enum MultiplayerMode {
 type Handler = (game: any) => void;
 
 export interface MultiplayerState {
-    winner?: Player;
+    winner?: Player | null; // null represents tie game
     gameState: GameState;
     player1: Game;
     player2: Game;

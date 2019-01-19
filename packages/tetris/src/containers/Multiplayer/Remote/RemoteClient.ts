@@ -158,6 +158,7 @@ export class MultiplayerRemoteClient {
     this.multiplayerState = {
       ...this.multiplayerState,
       ...state,
+      winner: state.winner,
     }
 
     this.notify();
