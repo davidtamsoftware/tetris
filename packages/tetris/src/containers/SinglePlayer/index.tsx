@@ -12,7 +12,6 @@ import styles from "./index.module.css";
 class App extends React.Component<Props, Models.Game> {
 
   private tetris: Tetris;
-  // private theme: HTMLAudioElement;
 
   constructor(props: Props) {
     super(props)
@@ -88,7 +87,6 @@ class App extends React.Component<Props, Models.Game> {
       this.tetris.togglePause();
     } else if (key === "RESTART") {
       this.tetris.restart();
-      // this.theme.currentTime = 0;
     }
     return true;
   }

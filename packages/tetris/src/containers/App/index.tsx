@@ -115,9 +115,6 @@ export const gameOverNoRestartMenu: Node = {
     }]
 };
 
-
-// TODO add match over?
-
 export const matchMenu: Node = {
     name: "Exit to Main Menu",
     children: [{
@@ -129,7 +126,6 @@ export const matchMenu: Node = {
         key: "QUIT_CANCEL",
     }]
 };
-
 
 export type Key = "HOME" | "RESTART" | "RESUME" | "QUIT_CONFIRM" | "QUIT_CANCEL" | "SINGLE_PLAYER" |
     "MULTIPLAYER_LOCAL" | "MULTIPLAYER_REMOTE" | "MULTIPLAYER_LOCAL_HIGH_SCORE_BATTLE" | "MULTIPLAYER_LOCAL_ATTACK_MODE" |

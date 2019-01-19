@@ -160,7 +160,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
 
     this.setState({
       matchEvent,
-      gameState: matchEvent === MatchEvent.DISCONNECTED ? GameState.GameOver : this.state.gameState,
+      gameState: this.state.gameState && matchEvent === MatchEvent.DISCONNECTED ? GameState.GameOver : this.state.gameState,
     });
 
   }

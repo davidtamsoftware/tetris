@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Models } from "tetris-core";
 import { BlockMatrix } from "../BlockMatrix";
-import "./index.css";
+import styles from "./index.module.css";
 
 interface Props {
     piece: Models.Piece;
@@ -10,6 +10,6 @@ interface Props {
 
 export const Piece = (props: Props) =>
     <BlockMatrix
-        className={`piece ${props.size}`}
+        className={`${styles["piece"]} ${styles[props.size]}`}
         matrix={props.piece} 
         size={props.size}/>;
