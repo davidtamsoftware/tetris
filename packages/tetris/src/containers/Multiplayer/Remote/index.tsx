@@ -48,8 +48,8 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
     if (!this.state.matchId) {
       return <div className={styles.matchmaking}>
         <div>Enter new/existing match id:</div>
-        <div><input ref={(input) => { this.matchIdInput = input; }} type={"text"} onKeyPress={this.setMatchId} /></div>
-        <div><button>Submit</button></div>
+        <div><input ref={(input) => { this.matchIdInput = input; }} type={"text"} onKeyPress={this.onEnter} /></div>
+        <div><button onClick={this.submitMatchId}>Submit</button></div>
         <div style={{ padding: "60px 0" }}>-- OR --</div>
         <div>Select match from list:</div>
         <div>
@@ -75,7 +75,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
       </div>;
     } else if (!this.state.player1 || !this.state.player2) {
       return <div>
-        Match event: {this.state.matchEvent} <br/>
+        Match event: {this.state.matchEvent} <br />
         Waiting for challenger to join...
       {this.state.matchMenu &&
           <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMenuClose} />
@@ -100,12 +100,18 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
     }
   }
 
-  private setMatchId = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const matchId = (e.target as any).value;
-    if (e.key === 'Enter' && matchId) {
+  private submitMatchId = () => {
+    const matchId = this.matchIdInput!.value;
+    if (matchId) {
       this.setState({ matchId }, () => {
         this.multiplayer.join(matchId);
       });
+    }
+  }
+
+  private onEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      this.submitMatchId();
     }
   }
 

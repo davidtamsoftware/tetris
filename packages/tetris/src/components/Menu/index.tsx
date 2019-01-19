@@ -47,8 +47,6 @@ class Menu extends React.Component<Props, State> {
                 borderRadius: "5px",
                 margin: "auto",
                 border: "5px solid white",
-                // boxShadow: "5px 10px gray",
-                // outline: "5px solid red",
                 padding: "20px"
             }}>
                 <div style={{ fontSize: "1.7em", padding: "0 0 15px" }}>{currMenu.name}</div>
