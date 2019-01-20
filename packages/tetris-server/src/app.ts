@@ -1,11 +1,9 @@
 import WebSocket from "ws";
 import { Multiplayer } from "tetris-core";
-import { Action, ClientMessage, ServerMessage, ResponseType, MatchEvent } from "tetris-ws-model";
+import { Action, ClientMessage, ServerMessage, ResponseType, MatchEvent, MatchState } from "tetris-ws-model";
 import { Event } from "tetris-core/lib/actions/Tetris";
 import express from "express";
 import http from "http";
-import { GameState } from "tetris-core/lib/models";
-import { Server } from "connect";
 
 const app = express();
 app.use(express.static(__dirname + "/../../tetris/build"));
@@ -39,7 +37,7 @@ class MatchService {
         if (match) {
             match.quit(player);
             if (!match.player1 && !match.player2) {
-                matchService.matches.splice(matchService.matches.indexOf(match));
+                matchService.matches.splice(matchService.matches.indexOf(match), 1);
             }
         }
     }
@@ -53,20 +51,18 @@ class MatchService {
         }
         return results[0];
     }
-
-    private purgeOldMatches = () => {
-        // TODO: cleanup old matches 
-    }
 }
 
 class Match {
     private _matchId: string;
     private _game: Multiplayer.Multiplayer;
+    private _delayedStart?: NodeJS.Timeout;
+    private _delayedStartExecuted: boolean;
     private _player1?: any;
     private _player2?: any;
-    // TODO add time for when not ready (ie. less than 2 players), used by cleanup process
 
     public constructor(matchId: string) {
+        this._delayedStartExecuted = false;
         this._matchId = matchId;
         this._game = new Multiplayer.Multiplayer();
         this._game.subscribe(this.handle);
@@ -109,13 +105,28 @@ class Match {
 
         if (joined && this._player1 && this._player2) {
             console.log("starting game...");
-            // TODO: this would restart the game if there is one already in
-            // progress and one of the players quit
-            if (this._game.getState().gameState !== GameState.Active) {
-                this._game.start();
+            // only start game from server if it hasn't already started once
+            if (this._game.getState().gameState === undefined) {
+                this._delayedStart = setTimeout(() => {
+                    this._delayedStartExecuted = true;
+                    this._game.start();
+                }, 5000);
+            } else {
+                this.handle(this._game.getState());
             }
         }
-        
+
+        if (joined) {
+            this.broadcast(ResponseType.MatchState, {
+                playerCount: (this._player1 ? 1 : 0) + (this._player2 ? 1 : 0),
+            } as MatchState);
+        } else {
+            sendState(player, JSON.stringify({
+                type: ResponseType.MatchEvent,
+                payload: MatchEvent.MATCH_FULL,
+            } as ServerMessage))
+        }
+
         return joined;
     }
 
@@ -123,36 +134,37 @@ class Match {
         const playerNumber = Match.getPlayerNumber(this, player);
         console.log("player quit: ", playerNumber);
         playerNumber === Multiplayer.Player.One ? this._player1 = undefined : this._player2 = undefined;
-        this._game.endGame(playerNumber);
+        if (this._delayedStart) {
+            clearTimeout(this._delayedStart);
+        }
+        if (this._delayedStartExecuted) {
+            this._game.endGame(playerNumber);
+        }
+
+        this.broadcast(ResponseType.MatchState, {
+            playerCount: (this._player1 ? 1 : 0) + (this._player2 ? 1 : 0),
+        } as MatchState);
     }
 
     private handle = (state: any) => {
-        if (this._player1) {
-            sendState(this._player1, JSON.stringify({
-                type: ResponseType.GameState,
-                payload: state,
-            } as ServerMessage));
-        }
-        if (this._player2) {
-            sendState(this._player2, JSON.stringify({
-                type: ResponseType.GameState,
-                payload: state,
-            } as ServerMessage));
-        }
+        this.broadcast(ResponseType.GameState, state);
     }
 
-
     private handleEvent = (event: Event) => {
+        this.broadcast(ResponseType.GameEvent, event);
+    }
+
+    private broadcast = (type: ResponseType, payload: any) => {
         if (this._player1) {
             sendState(this._player1, JSON.stringify({
-                type: ResponseType.GameEvent,
-                payload: event,
+                type,
+                payload,
             } as ServerMessage));
         }
         if (this._player2) {
             sendState(this._player2, JSON.stringify({
-                type: ResponseType.GameEvent,
-                payload: event,
+                type,
+                payload,
             } as ServerMessage));
         }
     }
@@ -174,7 +186,12 @@ const matchService = new MatchService();
 // TODO: port config
 const wss = new WebSocket.Server({ server });
 
-setInterval(() => console.log("active matches: ", matchService.matches.length), 5000);
+setInterval(() => console.log("active matches: ", matchService.matches.map((match) => ({
+        matchId: match.matchId,
+        count: (match.player1 ? 1 : 0) + (match.player2 ? 1 : 0),
+    })
+)), 5000);
+
 setInterval(() => {
     console.log("avg messages sent per 10 seconds: ", count);
     count = 0;
@@ -186,15 +203,7 @@ wss.on("connection", (ws, req) => {
         if (!match) {
             return;
         }
-        const otherConnection: WebSocket = ws === match.player2 ? match.player1 : match.player2;
         matchService.playerExit(ws);
-        if (otherConnection) {
-            console.log("*player has exit the game*");
-            sendState(otherConnection, JSON.stringify({
-                type: ResponseType.MatchEvent,
-                payload: MatchEvent.PLAYER_EXIT,
-            } as ServerMessage));
-        }
     });
 
     ws.on("message", (message) => {
@@ -202,23 +211,8 @@ wss.on("connection", (ws, req) => {
             const msg = JSON.parse(message.toString()) as ClientMessage;
             if (msg.action === Action.Joinmatch && msg.matchId) {
                 const match = matchService.getOrCreate(msg.matchId);
-                const success = match.join(ws);
-
-                if (success) {
-                    const otherConnection: WebSocket = ws === match.player2 ? match.player1 : match.player2;
-                    if (otherConnection) {
-                        console.log("player has joined the game");
-                        sendState(otherConnection, JSON.stringify({
-                            type: ResponseType.MatchEvent,
-                            payload: MatchEvent.PLAYER_JOIN,
-                        } as ServerMessage));
-                    }
-                } else {
-                    sendState(ws, JSON.stringify({
-                        type: ResponseType.MatchEvent,
-                        payload: MatchEvent.MATCH_FULL,
-                    }))
-                }
+                match.join(ws);
+                console.log("player has joined the game");
             } else {
                 const match = matchService.findMatch(ws);
                 if (!match) {

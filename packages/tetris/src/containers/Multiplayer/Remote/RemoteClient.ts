@@ -1,15 +1,17 @@
 import { Multiplayer as MultiplayerAction } from "tetris-core";
-import { Action, ClientMessage, ServerMessage, ResponseType, MatchEvent } from "tetris-ws-model";
+import { Action, ClientMessage, ServerMessage, ResponseType, MatchEvent, MatchState } from "tetris-ws-model";
 import { EventHandler, Event } from "tetris-core/lib/actions/Tetris";
 import { GameState } from "tetris-core/lib/models";
 
 type Handler = (game: any) => void;
 type MatchEventHandler = (event: MatchEvent) => void;
+type MatchStateHandler = (matchState: MatchState) => void;
 
 export class MultiplayerRemoteClient {
   private subscribers: Set<Handler>;
   private eventSubscribers: Map<EventHandler, Event[]>;
   private matchEventSubscribers: Set<MatchEventHandler>;
+  private matchStateSubscribers: Set<MatchStateHandler>;
 
   private multiplayerState: MultiplayerAction.MultiplayerState;
   private client?: WebSocket;
@@ -19,6 +21,7 @@ export class MultiplayerRemoteClient {
     this.subscribers = new Set<Handler>();
     this.eventSubscribers = new Map<EventHandler, Event[]>();
     this.matchEventSubscribers = new Set<Handler>();
+    this.matchStateSubscribers = new Set<MatchStateHandler>();
   }
 
   public disconnect() {
@@ -30,7 +33,8 @@ export class MultiplayerRemoteClient {
     const wsUrl = "wss://hidden-tundra-30225.herokuapp.com";
     this.client = new WebSocket(wsUrl);
 
-    this.client!.onerror = (event) => alert(JSON.stringify(event));
+    // this.client!.onerror = (event) => alert(JSON.stringify(event));
+
     const payload: ClientMessage = {
       action: Action.Joinmatch,
       matchId,
@@ -48,7 +52,9 @@ export class MultiplayerRemoteClient {
         } else if (message.type === ResponseType.GameEvent) {
           this.publishEvent(message.payload);
         } else if (message.type === ResponseType.MatchEvent) {
-          this.publishMatchEvent(message.payload) 
+          this.publishMatchEvent(message.payload);
+        } else if (message.type === ResponseType.MatchState) {
+          this.publishStateEvent(message.payload);
         }
       } catch (error) {
         // tslint:disable-next-line:no-console
@@ -152,6 +158,14 @@ export class MultiplayerRemoteClient {
   public unsubscribeToMatchEvent(handler: MatchEventHandler) {
     this.matchEventSubscribers.delete(handler);
   }
+  
+  public subscribeToMatchState(handler: MatchStateHandler) {
+    this.matchStateSubscribers.add(handler);
+  }
+
+  public unsubscribeToMatchState(handler: MatchStateHandler) {
+    this.matchStateSubscribers.delete(handler);
+  }
 
   private setState(state: any) {
     // mutate state
@@ -178,5 +192,9 @@ export class MultiplayerRemoteClient {
 
   private publishMatchEvent = (event: MatchEvent) => {
     this.matchEventSubscribers.forEach((handler) => handler(event));
+  }
+
+  private publishStateEvent = (state: MatchState) => {
+    this.matchStateSubscribers.forEach((handler) => handler(state));
   }
 }

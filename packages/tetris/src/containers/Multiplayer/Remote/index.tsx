@@ -5,12 +5,11 @@ import { Key, Props, matchMenu, handleEvent, pauseMenu, gameOverMenu, gameOverNo
 import { MultiplayerRemoteClient } from "./RemoteClient";
 import styles from "./index.module.css";
 import Menu from "../../../components/Menu";
-import { MatchEvent } from "tetris-ws-model";
+import { MatchEvent, MatchState } from "tetris-ws-model";
 import { GameState } from "tetris-core/lib/models";
 
 class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
-  matchId?: string, matchMenu?: boolean, matchEvent?: MatchEvent
-}> {
+  matchId?: string, matchMenu?: boolean, matchEvent?: MatchEvent, playerCount: number, matchMessages: string[]}> {
 
   private multiplayer: MultiplayerRemoteClient;
   private matchIdInput: HTMLInputElement | null;
@@ -20,6 +19,8 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
     this.multiplayer = new MultiplayerRemoteClient();
     this.state = {
       ...this.multiplayer.getState(),
+      playerCount: 0,
+      matchMessages: [],
     };
     this.handle = this.handle.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -32,6 +33,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
     this.multiplayer.subscribe(this.handle);
     this.multiplayer.subscribeToEvent(handleEvent);
     this.multiplayer.subscribeToMatchEvent(this.handleMatchEvent);
+    this.multiplayer.subscribeToMatchState(this.handleMatchState);
   }
 
   public componentWillUnmount() {
@@ -39,6 +41,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
     this.multiplayer.unsubscribe(this.handle);
     this.multiplayer.unsubscribeToEvent(handleEvent);
     this.multiplayer.unsubscribeToMatchEvent(this.handleMatchEvent);
+    this.multiplayer.unsubscribeToMatchState(this.handleMatchState);
     if (this.state.matchId !== undefined) {
       this.multiplayer.disconnect();
     }
@@ -83,8 +86,11 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
       </div>;
     } else if (!this.state.player1 || !this.state.player2) {
       return <div>
-        Match event: {this.state.matchEvent} <br />
-        Waiting for challenger to join...
+        { `${this.state.playerCount}/2`} <br/>
+        { this.state.matchEvent === MatchEvent.DISCONNECTED && "Disconnected from server"}
+        { this.state.matchEvent === MatchEvent.MATCH_FULL && `Game with match id ${this.state.matchId} is full`}
+        { this.state.matchEvent === undefined && "Waiting for challenger to join..." }
+        {this.state.matchMessages.map((msg) => <div>{msg}</div>) }
       {this.state.matchMenu &&
           <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMenuClose} />
         }
@@ -94,11 +100,13 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
       const gameOverMenuElement = <Menu menu={gameOverMenu} notify={this.handleMenuSelect} />;
       const gameOverNoRestartMenuElement = <Menu menu={gameOverNoRestartMenu} notify={this.handleMenuSelect} />;
       let menu = gameOverMenuElement;
-      if (this.state.matchEvent === MatchEvent.PLAYER_EXIT || this.state.matchEvent === MatchEvent.DISCONNECTED) {
+      if (this.state.playerCount < 2) {
         menu = gameOverNoRestartMenuElement;
       }
       return <>
-        Match event: {this.state.matchEvent}
+        { `${this.state.playerCount}/2`} <br/>
+        { this.state.matchEvent === MatchEvent.DISCONNECTED && "Disconnected from server"}
+        {this.state.matchMessages.map((msg) => <div>{msg}</div>) }
         <Multiplayer
           {...this.state}
           pauseMenu={<Menu menu={pauseMenu} notify={this.handleMenuSelect} menuClose={this.handleMenuClose} />}
@@ -157,21 +165,42 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
   }
 
   private handleMatchEvent = (matchEvent: MatchEvent) => {
-    if (matchEvent === MatchEvent.PLAYER_JOIN) {
-      console.log("player has joined the game");
-    } else if (matchEvent === MatchEvent.PLAYER_EXIT) {
-      console.log("player has left the game");
-    } else if (matchEvent === MatchEvent.MATCH_FULL) {
-      console.log("match is full");
-    } else if (matchEvent === MatchEvent.DISCONNECTED) {
-      console.log("disconnected");
-    }
-
     this.setState({
       matchEvent,
       gameState: this.state.gameState && matchEvent === MatchEvent.DISCONNECTED ? GameState.GameOver : this.state.gameState,
     });
+  }
 
+  private handleMatchState = (matchState: MatchState) => {
+    // if 2 => 1, player left game
+    // if 1 => 2 && gameState === undefined, player has joined the game, starting game
+    // if 0 => 2, starting game
+
+    const newMsg: string[] = [];
+    if (this.state.playerCount === 2 && matchState.playerCount === 1) {
+      newMsg.push("Player has left the game");
+    } else if (this.state.playerCount === 1 && matchState.playerCount === 2 && this.state.gameState === undefined) {
+      newMsg.push("Player has joined the game");
+      newMsg.push("Starting game...");
+    } else if (this.state.playerCount === 1 && matchState.playerCount === 2) {
+      newMsg.push("Player has joined the game");
+    } else if (this.state.playerCount === 0 && matchState.playerCount === 2 && this.state.gameState === undefined) {
+      newMsg.push("Starting game...");
+    }
+    const matchMessages = [...this.state.matchMessages, ...newMsg];
+
+    setTimeout(() => {
+      const clonedMessages = [...this.state.matchMessages];
+      newMsg.forEach(() => clonedMessages.shift());
+      this.setState({
+        matchMessages: clonedMessages,
+      })
+    }, 5000);
+
+    this.setState({
+      ...matchState,
+      matchMessages,
+    })
   }
 
   private handleKeyDown(event: KeyboardEvent) {

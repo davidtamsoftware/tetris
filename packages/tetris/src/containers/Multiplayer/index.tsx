@@ -1,12 +1,9 @@
 import * as React from "react";
 import { Functions, Models, Multiplayer as MultiplayerAction } from "tetris-core";
-import Menu from "../../components/Menu";
 import { NextPiece } from "../../components/NextPiece";
 import Playfield from "../../components/Playfield";
-import { gameOverMenu, pauseMenu } from "../App";
 import styles from "./index.module.css";
 import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
-import { MatchEvent } from "../../../../tetris-ws-model/lib/tetris-ws-model";
 
 export const Multiplayer = (
     props: MultiplayerAction.MultiplayerState & { mode?: MultiplayerMode; pauseMenu: JSX.Element; gameOverMenu: JSX.Element }) => {
