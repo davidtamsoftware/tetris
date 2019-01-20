@@ -47,13 +47,20 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
   public render() {
     if (!this.state.matchId) {
       return <div className={styles.matchmaking}>
-        <div>Enter new/existing match id:</div>
-        <div><input ref={(input) => { this.matchIdInput = input; }} type={"text"} onKeyPress={this.onEnter} /></div>
-        <div><button onClick={this.submitMatchId}>Submit</button></div>
-        <div style={{ padding: "60px 0" }}>-- OR --</div>
-        <div>Select match from list:</div>
-        <div>
-          {/* <table style={{border: "1px solid white"}}>
+        {!this.state.matchMenu &&
+          <div>
+            <div>Enter new/existing match id:</div>
+            <form onSubmit={this.submitMatchId}>
+              <div>
+                <input maxLength={10}
+                  className={styles.matchId} required autoFocus
+                  ref={(input) => { this.matchIdInput = input; }} type={"text"} /></div>
+              <div><button>Submit</button></div>
+            </form>
+            <div style={{ padding: "60px 0" }}>-- OR --</div>
+            <div>Select match from list:</div>
+            <div>
+              {/* <table style={{border: "1px solid white"}}>
             <thead>
               <th>
                 <td>Match ID</td>
@@ -67,8 +74,9 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
               </tr>
             </tbody>
           </table> */}
-          TBD
-        </div>
+              TBD
+          </div>
+          </div>}
         {this.state.matchMenu &&
           <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMenuClose} />
         }
@@ -100,18 +108,13 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
     }
   }
 
-  private submitMatchId = () => {
+  private submitMatchId = (event: any) => {
+    event.preventDefault();
     const matchId = this.matchIdInput!.value;
     if (matchId) {
       this.setState({ matchId }, () => {
         this.multiplayer.join(matchId);
       });
-    }
-  }
-
-  private onEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      this.submitMatchId();
     }
   }
 

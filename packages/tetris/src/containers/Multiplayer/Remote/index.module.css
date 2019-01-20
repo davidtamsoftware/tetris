@@ -6,3 +6,11 @@
 .matchmaking > div {
     padding: 5px 0;
 }
+
+.matchId:invalid {
+    border: 2px dashed red;
+}
+  
+.matchId:valid {
+    border: 2px solid black;
+}
