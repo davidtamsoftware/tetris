@@ -108,7 +108,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
       const gameOverMenuElement = <Menu menu={gameOverMenu} notify={this.handleMenuSelect} />;
       const gameOverNoRestartMenuElement = <Menu menu={gameOverNoRestartMenu} notify={this.handleMenuSelect} />;
       let menu = gameOverMenuElement;
-      if (this.state.playerCount < 2) {
+      if (this.state.playerCount < 2 || this.state.matchEvent === MatchEvent.DISCONNECTED) {
         menu = gameOverNoRestartMenuElement;
       }
       return <>
