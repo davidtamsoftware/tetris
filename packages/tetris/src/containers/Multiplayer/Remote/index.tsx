@@ -7,9 +7,17 @@ import styles from "./index.module.css";
 import Menu from "../../../components/Menu";
 import { MatchEvent, MatchState } from "tetris-ws-model";
 import { GameState } from "tetris-core/lib/models";
+import { Player } from "tetris-core/lib/actions/Multiplayer";
 
-class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
-  matchId?: string, matchMenu?: boolean, matchEvent?: MatchEvent, playerCount: number, matchMessages: string[]}> {
+class App extends React.Component<Props, MultiplayerAction.MultiplayerState & 
+{
+  matchId?: string;
+  matchMenu?: boolean;
+  matchEvent?: MatchEvent;
+  playerCount: number;
+  player?: Player;
+  matchMessages: string[];
+}> {
 
   private multiplayer: MultiplayerRemoteClient;
   private matchIdInput: HTMLInputElement | null;
@@ -111,6 +119,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState & {
           {...this.state}
           pauseMenu={<Menu menu={pauseMenu} notify={this.handleMenuSelect} menuClose={this.handleMenuClose} />}
           gameOverMenu={menu}
+          customGameWinner={<div>You {this.state.winner === this.state.player ? "win" : "lose"}</div>}
         />
       </>;
     }

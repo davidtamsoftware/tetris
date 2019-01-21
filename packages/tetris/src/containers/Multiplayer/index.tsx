@@ -6,7 +6,13 @@ import styles from "./index.module.css";
 import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
 
 export const Multiplayer = (
-    props: MultiplayerAction.MultiplayerState & { mode?: MultiplayerMode; pauseMenu: JSX.Element; gameOverMenu: JSX.Element }) => {
+    props: MultiplayerAction.MultiplayerState & 
+    { 
+        mode?: MultiplayerMode;
+        pauseMenu: JSX.Element;
+        gameOverMenu: JSX.Element;
+        customGameWinner?: JSX.Element;
+    }) => {
     if (!props.player1 || !props.player2) {
         return null;
     }
@@ -67,7 +73,7 @@ export const Multiplayer = (
                 }
                 <div style={{ position: "absolute", bottom: "353px", left: "calc(50% - 85px)", textShadow: "#af89f7 1px 1px 35px, blue 0px 0px 57px, #d4bec1 0px 0px 50px" }}>
                     {props.winner === null && "Tie Game"}
-                    {props.winner !== undefined && props.winner !== null && `Player ${props.winner + 1} wins!`}
+                    {props.winner !== undefined && props.winner !== null && (props.customGameWinner || `Player ${props.winner + 1} wins!`)}
                 </div>
             </div>
         </div>

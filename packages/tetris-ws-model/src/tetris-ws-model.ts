@@ -1,3 +1,5 @@
+import { Multiplayer } from "tetris-core";
+
 export enum Action {
     Joinmatch,
     MoveLeft,
@@ -24,6 +26,7 @@ export enum MatchEvent {
 
 export interface MatchState {
     playerCount: number;
+    player: Multiplayer.Player;
 }
 
 export interface ClientMessage {

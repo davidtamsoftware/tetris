@@ -4,10 +4,17 @@ import { Action, ClientMessage, ServerMessage, ResponseType, MatchEvent, MatchSt
 import { Event } from "tetris-core/lib/actions/Tetris";
 import express from "express";
 import http from "http";
+import { Player } from "tetris-core/lib/actions/Multiplayer";
 
 const app = express();
 app.use(express.static(__dirname + "/../../tetris/build"));
 const server = http.createServer(app);
+app.get("/matches", (req, res) => {
+    res.send(matchService.matches.map((match) => ({
+        matchId: match.matchId,
+        count: (match.player1 ? 1 : 0) + (match.player2 ? 1 : 0),
+    })));
+})
 
 server.listen(process.env.PORT || 8080);
 
@@ -117,14 +124,34 @@ class Match {
         }
 
         if (joined) {
-            this.broadcast(ResponseType.MatchState, {
-                playerCount: (this._player1 ? 1 : 0) + (this._player2 ? 1 : 0),
-            } as MatchState);
+            // this.broadcast(ResponseType.MatchState, {
+            //     playerCount: (this._player1 ? 1 : 0) + (this._player2 ? 1 : 0),
+            // } as MatchState);
+            const playerCount = (this._player1 ? 1 : 0) + (this._player2 ? 1 : 0);
+
+            if (this._player1) {
+                sendState(this._player1, {
+                    type: ResponseType.MatchState,
+                    payload: {
+                        playerCount,
+                        player: Player.One,
+                    } as MatchState,
+                });
+            }
+            if (this._player2) {
+                sendState(this._player2, {
+                    type: ResponseType.MatchState,
+                    payload: {
+                        playerCount,
+                        player: Player.Two,
+                    } as MatchState,
+                });
+            }
         } else {
-            sendState(player, JSON.stringify({
+            sendState(player, {
                 type: ResponseType.MatchEvent,
                 payload: MatchEvent.MATCH_FULL,
-            } as ServerMessage))
+            })
         }
 
         return joined;
@@ -156,16 +183,16 @@ class Match {
 
     private broadcast = (type: ResponseType, payload: any) => {
         if (this._player1) {
-            sendState(this._player1, JSON.stringify({
+            sendState(this._player1, {
                 type,
                 payload,
-            } as ServerMessage));
+            });
         }
         if (this._player2) {
-            sendState(this._player2, JSON.stringify({
+            sendState(this._player2, {
                 type,
                 payload,
-            } as ServerMessage));
+            });
         }
     }
 
@@ -187,9 +214,9 @@ const matchService = new MatchService();
 const wss = new WebSocket.Server({ server });
 
 setInterval(() => console.log("active matches: ", matchService.matches.map((match) => ({
-        matchId: match.matchId,
-        count: (match.player1 ? 1 : 0) + (match.player2 ? 1 : 0),
-    })
+    matchId: match.matchId,
+    count: (match.player1 ? 1 : 0) + (match.player2 ? 1 : 0),
+})
 )), 5000);
 
 setInterval(() => {
@@ -242,9 +269,9 @@ wss.on("connection", (ws, req) => {
 });
 
 let count = 0;
-const sendState = (ws: WebSocket, state: string) => {
+const sendState = (ws: WebSocket, state: ServerMessage) => {
     count++;
-    ws.send(state, (error) => {
+    ws.send(JSON.stringify(state), (error) => {
         if (error) {
             console.log("error sending state");
         }
