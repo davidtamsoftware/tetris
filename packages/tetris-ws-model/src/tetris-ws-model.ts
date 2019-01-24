@@ -9,7 +9,7 @@ export enum Action {
     RotateLeft,
     RotateRight,
     Restart,
-    InstantMessage,
+    TogglePause,
 }
 
 export enum ResponseType {

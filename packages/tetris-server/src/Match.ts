@@ -40,8 +40,7 @@ export class Match {
         this._game.subscribeToEvent(this.handleEvent,
             Event.Drop, Event.GameOver, Event.Single,
             Event.Double, Event.Triple, Event.Tetris,
-            Event.PauseIn, Event.PauseOut, Event.Start,
-            Event.GameOver, Event.Damage);
+            Event.Start, Event.GameOver, Event.Damage);
     }
 
     get game(): Multiplayer.Multiplayer {

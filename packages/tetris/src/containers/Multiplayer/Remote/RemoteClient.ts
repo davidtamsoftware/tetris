@@ -1,4 +1,4 @@
-import { Multiplayer as MultiplayerAction } from "tetris-core";
+import { MultiplayerState } from "tetris-core/lib/actions/Multiplayer";
 import { Event, EventHandler } from "tetris-core/lib/actions/Tetris";
 import { GameState } from "tetris-core/lib/models";
 import { Action, ClientMessage, MatchEvent, MatchState, ResponseType, ServerMessage } from "tetris-ws-model";
@@ -13,7 +13,7 @@ export class MultiplayerRemoteClient {
   private matchEventSubscribers: Set<MatchEventHandler>;
   private matchStateSubscribers: Set<MatchStateHandler>;
 
-  private multiplayerState: MultiplayerAction.MultiplayerState;
+  private multiplayerState: MultiplayerState;
   private client?: WebSocket;
 
   constructor() {
@@ -48,7 +48,13 @@ export class MultiplayerRemoteClient {
       try {
         const message: ServerMessage = JSON.parse(event.data);
         if (message.type === ResponseType.GameState) {
-          this.setState(message.payload);
+          const state = message.payload as MultiplayerState;
+          if (this.getState().gameState === GameState.Active && state.gameState === GameState.Paused) {
+            this.publishEvent(Event.PauseIn);
+          } else if (this.getState().gameState === GameState.Paused && state.gameState === GameState.Active) {
+            this.publishEvent(Event.PauseOut);
+          }
+          this.setState(state);
         } else if (message.type === ResponseType.GameEvent) {
           this.publishEvent(message.payload);
         } else if (message.type === ResponseType.MatchEvent) {
@@ -102,7 +108,7 @@ export class MultiplayerRemoteClient {
 
   public togglePause() {
     const payload: ClientMessage = {
-      action: Action.MoveRight, // TODO
+      action: Action.TogglePause,
     };
     this.client!.send(JSON.stringify(payload));
     // this.publishEvent(Event.PauseIn);
@@ -167,7 +173,7 @@ export class MultiplayerRemoteClient {
     this.matchStateSubscribers.delete(handler);
   }
 
-  private setState(state: any) {
+  private setState(state: MultiplayerState) {
     // mutate state
     this.multiplayerState = {
       ...this.multiplayerState,

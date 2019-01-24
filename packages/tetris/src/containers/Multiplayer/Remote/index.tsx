@@ -89,7 +89,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
           </div>
           </div>}
         {this.state.matchMenu &&
-          <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMenuClose} />
+          <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMatchMenuClose} />
         }
       </div>;
     } else if (!this.state.player1 || !this.state.player2) {
@@ -100,7 +100,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
         { this.state.matchEvent === undefined && "Waiting for challenger to join..." }
         {this.state.matchMessages.map((msg, index) => <div key={index}>{msg}</div>) }
       {this.state.matchMenu &&
-          <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMenuClose} />
+          <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMatchMenuClose} />
         }
       </div>;
     }
@@ -117,7 +117,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
         {this.state.matchMessages.map((msg, index) => <div key={index}>{msg}</div>) }
         <Multiplayer
           {...this.state}
-          pauseMenu={<Menu menu={pauseMenu} notify={this.handleMenuSelect} menuClose={this.handleMenuClose} />}
+          pauseMenu={<Menu menu={pauseMenu} notify={this.handleMenuSelect} menuClose={this.handlePauseMenuClose} />}
           gameOverMenu={menu}
           customGameWinner={<div>You {this.state.winner === this.state.player ? "win" : "lose"}</div>}
         />
@@ -147,11 +147,15 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
     return true;
   }
 
-  private handleMenuClose = () => {
+  private handleMatchMenuClose = () => {
     this.setState({
       matchMenu: false,
     })
   }
+
+  private handlePauseMenuClose = () => {
+    this.multiplayer.togglePause();
+  }  
 
   private handleMenuSelect = (key: Key) => {
     if (key === "HOME" || key === "QUIT_CONFIRM") {

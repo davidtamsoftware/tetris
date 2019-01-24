@@ -62,6 +62,8 @@ wss.on("connection", (ws) => {
                     match.game.drop(player, false, true);
                 } else if (msg.action === Action.SoftDrop) {
                     match.game.drop(player, false, false);
+                } else if (msg.action === Action.TogglePause) {
+                    match.game.togglePause();
                 } else if (msg.action === Action.Restart
                     && match.player1 && match.player2) {
                     match.game.restart();
