@@ -116,9 +116,6 @@ export class Multiplayer {
     public togglePause() {
         this.players[Player.One].togglePause();
         this.players[Player.Two].togglePause();
-        // this.setState({
-        //     gameState: this.getState().gameState,
-        // });
 
         this.publishEvent(this.getState().gameState === GameState.Paused ? Event.PauseOut : Event.PauseIn);
         this.setState({
@@ -168,9 +165,8 @@ export class Multiplayer {
     }
 
     public getState(): MultiplayerState {
-        return {
-            ...(this.multiplayerState || {}),
-        } as MultiplayerState;
+        // deep copy
+        return JSON.parse(JSON.stringify(this.multiplayerState || {}));
     }
 
     public subscribe(handler: Handler) {
@@ -206,8 +202,6 @@ export class Multiplayer {
             ...this.multiplayerState,
             ...state,
         };
-
-        // this.notify();
     }
 
     private updatePlayer1State(player1: Game) {

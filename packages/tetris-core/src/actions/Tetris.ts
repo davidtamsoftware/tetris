@@ -123,6 +123,7 @@ export class Tetris {
     }
 
     public async drop(tick: boolean, hardDrop?: boolean) {
+        // ignore calls to drop while freeze semaphore is active
         if (this.game!.gameState === GameState.Active && !this.freezeSemaphore) {
             this.freezeSemaphore = true;
             const result = await moveDown(
@@ -200,10 +201,8 @@ export class Tetris {
     }
 
     public getState(): Game {
-        // TODO: deep copy
-        return {
-            ...(this.game || {}),
-        } as Game;
+        // deep copy
+        return JSON.parse(JSON.stringify(this.game || {}));
     }
 
     public subscribe(handler: Handler) {
@@ -344,8 +343,6 @@ export class Tetris {
             ...this.game,
             ...state,
         };
-
-        // this.notify();
     }
 
 }
