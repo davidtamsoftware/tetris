@@ -22,7 +22,6 @@ class Menu extends React.Component<Props, State> {
 
     public componentWillReceiveProps(nextProps: Props) {
         if (this.props.menu !== nextProps.menu) {
-            console.log("setting");
             this.setState({
                 menuState: [nextProps.menu],
                 selection: 0,

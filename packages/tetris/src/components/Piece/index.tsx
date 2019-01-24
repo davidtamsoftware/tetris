@@ -10,6 +10,6 @@ interface Props {
 
 export const Piece = (props: Props) =>
     <BlockMatrix
-        className={`${styles["piece"]} ${styles[props.size]}`}
+        className={`${styles.piece} ${styles[props.size]}`}
         matrix={props.piece} 
         size={props.size}/>;

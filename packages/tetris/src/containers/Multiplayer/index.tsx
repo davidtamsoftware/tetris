@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Functions, Models, Multiplayer as MultiplayerAction } from "tetris-core";
+import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
 import { NextPiece } from "../../components/NextPiece";
 import Playfield from "../../components/Playfield";
 import styles from "./index.module.css";
-import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
 
 export const Multiplayer = (
     props: MultiplayerAction.MultiplayerState & 

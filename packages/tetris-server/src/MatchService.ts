@@ -9,7 +9,7 @@ export class MatchService {
     }
 
     get matches(): Match[] {
-        return this._matches
+        return this._matches;
     }
 
     public findMatch(player: MatchPlayer): Match | null {

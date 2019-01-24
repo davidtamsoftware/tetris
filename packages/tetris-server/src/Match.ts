@@ -1,6 +1,6 @@
-import { Multiplayer, Event } from "tetris-core";
-import { ResponseType, MatchState, MatchEvent, ServerMessage } from "../../tetris-ws-model/lib/tetris-ws-model";
+import { Event, Multiplayer } from "tetris-core";
 import { Player } from "tetris-core/lib/actions/Multiplayer";
+import { MatchEvent, MatchState, ResponseType, ServerMessage } from "../../tetris-ws-model/lib/tetris-ws-model";
 
 /**
  * Abstraction layer to remote player implementation
@@ -11,6 +11,16 @@ export interface MatchPlayer {
 }
 
 export class Match {
+    public static getPlayerNumber = (match: Match, matchPlayer: MatchPlayer): Multiplayer.Player => {
+        if (match._player1 && match._player1.uid === matchPlayer.uid) {
+            return Multiplayer.Player.One;
+        } else if (match._player2 && match._player2.uid === matchPlayer.uid) {
+            return Multiplayer.Player.Two;
+        }
+
+        throw new Error("player not found");
+    }
+
     private _matchId: string;
     private _game: Multiplayer.Multiplayer;
     private _delayedStart?: NodeJS.Timeout;
@@ -24,7 +34,7 @@ export class Match {
         this._game = new Multiplayer.Multiplayer();
         this._game.subscribe(this.handle);
         // Subscribe to only a subset of the events that are triggered by server
-        // game calculation logic. This is to reduce the number of web socket 
+        // game calculation logic. This is to reduce the number of web socket
         // messages. Events that are triggered by user button action can be
         // captured on the client.
         this._game.subscribeToEvent(this.handleEvent,
@@ -61,6 +71,7 @@ export class Match {
         }
 
         if (joined && this._player1 && this._player2) {
+            // tslint:disable-next-line:no-console
             console.log("starting game...");
             // only start game from server if it hasn't already started once
             if (this._game.getState().gameState === undefined) {
@@ -106,6 +117,7 @@ export class Match {
 
     public quit(player: MatchPlayer) {
         const playerNumber = Match.getPlayerNumber(this, player);
+        // tslint:disable-next-line:no-console
         console.log("player quit: ", playerNumber);
         playerNumber === Multiplayer.Player.One ? this._player1 = undefined : this._player2 = undefined;
         if (this._delayedStart) {
@@ -142,14 +154,4 @@ export class Match {
             });
         }
     }
-
-    public static getPlayerNumber = (match: Match, matchPlayer: MatchPlayer): Multiplayer.Player => {
-        if (match._player1 && match._player1.uid === matchPlayer.uid) {
-            return Multiplayer.Player.One;
-        } else if (match._player2 && match._player2.uid === matchPlayer.uid) {
-            return Multiplayer.Player.Two;
-        }
-
-        throw new Error("player not found");
-    };
 }

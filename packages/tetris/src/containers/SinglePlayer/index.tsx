@@ -6,7 +6,7 @@ import { NextPiece } from "../../components/NextPiece";
 import { Playfield } from "../../components/Playfield";
 import { Scoreboard } from "../../components/Scoreboard";
 import { Stats } from "../../components/Stats";
-import { gameOverMenu, Key, pauseMenu, Props, handleEvent } from "../App";
+import { gameOverMenu, handleEvent, Key, pauseMenu, Props } from "../App";
 import styles from "./index.module.css";
 
 class App extends React.Component<Props, Models.Game> {

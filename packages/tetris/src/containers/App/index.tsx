@@ -1,10 +1,10 @@
 import * as React from "react";
+import { Event } from "tetris-core";
+import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
 import Menu from "../../components/Menu";
 import MultiplayerLocal from "../Multiplayer/Local";
 import MultiplayerRemote from "../Multiplayer/Remote";
 import SinglePlayer from "../SinglePlayer";
-import { Event } from "tetris-core";
-import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
 // import linkedinLogo from "./In-2C-21px-R.png";
 
 interface State {

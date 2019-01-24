@@ -1,13 +1,13 @@
 import * as React from "react";
 import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
-import { Multiplayer } from "..";
-import { Key, Props, matchMenu, handleEvent, pauseMenu, gameOverMenu, gameOverNoRestartMenu } from "../../App";
-import { MultiplayerRemoteClient } from "./RemoteClient";
-import styles from "./index.module.css";
-import Menu from "../../../components/Menu";
-import { MatchEvent, MatchState } from "tetris-ws-model";
-import { GameState } from "tetris-core/lib/models";
 import { Player } from "tetris-core/lib/actions/Multiplayer";
+import { GameState } from "tetris-core/lib/models";
+import { MatchEvent, MatchState } from "tetris-ws-model";
+import { Multiplayer } from "..";
+import Menu from "../../../components/Menu";
+import { gameOverMenu, gameOverNoRestartMenu, handleEvent, Key, matchMenu, pauseMenu, Props } from "../../App";
+import styles from "./index.module.css";
+import { MultiplayerRemoteClient } from "./RemoteClient";
 
 class App extends React.Component<Props, MultiplayerAction.MultiplayerState & 
 {
@@ -98,7 +98,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
         { this.state.matchEvent === MatchEvent.DISCONNECTED && "Disconnected from server"}
         { this.state.matchEvent === MatchEvent.MATCH_FULL && `Game with match id ${this.state.matchId} is full`}
         { this.state.matchEvent === undefined && "Waiting for challenger to join..." }
-        {this.state.matchMessages.map((msg) => <div>{msg}</div>) }
+        {this.state.matchMessages.map((msg, index) => <div key={index}>{msg}</div>) }
       {this.state.matchMenu &&
           <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMenuClose} />
         }
@@ -114,7 +114,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
       return <>
         { `${this.state.playerCount}/2`} <br/>
         { this.state.matchEvent === MatchEvent.DISCONNECTED && "Disconnected from server"}
-        {this.state.matchMessages.map((msg) => <div>{msg}</div>) }
+        {this.state.matchMessages.map((msg, index) => <div key={index}>{msg}</div>) }
         <Multiplayer
           {...this.state}
           pauseMenu={<Menu menu={pauseMenu} notify={this.handleMenuSelect} menuClose={this.handleMenuClose} />}

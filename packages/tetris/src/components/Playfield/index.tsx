@@ -9,7 +9,7 @@ interface Props {
     size?: "small" | "large";
 }
 
-export const Playfield = (props: Props) => 
+export const Playfield = (props: Props) =>
     <BlockMatrix 
         className={
             `playfield ${props.size || "large"} ${props.gameState === Models.GameState.Paused ? "paused" : ""}`

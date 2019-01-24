@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
-import { Multiplayer } from "..";
-import { Key, Props, handleEvent, pauseMenu, gameOverMenu } from "../../App";
 import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
+import { Multiplayer } from "..";
 import Menu from "../../../components/Menu";
+import { gameOverMenu, handleEvent, Key, pauseMenu, Props } from "../../App";
 
 class App extends React.Component<Props & { mode: MultiplayerMode }, MultiplayerAction.MultiplayerState> {
 
