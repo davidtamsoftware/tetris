@@ -31,12 +31,16 @@ export enum Event {
     Attack,
 }
 
+export interface HighScoreService {
+    getHighScore(): number;
+    saveHighScore(score: number): void;
+}
+
 /**
  * @class Tetris
  * @description Contains the logic for tetris actions and uses pure functions to transform playfield contents
  * and save state to memory.
  */
-
 export class Tetris {
 
     private subscribers: Set<Handler>;
@@ -46,8 +50,9 @@ export class Tetris {
     private loop?: number;
     private refreshLoop?: number;
     private pieceGenerator?: () => Fill[][];
+    private highScoreService?: HighScoreService;
 
-    constructor(pieceGenerator?: () => Fill[][]) {
+    constructor(pieceGenerator?: () => Fill[][], highScoreService?: HighScoreService) {
         this.freezeSemaphore = false;
         this.incrementCount = this.incrementCount.bind(this);
         this.addLines = this.addLines.bind(this);
@@ -56,6 +61,7 @@ export class Tetris {
         this.subscribers = new Set<Handler>();
         this.eventSubscribers = new Map<EventHandler, Event[]>();
         this.pieceGenerator = pieceGenerator;
+        this.highScoreService = highScoreService;
     }
 
     public moveLeft() {
@@ -180,6 +186,10 @@ export class Tetris {
             return;
         }
 
+        if (this.highScoreService) {
+            this.highScoreService.saveHighScore(this.getState().scoreboard.highscore);
+        }
+
         this.setState({
             gameState: GameState.GameOver,
         });
@@ -253,10 +263,7 @@ export class Tetris {
             scoreboard: {
                 level: 1,
                 lines: 0,
-                // TODO: pass in score provider,
-                // client can implement in localstorage, server can implement in memory or persistent
-                // highscore: Number(localStorage.getItem("highscore") || 0),
-                highscore: 0,
+                highscore: (this.highScoreService && this.highScoreService.getHighScore()) || 0,
                 score: 0,
             },
             stats: pieces
@@ -278,10 +285,12 @@ export class Tetris {
     }
 
     private addScore(score: number) {
+        const newScore = this.game!.scoreboard.score + score;
         this.setState({
             scoreboard: {
                 ...this.game!.scoreboard,
-                score: this.game!.scoreboard.score + score,
+                score: newScore,
+                highscore: this.game!.scoreboard.highscore > newScore ? this.game!.scoreboard.highscore : newScore,
             },
         });
     }

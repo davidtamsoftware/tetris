@@ -153,7 +153,6 @@ export const removeCompletedLines =
             newState.unshift(...lines);
         }
 
-        // TODO: callback for line dropping audio
         publishEvent(Event.Drop);
         if (padEmptyLines) {
             switch (padEmptyLines) {

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Functions, Models, Tetris } from "tetris-core";
+import { HighScoreService } from "tetris-core/lib/actions/Tetris";
 import { Controls } from "../../components/Controls";
 import Menu from "../../components/Menu";
 import { NextPiece } from "../../components/NextPiece";
@@ -9,13 +10,22 @@ import { Stats } from "../../components/Stats";
 import { gameOverMenu, handleEvent, Key, pauseMenu, Props } from "../App";
 import styles from "./index.module.css";
 
+const localStorageHighScoreService: HighScoreService = {
+  getHighScore() {
+    return Number(localStorage.getItem("highscore") || 0);
+  },
+  saveHighScore(score: number) {
+    localStorage.setItem("highscore", score.toString());
+  }
+}
+
 class App extends React.Component<Props, Models.Game> {
 
   private tetris: Tetris;
 
   constructor(props: Props) {
     super(props)
-    this.tetris = new Tetris();
+    this.tetris = new Tetris(undefined, localStorageHighScoreService);
     this.state = this.tetris.getState();
     this.handle = this.handle.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -53,18 +63,22 @@ class App extends React.Component<Props, Models.Game> {
         <div className={styles.main}>
           <Playfield playfield={result.playfield} gameState={this.state.gameState} />
           {this.state.gameState === Models.GameState.Paused &&
-            <div style={{ position: "absolute", 
-            left: "calc(50% - 200px - 5px - 20px)",
-            top: "200px", 
-            backgroundColor: "black"}}>
+            <div style={{
+              position: "absolute",
+              left: "calc(50% - 200px - 5px - 20px)",
+              top: "200px",
+              backgroundColor: "black"
+            }}>
               <Menu menu={pauseMenu} notify={this.handleMenuSelect} menuClose={this.handleMenuClose} />
             </div>
           }
           {this.state.gameState === Models.GameState.GameOver &&
-            <div style={{ position: "absolute", 
-            left: "calc(50% - 200px - 5px - 20px)",
-            top: "200px", 
-            backgroundColor: "black"}}>
+            <div style={{
+              position: "absolute",
+              left: "calc(50% - 200px - 5px - 20px)",
+              top: "200px",
+              backgroundColor: "black"
+            }}>
               <Menu menu={gameOverMenu} notify={this.handleMenuSelect} />
             </div>
           }
@@ -92,9 +106,6 @@ class App extends React.Component<Props, Models.Game> {
   }
 
   private handle(game: Models.Game) {
-    if (game.gameState === Models.GameState.GameOver) {
-      localStorage.setItem("highscore", game.scoreboard.highscore.toString());
-    }
     this.setState(game);
   }
 
