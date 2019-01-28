@@ -30,8 +30,6 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
       playerCount: 0,
       matchMessages: [],
     };
-    this.handle = this.handle.bind(this);
-    this.handleKeyDown = this.handleKeyDown.bind(this);
     this.matchIdInput = null;
   }
 
@@ -139,9 +137,6 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
     if (key === "QUIT_CONFIRM") {
       this.props.exit();
     } else if (key === "QUIT_CANCEL") {
-      this.setState({
-
-      });
       return false;
     }
     return true;
@@ -171,7 +166,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
     return true;
   }
 
-  private handle(multiplayerState: MultiplayerAction.MultiplayerState) {
+  private handle = (multiplayerState: MultiplayerAction.MultiplayerState) => {
     this.setState({
       ...multiplayerState,
     });
@@ -216,7 +211,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
     })
   }
 
-  private handleKeyDown(event: KeyboardEvent) {
+  private handleKeyDown = (event: KeyboardEvent) => {
     if (!this.state.gameState) {
       if (!this.state.matchMenu && event.keyCode === 27) {
         this.setState({

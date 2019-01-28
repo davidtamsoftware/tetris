@@ -13,8 +13,6 @@ class App extends React.Component<Props & { mode: MultiplayerMode }, Multiplayer
     super(props)
     this.multiplayer = new MultiplayerAction.Multiplayer(props.mode);
     this.state = this.multiplayer.getState();
-    this.handle = this.handle.bind(this);
-    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   public componentDidMount() {
@@ -57,13 +55,13 @@ class App extends React.Component<Props & { mode: MultiplayerMode }, Multiplayer
     return true;
   }
 
-  private handle(multiplayerState: MultiplayerAction.MultiplayerState) {
+  private handle = (multiplayerState: MultiplayerAction.MultiplayerState) => {
     this.setState({
       ...multiplayerState,
     });
   }
 
-  private handleKeyDown(event: KeyboardEvent) {
+  private handleKeyDown = (event: KeyboardEvent) => {
     if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {
       this.multiplayer.restart();
     } else if (this.state.gameState === Models.GameState.Active && event.keyCode === 27) {

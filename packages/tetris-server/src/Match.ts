@@ -1,6 +1,6 @@
 import { Event, Multiplayer } from "tetris-core";
 import { Player } from "tetris-core/lib/actions/Multiplayer";
-import { MatchEvent, MatchState, ResponseType, ServerMessage } from "../../tetris-ws-model/lib/tetris-ws-model";
+import { MatchEvent, MatchState, ResponseType, ServerMessage } from "tetris-ws-model/lib/tetris-ws-model";
 
 /**
  * Abstraction layer to remote player implementation

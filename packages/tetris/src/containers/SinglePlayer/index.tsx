@@ -27,8 +27,6 @@ class App extends React.Component<Props, Models.Game> {
     super(props)
     this.tetris = new Tetris(undefined, localStorageHighScoreService);
     this.state = this.tetris.getState();
-    this.handle = this.handle.bind(this);
-    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   public componentDidMount() {
@@ -105,11 +103,11 @@ class App extends React.Component<Props, Models.Game> {
     return true;
   }
 
-  private handle(game: Models.Game) {
+  private handle = (game: Models.Game) => {
     this.setState(game);
   }
 
-  private handleKeyDown(event: KeyboardEvent) {
+  private handleKeyDown = (event: KeyboardEvent) => {
     if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {
       this.tetris.restart();
     } else if (this.state.gameState === Models.GameState.Active && event.keyCode === 27) {

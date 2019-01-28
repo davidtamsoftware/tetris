@@ -49,8 +49,6 @@ export class Multiplayer {
         this.subscribers = new Set<Handler>();
         this.eventSubscribers = new Map<EventHandler, Event[]>();
         this.lastState = JSON.stringify(this.multiplayerState);
-        this.updatePlayer1State = this.updatePlayer1State.bind(this);
-        this.updatePlayer2State = this.updatePlayer2State.bind(this);
         this.player1.subscribe(this.updatePlayer1State);
         this.player2.subscribe(this.updatePlayer2State);
         this.mode = mode === undefined ? MultiplayerMode.AttackMode : mode;
@@ -204,7 +202,7 @@ export class Multiplayer {
         };
     }
 
-    private updatePlayer1State(player1: Game) {
+    private updatePlayer1State = (player1: Game) => {
         if (this.mode === MultiplayerMode.AttackMode &&
             player1.gameState === GameState.GameOver &&
             this.player2.getState().gameState !== GameState.GameOver) {
@@ -249,7 +247,7 @@ export class Multiplayer {
         }
     }
 
-    private updatePlayer2State(player2: Game) {
+    private updatePlayer2State = (player2: Game) => {
         if (this.mode === MultiplayerMode.AttackMode &&
             player2.gameState === GameState.GameOver &&
             this.player1.getState().gameState !== GameState.GameOver) {

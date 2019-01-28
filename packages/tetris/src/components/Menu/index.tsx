@@ -51,9 +51,14 @@ class Menu extends React.Component<Props, State> {
                 <div style={{ fontSize: "1.7em", padding: "0 0 15px" }}>{currMenu.name}</div>
                 {currMenu.children && currMenu.children.
                     map((child, index) =>
-                        <div style={{ borderRadius: "5px", border: `3px solid ${index === this.state.selection ? "green" : "transparent"}`, padding: "10px" }}
-                            // tslint:disable-next-line:jsx-no-lambda
-                            onClick={() => this.selection(index, true)} onMouseMove={() => this.selection(index)} key={index}>
+                        <div style={{
+                            borderRadius: "5px",
+                            border: `3px solid ${index === this.state.selection ? "green" : "transparent"}`,
+                            padding: "10px"
+                        }}
+                            onClick={this.handleSelection}
+                            onMouseMove={this.handleSelection}
+                            key={index}>
                             {child.name}
                         </div>)}
             </div>;
@@ -97,6 +102,11 @@ class Menu extends React.Component<Props, State> {
         this.setState({
             selection: index > size - 1 ? 0 : index,
         });
+    }
+
+    private handleSelection = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        const index = parseInt(e.currentTarget.getAttribute("key") as string, 10);
+        this.selection(index);
     }
 
     private selection = (index: number, click?: boolean) => {

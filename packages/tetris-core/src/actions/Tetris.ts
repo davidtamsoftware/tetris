@@ -54,10 +54,6 @@ export class Tetris {
 
     constructor(pieceGenerator?: () => Fill[][], highScoreService?: HighScoreService) {
         this.freezeSemaphore = false;
-        this.incrementCount = this.incrementCount.bind(this);
-        this.addLines = this.addLines.bind(this);
-        this.addScore = this.addScore.bind(this);
-        this.updateGame = this.updateGame.bind(this);
         this.subscribers = new Set<Handler>();
         this.eventSubscribers = new Map<EventHandler, Event[]>();
         this.pieceGenerator = pieceGenerator;
@@ -182,7 +178,7 @@ export class Tetris {
     }
 
     public endGame() {
-        if ((this.getState() as Game).gameState === GameState.GameOver) {
+        if (this.getState().gameState === GameState.GameOver) {
             return;
         }
 
@@ -204,7 +200,7 @@ export class Tetris {
     }
 
     public restart() {
-        this.tick(1);
+        this.changeLevel(1);
         this.setState(this.initializeState());
         this.refreshLoop = setInterval(this.notify, 20);
         this.publishEvent(Event.Start);
@@ -246,7 +242,7 @@ export class Tetris {
         });
     }
 
-    private tick(level: number) {
+    private changeLevel(level: number) {
         clearInterval(this.loop);
         this.loop = setInterval(() => this.drop(true), 1000 / level);
     }
@@ -273,7 +269,7 @@ export class Tetris {
         this.setState(state);
     }
 
-    private incrementCount(pieceKey: string) {
+    private incrementCount = (pieceKey: string) => {
         const stats = {
             ...this.game!.stats,
             [pieceKey]: this.game!.stats[pieceKey] + 1,
@@ -284,7 +280,7 @@ export class Tetris {
         });
     }
 
-    private addScore(score: number) {
+    private addScore = (score: number) => {
         const newScore = this.game!.scoreboard.score + score;
         this.setState({
             scoreboard: {
@@ -295,14 +291,14 @@ export class Tetris {
         });
     }
 
-    private addLines(lines: number) {
+    private addLines = (lines: number) => {
         const pts = [0, 40, 100, 300, 400];
 
         const level = Math.floor((this.game!.scoreboard.lines + lines) / 10) + 1;
         const score = this.game!.scoreboard.score + this.game!.scoreboard.level * pts[lines];
 
         if (this.game!.scoreboard.level !== level) {
-            this.tick(level);
+            this.changeLevel(level);
         }
 
         const damageLines = [0, 0, 0, 1, 2];
@@ -327,7 +323,7 @@ export class Tetris {
     }
 
     // used for animating line removal
-    private updateGame(playfield: Playfield) {
+    private updateGame = (playfield: Playfield) => {
         this.setState({
             playfield,
             piece: [],
@@ -353,5 +349,4 @@ export class Tetris {
             ...state,
         };
     }
-
 }

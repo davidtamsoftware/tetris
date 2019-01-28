@@ -34,49 +34,51 @@ export const rotate = (rotatePiece: (p: Piece) => Piece, playfield: Playfield, p
     };
 };
 
-export const rotateRight = (playfield: Playfield, position: PiecePosition, p: Piece) => {
-    const transform = (piece: Piece) => {
-        const rotated = p.map((row) => [...row]);
-        for (let i = 0; i < rotated.length; i++) {
-            for (let j = i; j < (rotated[i].length - i); j++) {
-                if (j + 1 === rotated[i].length - i) {
-                    break;
-                }
-                const rows = rotated.length;
-                const cols = rotated[i].length;
-                const temp = rotated[i][j];
-
-                rotated[i][j] = rotated[rows - 1 - j][i];
-                rotated[rows - 1 - j][i] = rotated[rows - 1 - i][cols - 1 - j];
-                rotated[rows - 1 - i][cols - 1 - j] = rotated[j][cols - 1 - i];
-                rotated[j][cols - 1 - i] = temp;
+const transformRight = (piece: Piece) => {
+    const rotated = piece.map((row) => [...row]);
+    for (let i = 0; i < rotated.length; i++) {
+        for (let j = i; j < (rotated[i].length - i); j++) {
+            if (j + 1 === rotated[i].length - i) {
+                break;
             }
+            const rows = rotated.length;
+            const cols = rotated[i].length;
+            const temp = rotated[i][j];
+
+            rotated[i][j] = rotated[rows - 1 - j][i];
+            rotated[rows - 1 - j][i] = rotated[rows - 1 - i][cols - 1 - j];
+            rotated[rows - 1 - i][cols - 1 - j] = rotated[j][cols - 1 - i];
+            rotated[j][cols - 1 - i] = temp;
         }
-        return rotated;
-    };
-    return rotate(transform as any, playfield, position, p);
+    }
+    return rotated;
+};
+
+export const rotateRight = (playfield: Playfield, position: PiecePosition, p: Piece) => {
+    return rotate(transformRight, playfield, position, p);
+};
+
+const transformLeft = (piece: Piece) => {
+    const rotated = piece.map((row) => [...row]);
+    for (let i = 0; i < rotated.length; i++) {
+        for (let j = i; j < (rotated[i].length - i); j++) {
+            if (j + 1 === rotated[i].length - i) {
+                break;
+            }
+            const rows = rotated.length;
+            const cols = rotated[i].length;
+            const temp = rotated[i][j];
+            rotated[i][j] = rotated[j][cols - 1 - i];
+            rotated[j][cols - 1 - i] = rotated[rows - 1 - i][cols - 1 - j];
+            rotated[rows - 1 - i][cols - 1 - j] = rotated[rows - 1 - j][i];
+            rotated[rows - 1 - j][i] = temp;
+        }
+    }
+    return rotated;
 };
 
 export const rotateLeft = (playfield: Playfield, position: PiecePosition, p: Piece) => {
-    const transform = (piece: Piece) => {
-        const rotated = p.map((row) => [...row]);
-        for (let i = 0; i < rotated.length; i++) {
-            for (let j = i; j < (rotated[i].length - i); j++) {
-                if (j + 1 === rotated[i].length - i) {
-                    break;
-                }
-                const rows = rotated.length;
-                const cols = rotated[i].length;
-                const temp = rotated[i][j];
-                rotated[i][j] = rotated[j][cols - 1 - i];
-                rotated[j][cols - 1 - i] = rotated[rows - 1 - i][cols - 1 - j];
-                rotated[rows - 1 - i][cols - 1 - j] = rotated[rows - 1 - j][i];
-                rotated[rows - 1 - j][i] = temp;
-            }
-        }
-        return rotated;
-    };
-    return rotate(transform as any, playfield, position, p);
+    return rotate(transformLeft, playfield, position, p);
 };
 
 export const moveLeft = (playfield: Playfield, position: PiecePosition, piece: Piece) => {
@@ -238,12 +240,7 @@ export const appendRandomLines = (playfield: Playfield, count: number, updateGam
     }
     const lines = [];
     for (let row = 0; row < count; row++) {
-        const line = [];
-        // tslint:disable-next-line:prefer-for-of
-        for (let col = 0; col < playfield[0].length; col++) {
-            line.push(Math.round(Math.random()));
-        }
-        lines.push(line);
+        lines.push(playfield[0].map(() => Math.round(Math.random())));
     }
 
     const animateState1 = clonedPlayfield
