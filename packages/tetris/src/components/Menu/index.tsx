@@ -58,7 +58,8 @@ class Menu extends React.Component<Props, State> {
                         }}
                             onClick={this.handleSelection}
                             onMouseMove={this.handleSelection}
-                            key={index}>
+                            key={index}
+                            data-key={index}>
                             {child.name}
                         </div>)}
             </div>;
@@ -105,8 +106,8 @@ class Menu extends React.Component<Props, State> {
     }
 
     private handleSelection = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        const index = parseInt(e.currentTarget.getAttribute("key") as string, 10);
-        this.selection(index);
+        const index = parseInt(e.currentTarget.getAttribute("data-key") as string, 10);
+        this.selection(index, e.type === "click");
     }
 
     private selection = (index: number, click?: boolean) => {
