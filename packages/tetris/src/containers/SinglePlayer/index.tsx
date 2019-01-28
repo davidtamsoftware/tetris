@@ -123,9 +123,9 @@ class App extends React.Component<Props, Models.Game> {
     } else if (event.keyCode === 37) {
       this.tetris.moveLeft();
     } else if (event.keyCode === 40) {
-      this.tetris.drop(false);
+      this.tetris.drop();
     } else if (event.keyCode === 32) {
-      this.tetris.drop(false, true);
+      this.tetris.drop(true);
     }
   }
 }

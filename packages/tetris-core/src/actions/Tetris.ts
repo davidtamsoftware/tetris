@@ -124,57 +124,8 @@ export class Tetris {
 
     }
 
-    public async drop(tick: boolean, hardDrop?: boolean) {
-        // ignore calls to drop while freeze semaphore is active
-        if (this.game!.gameState === GameState.Active && !this.freezeSemaphore) {
-            this.freezeSemaphore = true;
-            const result = await moveDown(
-                this.game!.playfield,
-                this.game!.position,
-                this.game!.piece,
-                this.addScore,
-                this.addLines,
-                this.updateGame,
-                this.publishEvent,
-                tick,
-                hardDrop);
-
-            let nextPiece;
-            if (!result.piece) {
-                if (this.getState().pendingDamage) {
-                    this.publishEvent(Event.Damage);
-                    const playfield =
-                        await appendRandomLines(result.playfield, this.getState().pendingDamage, this.updateGame);
-                    this.setState({
-                        pendingDamage: 0,
-                    });
-
-                    result.playfield = playfield;
-                }
-
-                const position = calculatePosition(this.game!.playfield, this.game!.nextPiece);
-                result.piece = this.game!.nextPiece;
-                result.position = position;
-
-                nextPiece = this.pieceGenerator ? this.pieceGenerator() : generateRandomPiece();
-                this.incrementCount(result.piece.toString());
-
-                // check if new piece has collision with new playfield, if so then game over
-                if (hasCollision(result.playfield, position, result.piece)) {
-                    result.gameover = GameState.GameOver;
-                }
-            }
-
-            this.setState({
-                ...result,
-                nextPiece: nextPiece ? nextPiece : this.game!.nextPiece,
-            });
-
-            if (result.gameover) {
-                this.endGame();
-            }
-            this.freezeSemaphore = false;
-        }
+    public drop(hardDrop?: boolean) {
+        return this.moveDown(false, hardDrop);
     }
 
     public endGame() {
@@ -242,9 +193,62 @@ export class Tetris {
         });
     }
 
+    private async moveDown(tick: boolean, hardDrop?: boolean) {
+        // ignore calls to drop while freeze semaphore is active
+        if (this.game!.gameState === GameState.Active && !this.freezeSemaphore) {
+            this.freezeSemaphore = true;
+            const result = await moveDown(
+                this.game!.playfield,
+                this.game!.position,
+                this.game!.piece,
+                this.addScore,
+                this.addLines,
+                this.updateGame,
+                this.publishEvent,
+                tick,
+                hardDrop);
+
+            let nextPiece;
+            if (!result.piece) {
+                if (this.getState().pendingDamage) {
+                    this.publishEvent(Event.Damage);
+                    const playfield =
+                        await appendRandomLines(result.playfield, this.getState().pendingDamage, this.updateGame);
+                    this.setState({
+                        pendingDamage: 0,
+                    });
+
+                    result.playfield = playfield;
+                }
+
+                const position = calculatePosition(this.game!.playfield, this.game!.nextPiece);
+                result.piece = this.game!.nextPiece;
+                result.position = position;
+
+                nextPiece = this.pieceGenerator ? this.pieceGenerator() : generateRandomPiece();
+                this.incrementCount(result.piece.toString());
+
+                // check if new piece has collision with new playfield, if so then game over
+                if (hasCollision(result.playfield, position, result.piece)) {
+                    result.gameover = GameState.GameOver;
+                }
+            }
+
+            this.setState({
+                ...result,
+                nextPiece: nextPiece ? nextPiece : this.game!.nextPiece,
+            });
+
+            if (result.gameover) {
+                this.endGame();
+            }
+            this.freezeSemaphore = false;
+        }
+    }
+
     private changeLevel(level: number) {
         clearInterval(this.loop);
-        this.loop = setInterval(() => this.drop(true), 1000 / level);
+        this.loop = setInterval(() => this.moveDown(true), 1000 / level);
     }
 
     private initializeState() {

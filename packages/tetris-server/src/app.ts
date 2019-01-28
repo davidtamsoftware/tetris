@@ -59,9 +59,9 @@ wss.on("connection", (ws) => {
                 } else if (msg.action === Action.RotateRight) {
                     match.game.rotateRight(player);
                 } else if (msg.action === Action.HardDrop) {
-                    match.game.drop(player, false, true);
+                    match.game.drop(player, true);
                 } else if (msg.action === Action.SoftDrop) {
-                    match.game.drop(player, false, false);
+                    match.game.drop(player, false);
                 } else if (msg.action === Action.TogglePause) {
                     match.game.togglePause();
                 } else if (msg.action === Action.Restart

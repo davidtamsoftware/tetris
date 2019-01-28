@@ -121,8 +121,8 @@ export class Multiplayer {
         });
     }
 
-    public drop(player: Player, tick: boolean, hardDrop?: boolean): Promise<void> {
-        return this.players[player].drop(tick, hardDrop);
+    public drop(player: Player, hardDrop?: boolean): Promise<void> {
+        return this.players[player].drop(hardDrop);
     }
 
     public endGame(player?: Player) {

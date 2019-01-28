@@ -77,9 +77,9 @@ class App extends React.Component<Props & { mode: MultiplayerMode }, Multiplayer
     } else if (event.keyCode === 37) {
       this.multiplayer.moveLeft(MultiplayerAction.Player.One);
     } else if (event.keyCode === 40) {
-      this.multiplayer.drop(MultiplayerAction.Player.One, false);
+      this.multiplayer.drop(MultiplayerAction.Player.One);
     } else if (event.keyCode === 32) {
-      this.multiplayer.drop(MultiplayerAction.Player.One, false, true);
+      this.multiplayer.drop(MultiplayerAction.Player.One, true);
     } else if (event.keyCode === 69) {
       this.multiplayer.rotateLeft(MultiplayerAction.Player.Two);
     } else if (event.keyCode === 38) {
@@ -89,9 +89,9 @@ class App extends React.Component<Props & { mode: MultiplayerMode }, Multiplayer
     } else if (event.keyCode === 83) {
       this.multiplayer.moveLeft(MultiplayerAction.Player.Two);
     } else if (event.keyCode === 68) {
-      this.multiplayer.drop(MultiplayerAction.Player.Two, false);
+      this.multiplayer.drop(MultiplayerAction.Player.Two);
     } else if (event.keyCode === 65) {
-      this.multiplayer.drop(MultiplayerAction.Player.Two, false, true);
+      this.multiplayer.drop(MultiplayerAction.Player.Two, true);
     }
   }
 }
