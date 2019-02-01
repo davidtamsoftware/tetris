@@ -1,4 +1,5 @@
-import { GameState } from "../../models";
+import * as Functions from "..";
+import { Fill, GameState } from "../../models";
 import { Multiplayer } from "../../tetris-core";
 import { MultiplayerMode, Player } from "../Multiplayer";
 
@@ -112,13 +113,161 @@ describe("High score battle logic", () => {
     });
 });
 
-xdescribe("Attack mode logic", () => {
-    it("should generate pending damage to opponent when you get a triple");
-    it("should generate pending damage to opponent when you get a tetris");
-    it("should cancel your pending damage when you get a triple");
-    it("should cancel your pending damage when you get a tetris");
-    it("should pending damage to damage lines when current piece completes drop");
-    it("should declare the winner another player's game ends");
-    it("should generate the same sequence of pieces");
-    it("should be able to restart the game when game is over");
+describe("Attack mode logic", () => {
+    const mockGenerateTriple = jest.fn(() => [
+        [Fill.Blue, Fill.Blank, Fill.Blank, Fill.Blank],
+        [Fill.Blue, Fill.Blank, Fill.Blank, Fill.Blank],
+        [Fill.Blue, Fill.Blank, Fill.Blank, Fill.Blank],
+        [Fill.Blank, Fill.Blank, Fill.Blank, Fill.Blank]]);
+
+    const mockGenerateTetris = jest.fn(() => [
+        [Fill.Blue, Fill.Blank, Fill.Blank, Fill.Blank],
+        [Fill.Blue, Fill.Blank, Fill.Blank, Fill.Blank],
+        [Fill.Blue, Fill.Blank, Fill.Blank, Fill.Blank],
+        [Fill.Blue, Fill.Blank, Fill.Blank, Fill.Blank]]);
+
+    beforeEach(() => {
+        mockGenerateTriple.mockClear();
+        mockGenerateTetris.mockClear();
+    });
+
+    it("should generate pending damage to opponent when you get a triple", async () => {
+        (Functions.generateRandomPiece as any) = mockGenerateTriple;
+
+        const multiplayer = new Multiplayer.Multiplayer(MultiplayerMode.AttackMode);
+        multiplayer.start();
+        await setupLine(multiplayer, Player.One, false);
+        expect(multiplayer.getState().player2.pendingDamage).toBe(0);
+        await multiplayer.drop(Player.One, true);
+        await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
+        // expect(mockGenerateTriple).toBeCalledTimes(10);
+        expect(multiplayer.getState().player2.pendingDamage).toBe(1);
+    });
+
+    it("should generate pending damage to opponent when you get a tetris", async () => {
+        (Functions.generateRandomPiece as any) = mockGenerateTetris;
+
+        const multiplayer = new Multiplayer.Multiplayer(MultiplayerMode.AttackMode);
+        multiplayer.start();
+        await setupLine(multiplayer, Player.One, false);
+        expect(multiplayer.getState().player2.pendingDamage).toBe(0);
+        await multiplayer.drop(Player.One, true);
+        await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
+        expect(multiplayer.getState().player2.pendingDamage).toBe(2);
+    });
+
+    it("should cancel your pending damage when you generate damage for opponent", async () => {
+        (Functions.generateRandomPiece as any) = mockGenerateTetris;
+
+        const multiplayer = new Multiplayer.Multiplayer(MultiplayerMode.AttackMode);
+        multiplayer.start();
+        await setupLine(multiplayer, Player.One, false);
+        await setupLine(multiplayer, Player.Two, false);
+        expect(multiplayer.getState().player1.pendingDamage).toBe(0);
+        expect(multiplayer.getState().player2.pendingDamage).toBe(0);
+        await multiplayer.drop(Player.One, true);
+        await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
+        expect(multiplayer.getState().player1.pendingDamage).toBe(0);
+        expect(multiplayer.getState().player2.pendingDamage).toBe(2);
+        await multiplayer.drop(Player.Two, true);
+        await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
+        expect(multiplayer.getState().player1.pendingDamage).toBe(0);
+        expect(multiplayer.getState().player2.pendingDamage).toBe(0);
+    });
+
+    it("should convert pending damage to damage lines when current piece completes drop", async () => {
+        (Functions.generateRandomPiece as any) = mockGenerateTetris;
+
+        const multiplayer = new Multiplayer.Multiplayer(MultiplayerMode.AttackMode);
+        multiplayer.start();
+        await setupLine(multiplayer, Player.One, false);
+        expect(multiplayer.getState().player2.pendingDamage).toBe(0);
+        await multiplayer.drop(Player.One, true);
+        await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
+        expect(multiplayer.getState().player2.pendingDamage).toBe(2);
+        await multiplayer.drop(Player.Two, true);
+        await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
+        expect(multiplayer.getState().player2.pendingDamage).toBe(0);
+    });
+
+    it("should declare the winner when the other player's game ends", async () => {
+        (Functions.generateRandomPiece as any) = mockGenerateTetris;
+
+        const multiplayer = new Multiplayer.Multiplayer(MultiplayerMode.AttackMode);
+        multiplayer.start();
+        expect(multiplayer.getState().winner).toBeUndefined();
+        for (let i = 0; i < 15; i++) {
+            await multiplayer.drop(Player.One, true);
+        }
+        await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
+        expect(multiplayer.getState().winner).toBe(Player.Two);
+    });
+
+    // it("should generate the same sequence of pieces for both players");
+
+    it("should be able to restart the game when game is over", async () => {
+        (Functions.generateRandomPiece as any) = mockGenerateTetris;
+
+        const multiplayer = new Multiplayer.Multiplayer(MultiplayerMode.AttackMode);
+        multiplayer.start();
+        expect(multiplayer.getState().winner).toBeUndefined();
+        for (let i = 0; i < 15; i++) {
+            await multiplayer.drop(Player.One, true);
+        }
+        await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
+        expect(multiplayer.getState().winner).toBe(Player.Two);
+        multiplayer.restart();
+        expect(multiplayer.getState().winner).toBeUndefined();
+    });
 });
+
+const setupLine = async (multiplayer: Multiplayer.Multiplayer, player: Player, completeLine: boolean) => {
+    multiplayer.moveLeft(player);
+    multiplayer.moveLeft(player);
+    multiplayer.moveLeft(player);
+    await multiplayer.drop(player, true);
+
+    multiplayer.moveLeft(player);
+    multiplayer.moveLeft(player);
+    await multiplayer.drop(player, true);
+
+    multiplayer.moveLeft(player);
+    await multiplayer.drop(player, true);
+
+    multiplayer.moveRight(player);
+    await multiplayer.drop(player, true);
+
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    await multiplayer.drop(player, true);
+
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    await multiplayer.drop(player, true);
+
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    await multiplayer.drop(player, true);
+
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    await multiplayer.drop(player, true);
+
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    multiplayer.moveRight(player);
+    await multiplayer.drop(player, true);
+
+    if (completeLine) {
+        await multiplayer.drop(player, true);
+    }
+};
