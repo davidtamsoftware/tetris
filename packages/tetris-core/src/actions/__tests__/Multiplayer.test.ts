@@ -35,6 +35,26 @@ describe("High score battle logic", () => {
 
         expect(multiplayer.getState().gameState).toBe(GameState.GameOver);
         expect(multiplayer.getState().winner).toBe(Multiplayer.Player.One);
+
+        // run same logic but for other player
+        multiplayer.restart();
+        expect(multiplayer.getState().gameState).toBe(GameState.Active);
+
+        // worst case is 18 pieces to force game over
+        // height is 18, smallest piece is 1 row tall
+        for (let i = 0; i < 18; i++) {
+            await multiplayer.drop(Multiplayer.Player.Two, true);
+        }
+
+        await new Promise((res, rej) => setTimeout(res, 2000));
+        // worst case is 18 pieces to force game over
+        // height is 18, smallest piece is 1 row tall
+        for (let i = 0; i < 18; i++) {
+            await multiplayer.drop(Multiplayer.Player.One, true);
+        }
+
+        expect(multiplayer.getState().gameState).toBe(GameState.GameOver);
+        expect(multiplayer.getState().winner).toBe(Multiplayer.Player.Two);
     });
 
     it("should generate the same sequence of pieces", async () => {
@@ -140,7 +160,6 @@ describe("Attack mode logic", () => {
         expect(multiplayer.getState().player2.pendingDamage).toBe(0);
         await multiplayer.drop(Player.One, true);
         await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
-        // expect(mockGenerateTriple).toBeCalledTimes(10);
         expect(multiplayer.getState().player2.pendingDamage).toBe(1);
     });
 
@@ -191,8 +210,6 @@ describe("Attack mode logic", () => {
     });
 
     it("should declare the winner when the other player's game ends", async () => {
-        (Functions.generateRandomPiece as any) = mockGenerateTetris;
-
         const multiplayer = new Multiplayer.Multiplayer(MultiplayerMode.AttackMode);
         multiplayer.start();
         expect(multiplayer.getState().winner).toBeUndefined();
@@ -201,6 +218,15 @@ describe("Attack mode logic", () => {
         }
         await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
         expect(multiplayer.getState().winner).toBe(Player.Two);
+
+        // run same logic but for other player
+        multiplayer.restart();
+        expect(multiplayer.getState().winner).toBeUndefined();
+        for (let i = 0; i < 15; i++) {
+            await multiplayer.drop(Player.Two, true);
+        }
+        await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
+        expect(multiplayer.getState().winner).toBe(Player.One);
     });
 
     // it("should generate the same sequence of pieces for both players");
@@ -218,6 +244,17 @@ describe("Attack mode logic", () => {
         expect(multiplayer.getState().winner).toBe(Player.Two);
         multiplayer.restart();
         expect(multiplayer.getState().winner).toBeUndefined();
+    });
+
+    it("should be able to end an active game", async () => {
+        const multiplayer = new Multiplayer.Multiplayer(MultiplayerMode.AttackMode);
+        multiplayer.start();
+        expect(multiplayer.getState().gameState).toBe(GameState.Active);
+        multiplayer.endGame();
+        expect(multiplayer.getState().gameState).toBe(GameState.GameOver);
+        // attempts to end a game that is already game over will not change the state
+        multiplayer.endGame();
+        expect(multiplayer.getState().gameState).toBe(GameState.GameOver);
     });
 });
 

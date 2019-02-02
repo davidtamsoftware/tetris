@@ -43,14 +43,14 @@ export class Multiplayer {
     constructor(mode?: MultiplayerMode) {
         this.nextPiecesPlayer1 = [];
         this.nextPiecesPlayer2 = [];
-        this.player1 = new Tetris(this.generatePiecePlayer1);
-        this.player2 = new Tetris(this.generatePiecePlayer2);
+        this.player1 = new Tetris(() => this.generatePiece(Player.One));
+        this.player2 = new Tetris(() => this.generatePiece(Player.Two));
         this.players = [this.player1, this.player2];
         this.subscribers = new Set<Handler>();
         this.eventSubscribers = new Map<EventHandler, Event[]>();
         this.lastState = JSON.stringify(this.multiplayerState);
-        this.player1.subscribe(this.updatePlayer1State);
-        this.player2.subscribe(this.updatePlayer2State);
+        this.player1.subscribe((game) => this.updatePlayer(game, Player.One));
+        this.player2.subscribe((game) => this.updatePlayer(game, Player.Two));
         this.mode = mode === undefined ? MultiplayerMode.AttackMode : mode;
 
         if (this.mode === MultiplayerMode.AttackMode) {
@@ -62,8 +62,8 @@ export class Multiplayer {
     public subscribeToEvent(handler: EventHandler, ...events: Event[]) {
         const tempEvents: any[] = events.length === 0 ?
             Object.keys(Event)
-            .map((key: any) => Event[key])
-            .filter((value) => typeof value === "number") : events;
+                .map((key: any) => Event[key])
+                .filter((value) => typeof value === "number") : events;
 
         const filteredEvents = tempEvents.filter((event) =>
             event !== Event.Start &&
@@ -126,17 +126,44 @@ export class Multiplayer {
     }
 
     public endGame(player?: Player) {
-        if (this.getState().gameState === GameState.GameOver) {
-            return;
-        }
-
-        if (this.mode === MultiplayerMode.AttackMode) {
-            clearInterval(this.refreshLoop);
-        }
-
         if (player !== undefined) {
             this.players[player].endGame();
+            if (this.mode === MultiplayerMode.AttackMode &&
+                (this.player1.getState().gameState === GameState.GameOver ||
+                    this.player2.getState().gameState === GameState.GameOver) &&
+                this.player1.getState().gameState !== this.player2.getState().gameState) {
+
+                const winner = this.player1.getState().gameState === GameState.GameOver ? Player.Two : Player.One;
+                this.players[winner].endGame();
+                this.setState({
+                    gameState: GameState.GameOver,
+                    winner,
+                });
+                this.publishEvent(Event.GameOver);
+                this.notify();
+                clearInterval(this.refreshLoop);
+            } else if (this.mode === MultiplayerMode.HighScoreBattle &&
+                this.player1.getState().gameState === GameState.GameOver &&
+                this.player2.getState().gameState === GameState.GameOver) {
+
+                const winner = this.getWinner(this.player1.getState(), this.player2.getState());
+
+                this.setState({
+                    gameState: GameState.GameOver,
+                    winner,
+                });
+                this.publishEvent(Event.GameOver);
+                this.notify();
+                clearInterval(this.refreshLoop);
+            }
         } else {
+            if (this.getState().gameState === GameState.GameOver) {
+                return;
+            }
+
+            if (this.mode === MultiplayerMode.AttackMode) {
+                clearInterval(this.refreshLoop);
+            }
             this.player1.endGame();
             this.player2.endGame();
             this.setState({
@@ -195,121 +222,52 @@ export class Multiplayer {
     }
 
     private setState(state: any) {
-        // mutate state
         this.multiplayerState = {
             ...this.multiplayerState,
             ...state,
         };
     }
 
-    private updatePlayer1State = (player1: Game) => {
-        if (this.mode === MultiplayerMode.AttackMode &&
-            player1.gameState === GameState.GameOver &&
-            this.player2.getState().gameState !== GameState.GameOver) {
-            this.setState({
-                player1,
-                gameState: GameState.GameOver,
-                winner: Player.Two,
-            });
-            this.publishEvent(Event.GameOver);
-            this.player2.endGame();
-            this.notify();
-            clearInterval(this.refreshLoop);
-        } else if (this.mode === MultiplayerMode.HighScoreBattle &&
-            player1.gameState === GameState.GameOver &&
-            this.player2.getState().gameState === GameState.GameOver) {
+    private updatePlayer = (game: Game, player: Player) => {
+        const state = {} as any;
+        state[player === Player.One ? "player1" : "player2"] = game;
+        this.setState({
+            ...state,
+        });
 
-            let winner;
-            if (this.player1.getState().scoreboard &&
-                this.player2.getState().scoreboard) {
+        if (game.gameState === GameState.GameOver) {
+            this.endGame(player);
+        }
+    }
 
-                if (this.player1.getState().scoreboard.score === this.player2.getState().scoreboard.score) {
-                    winner = null;
-                } else if (this.player1.getState().scoreboard.score > this.player2.getState().scoreboard.score) {
-                    winner = Player.One;
-                } else  {
-                    winner = Player.Two;
-                }
+    private getWinner(player1: Game, player2: Game) {
+        if (player1.gameState !== GameState.GameOver ||
+            player2.gameState !== GameState.GameOver) {
+            throw new Error("Game is still active");
+        }
+        let winner;
+        if (player1.scoreboard &&
+            player2.scoreboard) {
+
+            if (player1.scoreboard.score === player2.scoreboard.score) {
+                winner = null;
+            } else if (player1.scoreboard.score > player2.scoreboard.score) {
+                winner = Player.One;
+            } else {
+                winner = Player.Two;
             }
-
-            this.setState({
-                player1,
-                gameState: GameState.GameOver,
-                winner,
-            });
-            this.publishEvent(Event.GameOver);
-            this.notify();
-            clearInterval(this.refreshLoop);
-        } else {
-            this.setState({
-                player1,
-            });
         }
+        return winner;
     }
 
-    private updatePlayer2State = (player2: Game) => {
-        if (this.mode === MultiplayerMode.AttackMode &&
-            player2.gameState === GameState.GameOver &&
-            this.player1.getState().gameState !== GameState.GameOver) {
-            this.setState({
-                player2,
-                gameState: GameState.GameOver,
-                winner: Player.One,
-            });
-            this.publishEvent(Event.GameOver);
-            this.player1.endGame();
-            this.notify();
-            clearInterval(this.refreshLoop);
-        } else if (player2.gameState === GameState.GameOver &&
-            this.mode === MultiplayerMode.HighScoreBattle &&
-            this.player1.getState().gameState === GameState.GameOver) {
-
-            let winner;
-            if (this.player1.getState().scoreboard &&
-                this.player2.getState().scoreboard) {
-
-                if (this.player1.getState().scoreboard.score === this.player2.getState().scoreboard.score) {
-                    winner = null;
-                } else if (this.player1.getState().scoreboard.score > this.player2.getState().scoreboard.score) {
-                    winner = Player.One;
-                } else  {
-                    winner = Player.Two;
-                }
-            }
-
-            this.setState({
-                player2,
-                gameState: GameState.GameOver,
-                winner,
-            });
-            this.publishEvent(Event.GameOver);
-            this.notify();
-            clearInterval(this.refreshLoop);
-        } else {
-            this.setState({
-                player2,
-            });
+    private generatePiece = (player: Player) => {
+        const nextPieces = player === Player.One ? this.nextPiecesPlayer1 : this.nextPiecesPlayer2;
+        if (nextPieces.length === 0) {
+            const piece = generateRandomPiece();
+            this.nextPiecesPlayer1.push(piece);
+            this.nextPiecesPlayer2.push(piece);
         }
-    }
-
-    private generatePiecePlayer1 = () => {
-        if (this.nextPiecesPlayer1.length === 0) {
-            this.generatePiece();
-        }
-        return this.nextPiecesPlayer1.shift()!;
-    }
-
-    private generatePiecePlayer2 = () => {
-        if (this.nextPiecesPlayer2.length === 0) {
-            this.generatePiece();
-        }
-        return this.nextPiecesPlayer2.shift()!;
-    }
-
-    private generatePiece = () => {
-        const piece = generateRandomPiece();
-        this.nextPiecesPlayer1.push(piece);
-        this.nextPiecesPlayer2.push(piece);
+        return nextPieces.shift()!;
     }
 
     private publishEvent = (event: Event) => {
