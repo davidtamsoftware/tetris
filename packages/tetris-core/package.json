@@ -1,7 +1,7 @@
 {
   "name": "tetris-core",
   "version": "0.0.0",
-  "description": "> TODO: description",
+  "description": "Tetris game logic and domain models",
   "author": "David Tam <david.tam.kc@gmail.com>",
   "homepage": "",
   "license": "ISC",

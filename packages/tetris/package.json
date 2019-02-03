@@ -1,11 +1,13 @@
 {
   "name": "tetris",
   "version": "0.1.0",
+  "description": "Web-app for Tetris game",
   "devDependencies": {
     "@types/jest": "^23.3.10",
     "@types/node": "^10.12.18",
     "@types/react": "^16.7.18",
     "@types/react-dom": "^16.0.11",
+    "@types/react-test-renderer": "^16.0.3",
     "enzyme": "^3.8.0",
     "enzyme-adapter-react-16": "^1.8.0",
     "react-scripts": "^2.1.1",

@@ -1,11 +1,10 @@
 {
   "name": "tetris-server",
   "version": "0.0.0",
-  "description": "> TODO: description",
+  "description": "Game server for remote multiplayer",
   "author": "David Tam <david.tam.kc@gmail.com>",
   "homepage": "",
   "license": "ISC",
-  "main": "lib/tetris-server.js",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
