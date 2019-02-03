@@ -1,12 +1,12 @@
 import React from "react";
 import renderer from "react-test-renderer";
-import { Fill } from "tetris-core/lib/models";
-import { Block } from ".";
+import { l } from "tetris-core/lib/models";
+import { NextPiece } from ".";
 
-describe("<Block />", () => {
+describe("<NextPiece />", () => {
     it("renders correctly", () => {
         const tree = renderer
-            .create(<Block data={Fill.Blue} />)
+            .create(<NextPiece piece={l} />)
             .toJSON();
         expect(tree).toMatchSnapshot();
     });

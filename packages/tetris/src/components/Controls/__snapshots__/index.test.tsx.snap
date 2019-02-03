@@ -1,0 +1,82 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Controls /> renders correctly 1`] = `
+<table
+  className="controls"
+>
+  <tbody>
+    <tr>
+      <td
+        colSpan={2}
+      >
+        <h2>
+          Controls
+        </h2>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Rotate Left
+      </td>
+      <td>
+        Z
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Rotate Right
+      </td>
+      <td>
+        ↑
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Move Left
+      </td>
+      <td>
+        ←
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Move Right
+      </td>
+      <td>
+        →
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Soft Drop
+      </td>
+      <td>
+        ↓
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Hard Drop
+      </td>
+      <td>
+        Spacebar
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Pause/Resume
+      </td>
+      <td>
+        Esc
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <br />
+        <br />
+      </td>
+      <td />
+    </tr>
+  </tbody>
+</table>
+`;

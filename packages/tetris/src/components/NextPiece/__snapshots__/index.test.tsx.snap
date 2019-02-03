@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<NextPiece /> renders correctly 1`] = `
+<div>
+  <h2>
+    Next
+  </h2>
+  <table
+    className="piece large"
+  >
+    <tbody>
+      <tr>
+        <td />
+        <td />
+        <td />
+      </tr>
+      <tr>
+        <td>
+          <div
+            className="block green large"
+          />
+        </td>
+        <td>
+          <div
+            className="block green large"
+          />
+        </td>
+        <td>
+          <div
+            className="block green large"
+          />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div
+            className="block green large"
+          />
+        </td>
+        <td />
+        <td />
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;

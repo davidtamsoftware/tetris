@@ -1,8 +1,9 @@
 import * as React from "react";
+import { Fill } from "tetris-core/lib/models";
 import styles from "./index.module.css";
 
 interface Props {
-    data: number;
+    data: Fill;
     size?: "small" | "large";
 }
 

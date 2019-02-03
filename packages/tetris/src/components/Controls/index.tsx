@@ -1,11 +1,7 @@
 import * as React from "react";
+import styles from "./index.module.css";
 
-export const Controls = () => (<table style={{
-  tableLayout: "fixed",
-  border: "0px solid white",
-  width: "100%",
-  borderSpacing: "0 10px"
-}}>
+export const Controls = () => (<table className={styles.controls}>
   <tbody>
     <tr>
       <td colSpan={2}><h2>Controls</h2></td>

@@ -91,10 +91,6 @@ export class Multiplayer {
         this.eventSubscribers.delete(handler);
     }
 
-    // TODO: refactor to have player 1 and 2 join the game
-    // local to make them join and leave
-    // online is same but controlled by the human player
-
     public moveLeft(player: Player) {
         return this.players[player].moveLeft();
     }
