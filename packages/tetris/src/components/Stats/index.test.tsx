@@ -3,7 +3,7 @@ import renderer from "react-test-renderer";
 import { l, o, s } from "tetris-core/lib/models";
 import { Stats } from ".";
 
-describe("<Block />", () => {
+describe("<Stats />", () => {
     it("renders correctly", () => {
         const tree = renderer
             .create(<Stats stats={{

@@ -319,3 +319,323 @@ exports[`<Block /> renders correctly 1`] = `
   </tbody>
 </table>
 `;
+
+exports[`<Stats /> renders correctly 1`] = `
+<table
+  className="stats"
+>
+  <tbody>
+    <tr>
+      <td
+        colSpan={2}
+      >
+        <h2>
+          Stats
+        </h2>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <table
+          className="piece small"
+        >
+          <tbody>
+            <tr>
+              <td>
+                <div
+                  className="block blue small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block blue small"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div
+                  className="block blue small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block blue small"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+      <td>
+        15
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <table
+          className="piece small"
+        >
+          <tbody>
+            <tr>
+              <td />
+              <td />
+              <td />
+              <td />
+            </tr>
+            <tr>
+              <td>
+                <div
+                  className="block gray small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block gray small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block gray small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block gray small"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td />
+              <td />
+              <td />
+              <td />
+            </tr>
+            <tr>
+              <td />
+              <td />
+              <td />
+              <td />
+            </tr>
+          </tbody>
+        </table>
+      </td>
+      <td />
+    </tr>
+    <tr>
+      <td>
+        <table
+          className="piece small"
+        >
+          <tbody>
+            <tr>
+              <td />
+              <td />
+              <td />
+            </tr>
+            <tr>
+              <td />
+              <td>
+                <div
+                  className="block yellow small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block yellow small"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div
+                  className="block yellow small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block yellow small"
+                />
+              </td>
+              <td />
+            </tr>
+          </tbody>
+        </table>
+      </td>
+      <td>
+        25
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <table
+          className="piece small"
+        >
+          <tbody>
+            <tr>
+              <td />
+              <td />
+              <td />
+            </tr>
+            <tr>
+              <td>
+                <div
+                  className="block orange small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block orange small"
+                />
+              </td>
+              <td />
+            </tr>
+            <tr>
+              <td />
+              <td>
+                <div
+                  className="block orange small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block orange small"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+      <td />
+    </tr>
+    <tr>
+      <td>
+        <table
+          className="piece small"
+        >
+          <tbody>
+            <tr>
+              <td />
+              <td />
+              <td />
+            </tr>
+            <tr>
+              <td>
+                <div
+                  className="block green small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block green small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block green small"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div
+                  className="block green small"
+                />
+              </td>
+              <td />
+              <td />
+            </tr>
+          </tbody>
+        </table>
+      </td>
+      <td>
+        20
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <table
+          className="piece small"
+        >
+          <tbody>
+            <tr>
+              <td />
+              <td />
+              <td />
+            </tr>
+            <tr>
+              <td>
+                <div
+                  className="block red small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block red small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block red small"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td />
+              <td />
+              <td>
+                <div
+                  className="block red small"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+      <td />
+    </tr>
+    <tr>
+      <td>
+        <table
+          className="piece small"
+        >
+          <tbody>
+            <tr>
+              <td />
+              <td />
+              <td />
+            </tr>
+            <tr>
+              <td>
+                <div
+                  className="block purple small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block purple small"
+                />
+              </td>
+              <td>
+                <div
+                  className="block purple small"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td />
+              <td>
+                <div
+                  className="block purple small"
+                />
+              </td>
+              <td />
+            </tr>
+          </tbody>
+        </table>
+      </td>
+      <td />
+    </tr>
+  </tbody>
+</table>
+`;

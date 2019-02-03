@@ -1,12 +1,13 @@
 import * as React from "react";
 import { Models } from "tetris-core";
+import styles from "./index.module.css";
 
 interface Props {
     scoreboard: Models.Scoreboard;
 }
 
 export const Scoreboard = (props: Props) => (
-    <table style={{ tableLayout: "fixed", border: "0px solid white", width: "100%", borderSpacing: "0 10px" }}>
+    <table className={styles.scoreboard}>
         <tbody>
             <tr>
                 <td colSpan={2}><h2>Scoreboard</h2></td>

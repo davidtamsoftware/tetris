@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Scoreboard /> renders correctly 1`] = `
+<table
+  className="scoreboard"
+>
+  <tbody>
+    <tr>
+      <td
+        colSpan={2}
+      >
+        <h2>
+          Scoreboard
+        </h2>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        High Score
+      </td>
+      <td>
+        20000
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Score
+      </td>
+      <td>
+        1500
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Lines
+      </td>
+      <td>
+        5
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Level
+      </td>
+      <td>
+        2
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
