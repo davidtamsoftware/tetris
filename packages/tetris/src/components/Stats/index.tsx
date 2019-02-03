@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Models } from "tetris-core";
 import { Piece } from "../Piece";
+import styles from "./index.module.css";
 
 interface Props {
     stats: Models.Stats;
@@ -19,7 +20,7 @@ export const Stats = (props: Props) => {
     ));
 
     return (
-        <table style={{ tableLayout: "fixed", border: "0px solid white", width: "100%", borderSpacing: "0 10px" }}>
+        <table className={styles.stats}>
             <tbody>
                 <tr>
                     <td colSpan={2}><h2>Stats</h2></td>

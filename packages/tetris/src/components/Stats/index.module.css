@@ -1,0 +1,6 @@
+.stats {
+    table-layout: fixed;
+    border: 0px solid white;
+    width: 100%;
+    border-spacing: 0 10px;
+}
