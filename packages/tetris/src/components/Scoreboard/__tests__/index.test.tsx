@@ -1,6 +1,6 @@
 import React from "react";
 import renderer from "react-test-renderer";
-import { Scoreboard } from ".";
+import { Scoreboard } from "..";
 
 describe("<Scoreboard />", () => {
     it("renders correctly", () => {

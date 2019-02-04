@@ -1,7 +1,7 @@
 import React from "react";
 import renderer from "react-test-renderer";
 import { l, o, s } from "tetris-core/lib/models";
-import { Stats } from ".";
+import { Stats } from "..";
 
 describe("<Stats />", () => {
     it("renders correctly", () => {
