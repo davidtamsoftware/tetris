@@ -1,8 +1,53 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<NextPiece /> renders correctly 1`] = `
+exports[`<Playfield /> renders active state correctly 1`] = `
 <table
   className="playfield large "
+>
+  <tbody>
+    <tr>
+      <td />
+      <td />
+      <td />
+    </tr>
+    <tr>
+      <td />
+      <td />
+      <td />
+    </tr>
+    <tr>
+      <td />
+      <td />
+      <td>
+        <div
+          className="block blue large"
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div
+          className="block blue large"
+        />
+      </td>
+      <td>
+        <div
+          className="block blue large"
+        />
+      </td>
+      <td>
+        <div
+          className="block blue large"
+        />
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`<Playfield /> renders pause state correctly 1`] = `
+<table
+  className="playfield large paused"
 >
   <tbody>
     <tr>

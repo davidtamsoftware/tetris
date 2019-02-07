@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "description": "Web-app for Tetris game",
   "devDependencies": {
+    "@types/enzyme": "^3.1.16",
+    "@types/enzyme-adapter-react-16": "^1.0.3",
     "@types/jest": "^23.3.10",
     "@types/node": "^10.12.18",
     "@types/react": "^16.7.18",

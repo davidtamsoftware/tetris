@@ -19,7 +19,7 @@ const localStorageHighScoreService: HighScoreService = {
   }
 }
 
-class App extends React.Component<Props, Models.Game> {
+class SinglePlayer extends React.Component<Props, Models.Game> {
 
   private tetris: Tetris;
 
@@ -38,6 +38,7 @@ class App extends React.Component<Props, Models.Game> {
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
+    this.tetris.unsubscribe(this.handle);
     this.tetris.unsubscribeToEvent(handleEvent);
   }
 
@@ -130,4 +131,4 @@ class App extends React.Component<Props, Models.Game> {
   }
 }
 
-export default App;
+export default SinglePlayer;
