@@ -154,7 +154,6 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
 
   private handleMenuSelect = (key: Key) => {
     if (key === "HOME" || key === "QUIT_CONFIRM") {
-      this.multiplayer.endGame();
       this.props.exit();
     } else if (key === "QUIT_CANCEL") {
       return false;

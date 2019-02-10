@@ -123,10 +123,6 @@ export class MultiplayerRemoteClient {
     this.client!.send(JSON.stringify(payload));
   }
 
-  public endGame() {
-    return;
-  }
-
   public start() {
     this.restart();
   }
@@ -139,7 +135,8 @@ export class MultiplayerRemoteClient {
   }
 
   public getState() {
-    return this.multiplayerState;
+    // deep copy
+    return JSON.parse(JSON.stringify(this.multiplayerState || {}));
   }
 
   public subscribe(handler: Handler) {
