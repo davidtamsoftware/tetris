@@ -2,12 +2,12 @@ import * as React from "react";
 import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
 import { Player } from "tetris-core/lib/actions/Multiplayer";
 import { GameState } from "tetris-core/lib/models";
+import { MultiplayerRemoteClient } from "tetris-ws-client";
 import { MatchEvent, MatchState } from "tetris-ws-model";
 import { Multiplayer } from "..";
 import Menu from "../../../components/Menu";
 import { gameOverMenu, gameOverNoRestartMenu, handleEvent, Key, matchMenu, pauseMenu, Props } from "../../App";
 import styles from "./index.module.css";
-import { MultiplayerRemoteClient } from "./RemoteClient";
 
 class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
 {

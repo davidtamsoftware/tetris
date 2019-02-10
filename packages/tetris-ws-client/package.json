@@ -1,0 +1,28 @@
+{
+  "name": "tetris-ws-client",
+  "version": "0.0.0",
+  "description": "Client library for communicating with Tetris game server for remote multiplayer games",
+  "author": "David Tam <david.tam.kc@gmail.com>",
+  "homepage": "https://bitbucket.org/davidtamsoftware/tetris-monorepo#readme",
+  "license": "ISC",
+  "main": "lib/tetris-ws-client.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://davidtamsoftware@bitbucket.org/davidtamsoftware/tetris-monorepo.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "dependencies": {
+    "tetris-core": "^0.0.0",
+    "tetris-ws-model": "^0.0.0"
+  }
+}
