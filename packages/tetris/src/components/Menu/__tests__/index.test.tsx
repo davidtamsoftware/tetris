@@ -1,6 +1,6 @@
 import React from "react";
 
-describe("<Menu />", () => {
+xdescribe("<Menu />", () => {
     it("should display the list of menu options");
     it("should display the sub menu when user select one of the menu options");
     it("should return to the parent menu when user goes back");
