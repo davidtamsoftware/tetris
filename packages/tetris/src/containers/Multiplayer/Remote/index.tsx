@@ -9,7 +9,7 @@ import { gameOverMenu, gameOverNoRestartMenu, handleEvent, Key, matchMenu, pause
 import styles from "./index.module.css";
 import { MultiplayerRemoteClient } from "./RemoteClient";
 
-class App extends React.Component<Props, MultiplayerAction.MultiplayerState & 
+class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
 {
   matchId?: string;
   matchMenu?: boolean;
@@ -24,7 +24,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
 
   constructor(props: Props) {
     super(props);
-    this.multiplayer = new MultiplayerRemoteClient();
+    this.multiplayer = new MultiplayerRemoteClient(process.env.REACT_APP_TETRIS_SERVER_URL as any);
     this.state = {
       ...this.multiplayer.getState(),
       playerCount: 0,
@@ -92,12 +92,12 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
       </div>;
     } else if (!this.state.player1 || !this.state.player2) {
       return <div>
-        { `${this.state.playerCount}/2`} <br/>
-        { this.state.matchEvent === MatchEvent.DISCONNECTED && "Disconnected from server"}
-        { this.state.matchEvent === MatchEvent.MATCH_FULL && `Game with match id ${this.state.matchId} is full`}
-        { this.state.matchEvent === undefined && "Waiting for challenger to join..." }
-        {this.state.matchMessages.map((msg, index) => <div key={index}>{msg}</div>) }
-      {this.state.matchMenu &&
+        {`${this.state.playerCount}/2`} <br />
+        {this.state.matchEvent === MatchEvent.DISCONNECTED && "Disconnected from server"}
+        {this.state.matchEvent === MatchEvent.MATCH_FULL && `Game with match id ${this.state.matchId} is full`}
+        {this.state.matchEvent === undefined && "Waiting for challenger to join..."}
+        {this.state.matchMessages.map((msg, index) => <div key={index}>{msg}</div>)}
+        {this.state.matchMenu &&
           <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMatchMenuClose} />
         }
       </div>;
@@ -110,9 +110,9 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
         menu = gameOverNoRestartMenuElement;
       }
       return <>
-        { `${this.state.playerCount}/2`} <br/>
-        { this.state.matchEvent === MatchEvent.DISCONNECTED && "Disconnected from server"}
-        {this.state.matchMessages.map((msg, index) => <div key={index}>{msg}</div>) }
+        {`${this.state.playerCount}/2`} <br />
+        {this.state.matchEvent === MatchEvent.DISCONNECTED && "Disconnected from server"}
+        {this.state.matchMessages.map((msg, index) => <div key={index}>{msg}</div>)}
         <Multiplayer
           {...this.state}
           pauseMenu={<Menu menu={pauseMenu} notify={this.handleMenuSelect} menuClose={this.handlePauseMenuClose} />}
@@ -150,7 +150,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
 
   private handlePauseMenuClose = () => {
     this.multiplayer.togglePause();
-  }  
+  }
 
   private handleMenuSelect = (key: Key) => {
     if (key === "HOME" || key === "QUIT_CONFIRM") {

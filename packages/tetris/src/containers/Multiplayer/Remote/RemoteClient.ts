@@ -16,7 +16,10 @@ export class MultiplayerRemoteClient {
   private multiplayerState: MultiplayerState;
   private client?: WebSocket;
 
-  constructor() {
+  private wsUrl: string;
+  
+  constructor(wsUrl: string) {
+    this.wsUrl = wsUrl;
     this.multiplayerState = {} as any;
     this.subscribers = new Set<Handler>();
     this.eventSubscribers = new Map<EventHandler, Event[]>();
@@ -29,9 +32,7 @@ export class MultiplayerRemoteClient {
   }
 
   public join(matchId: string) {
-    // const wsUrl = "ws://192.168.1.72:8080";
-    const wsUrl = "wss://hidden-tundra-30225.herokuapp.com";
-    this.client = new WebSocket(wsUrl);
+    this.client = new WebSocket(this.wsUrl);
 
     // this.client!.onerror = (event) => alert(JSON.stringify(event));
 
