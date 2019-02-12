@@ -7,6 +7,7 @@ Classic Tetris game implemented using latest web technologies. Supports single p
 ## Table of Contents <!-- omit in toc -->
 - [Game Features](#game-features)
   - [Audio](#audio)
+  - [Scoring / Level System](#scoring--level-system)
   - [Single Player](#single-player)
   - [Local Multiplayer](#local-multiplayer)
     - [High Score Battle](#high-score-battle)
@@ -20,15 +21,26 @@ Classic Tetris game implemented using latest web technologies. Supports single p
   - [Performance for Multiplayer](#performance-for-multiplayer)
   - [Misc Features for Multiplayer](#misc-features-for-multiplayer)
   - [Deployment](#deployment)
+- [Running the App](#running-the-app)
 
 # Game Features
 
 ## Audio
 
 * All game modes have sound effects and background music
+* Sources
+  * https://opengameart.org/content/512-sound-effects-8-bit-style
+  * https://commons.wikimedia.org/wiki/File:Tetris_theme.ogg
+
+## Scoring / Level System
+
+* Every 10 lines, the level will increase which will:
+  * Increase drop speed
+  * Increase the amount of points for completing lines
 
 ## Single Player
 
+* Single player mode to play for highscore
 * Tracks number of pieces, level, high score
 
 ## Local Multiplayer
@@ -63,6 +75,8 @@ Classic Tetris game implemented using latest web technologies. Supports single p
 * Web Sockets
 
 ## Design
+
+The following solution overview diagram shows a subset of the components that make up the client / server Tetris game.
 
 ![picture](readme-assets/solution-overview.svg)
 
@@ -104,3 +118,18 @@ Classic Tetris game implemented using latest web technologies. Supports single p
 
 * Published to Heroku
 * https://hidden-tundra-30225.herokuapp.com
+
+# Running the App
+
+1) At the root of the project, install and build the project:
+```
+npm install
+```
+2) Go to tetris webapp project under packages/tetris and run the app:
+```
+npm run watch
+```
+3) Go to the Tetris server project under packages/tetris-server and run the server:
+```
+npm start
+```

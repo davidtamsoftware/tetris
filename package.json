@@ -1,5 +1,6 @@
 {
   "name": "root",
+  "description": "Tetris Monorepo",
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap",
