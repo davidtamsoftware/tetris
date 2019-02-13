@@ -20,6 +20,7 @@ Classic Tetris game implemented using latest web technologies. Supports single p
   - [Summary of Design Patterns / Algorithms](#summary-of-design-patterns--algorithms)
   - [Performance for Multiplayer](#performance-for-multiplayer)
   - [Misc Features for Multiplayer](#misc-features-for-multiplayer)
+  - [Future Components](#future-components)
   - [Deployment](#deployment)
 - [Running the App](#running-the-app)
 
@@ -113,6 +114,16 @@ The following solution overview diagram shows a subset of the components that ma
   * Server connectivity is lost
 * Prevent players from joining a match that is already full
 * Alert messages for when user joins/leaves the game
+
+## Future Components
+
+Since state is managed on the game server, each game server must maintain its own active games. As we horizontally scale game servers, the client will need to know how many game servers are available and what matches exist on each game server. To achieve this, a new Tetris server registry would need to be created. Using [Netflix Eureka](https://github.com/Netflix/eureka/wiki/Eureka-at-a-glance#high-level-architecture), game servers can be registered to the registry upon startup and polling interval. Updates (firewall changes) will need to be made to lock down the Eureka API to only allow readonly api calls to be made from the web client. The web client will communicate with Eureka APIs to determine which game servers are running.
+
+This solution will allow users to browse through the list of registered game servers, and connect to the game server's APIs to view the list of active matches or join/create a match. This would allow for game servers to be scaled horizontally and allow users to find the game. 
+
+The following diagram illustrates the changes that would made (Green indicates new):
+
+![picture](readme-assets/future-server-registry.svg)
 
 ## Deployment
 
