@@ -10,9 +10,5 @@ interface Props {
 const colors = ["black", "orange", "yellow", "green", "blue", "gray", "red", "purple", "white"];
 
 export const Block = (props: Props) => (
-    <div className={
-        `block ${colors[props.data]} ${props.size || "large"}`
-            .split(" ")
-            .map((entry) => styles[entry.toString()])
-            .reduce((a, b) => a + " " + b)} />
+    <div className={`${styles.block} ${styles[colors[props.data]]} ${styles[props.size || "large"]}`} />
 );

@@ -11,12 +11,7 @@ interface Props {
 
 export const Playfield = (props: Props) =>
     <BlockMatrix 
-        className={
-            `playfield ${props.size || "large"} ${props.gameState === Models.GameState.Paused ? "paused" : ""}`
-                .split(" ")
-                .map((entry) => styles[entry])
-                .reduce((a, b) => a + " " + b)
-        }
+        className={`${styles.playfield} ${styles[props.size || "large"]} ${props.gameState === Models.GameState.Paused ? styles.paused : ""}`}
         matrix={props.playfield}
         size={props.size}
     />;

@@ -1,4 +1,5 @@
 import * as React from "react";
+import styles from "./index.module.css";
 
 interface State {
     menuState: Node[];
@@ -40,22 +41,11 @@ class Menu extends React.Component<Props, State> {
     public render() {
         const currMenu = this.state.menuState[this.state.menuState.length - 1];
         const menu =
-            <div style={{
-                textAlign: "center",
-                width: "400px",
-                borderRadius: "5px",
-                margin: "auto",
-                border: "5px solid white",
-                padding: "20px"
-            }}>
-                <div style={{ fontSize: "1.7em", padding: "0 0 15px" }}>{currMenu.name}</div>
+            <div className={styles.menu}>
+                <div className={styles.menuTitle}>{currMenu.name}</div>
                 {currMenu.children && currMenu.children.
                     map((child, index) =>
-                        <div style={{
-                            borderRadius: "5px",
-                            border: `3px solid ${index === this.state.selection ? "green" : "transparent"}`,
-                            padding: "10px"
-                        }}
+                        <div className={`${styles.menuItem} ${index === this.state.selection ? styles.selected : ""}`}
                             onClick={this.handleSelection}
                             onMouseMove={this.handleSelection}
                             key={index}

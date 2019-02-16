@@ -21,9 +21,6 @@ export interface MultiplayerState {
     player2: Game;
 }
 
-// TODO: move subsribe into start, unsub in end
-// use players array and get rid of player 1 and player 2 intance var
-
 export class Multiplayer {
 
     public readonly mode: MultiplayerMode;
@@ -242,9 +239,7 @@ export class Multiplayer {
             throw new Error("Game is still active");
         }
         let winner;
-        if (player1.scoreboard &&
-            player2.scoreboard) {
-
+        if (player1.scoreboard && player2.scoreboard) {
             if (player1.scoreboard.score === player2.scoreboard.score) {
                 winner = null;
             } else if (player1.scoreboard.score > player2.scoreboard.score) {
