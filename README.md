@@ -1,8 +1,11 @@
-# Tetris <!-- omit in toc -->
+# Tetris <!-- omit in toc --> &middot; [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/) [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
+
 
 ## Overview <!-- omit in toc -->
 
 Classic Tetris game implemented using latest web technologies. Supports single player and multiplayer (local and remote).
+
+A running demo can be found [here](https://hidden-tundra-30225.herokuapp.com)
 
 ## Table of Contents <!-- omit in toc -->
 - [Game Features](#game-features)
