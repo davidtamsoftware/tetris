@@ -17,7 +17,9 @@
     "start": "node dist/app.js",
     "watch": "concurrently --kill-others \"tsc -w\" \"nodemon dist/app.js\"",
     "build": "tsc",
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "dependencies": {
     "express": "^4.16.4",

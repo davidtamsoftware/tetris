@@ -19,7 +19,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "dependencies": {
     "tetris-core": "^0.0.0",
