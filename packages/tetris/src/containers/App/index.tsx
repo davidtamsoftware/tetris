@@ -5,7 +5,10 @@ import Menu from "../../components/Menu";
 import MultiplayerLocal from "../Multiplayer/Local";
 import MultiplayerRemote from "../Multiplayer/Remote";
 import SinglePlayer from "../SinglePlayer";
-// import linkedinLogo from "./In-2C-21px-R.png";
+import controller from "./console.svg";
+import githubLogo from "./github.svg";
+import linkedinLogo from "./linkedin.svg";
+import mail from "./mail.svg";
 
 interface State {
     gameMode?: Key;
@@ -25,7 +28,7 @@ class App extends React.Component<{}, State> {
     public render() {
         let game;
         if (!this.state.gameMode) {
-            game = <div>
+            game = <>
                 <div style={{ textAlign: "center", margin: "0 auto", border: "0px solid white" }}>
                     <span style={{
                         fontSize: "5em",
@@ -36,15 +39,23 @@ class App extends React.Component<{}, State> {
                     <Menu menu={mainMenu} notify={this.handle} />
                 </div>
                 <div style={{ textAlign: "center", paddingTop: "100px" }}>
-                    <div style={{ paddingBottom: "15px" }}>Implemented by David Tam</div>
-                    <div style={{ fontFamily: "sans-serif" }}>
-                        {/* <a href="#"><img src={linkedinLogo} /></a> */}
-                        {/* <a href="#">linkedin</a>&#09; */}
-                        {/* <a className="github-button" href="https://github.com/davidtamsoftware" aria-label="Follow @davidtamsoftware on GitHub">Follow @davidtamsoftware</a> */}
-                        {/* GitHub <a href="#">@davidtamsoftware</a> */}
+                    <div>
+                        <a href="https://forms.gle/VwsLJjij5EkZ9X758" target="_blank">
+                            <img src={mail} style={{ padding: "25px", height: "45px", filter: "invert(0.4)"}}/>
+                        </a>
+                        <a href="https://www.linkedin.com/in/davidtamsoftware" target="_blank">
+                            <img src={linkedinLogo} style={{ padding: "25px", height: "45px", filter: "invert(0.4)"}}/>
+                        </a>
+                        <a href="https://github.com/davidtamsoftware" target="_blank">
+                            <img src={githubLogo} style={{ padding: "25px", height: "45px", filter: "invert(0.4)"}}/>
+                        </a>
+                        <a href="https://github.com/davidtamsoftware/tetris#controls" target="_blank">
+                            <img src={controller} style={{ padding: "25px", height: "45px", filter: "invert(0.4)"}}/>
+                        </a>
                     </div>
+                    <div style={{ fontFamily: "monospace" }}>Implemented by David Tam</div>
                 </div>
-            </div>;
+            </>;
         } else if (this.state.gameMode === "SINGLE_PLAYER") {
             game = <SinglePlayer exit={this.returnToMain} />;
         } else if (this.state.gameMode === "MULTIPLAYER_LOCAL_HIGH_SCORE_BATTLE") {
@@ -55,9 +66,7 @@ class App extends React.Component<{}, State> {
             game = <MultiplayerRemote exit={this.returnToMain} />;
         }
 
-        return <div>
-            {game}
-        </div>
+        return game;
     }
 
     private handle = (key: string) => {
@@ -171,6 +180,8 @@ const mainMenu: Node = {
 
 const theme = new Audio("/tetris_theme.mp3");
 theme.loop = true;
+theme.preload = "auto";
+theme.load();
 
 export const handleEvent = (event: Event) => {
     if (event === Event.Drop) {

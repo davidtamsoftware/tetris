@@ -1,5 +1,5 @@
 import { generateRandomPiece } from ".";
-import { Fill, Game, GameState } from "../models";
+import { Game, GameState, Piece } from "../models";
 import { Event, EventHandler, Tetris } from "./Tetris";
 
 export enum Player {
@@ -34,8 +34,8 @@ export class Multiplayer {
 
     private refreshLoop?: number;
 
-    private nextPiecesPlayer1: Fill[][][];
-    private nextPiecesPlayer2: Fill[][][];
+    private nextPiecesPlayer1: Piece[];
+    private nextPiecesPlayer2: Piece[];
 
     constructor(mode?: MultiplayerMode) {
         this.nextPiecesPlayer1 = [];

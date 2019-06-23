@@ -91,7 +91,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
         }
       </div>;
     } else if (!this.state.player1 || !this.state.player2) {
-      return <div>
+      return <>
         {`${this.state.playerCount}/2`} <br />
         {this.state.matchEvent === MatchEvent.DISCONNECTED && "Disconnected from server"}
         {this.state.matchEvent === MatchEvent.MATCH_FULL && `Game with match id ${this.state.matchId} is full`}
@@ -100,7 +100,7 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
         {this.state.matchMenu &&
           <Menu menu={matchMenu} notify={this.handleMatchMenuSelect} menuClose={this.handleMatchMenuClose} />
         }
-      </div>;
+      </>;
     }
     else {
       const gameOverMenuElement = <Menu menu={gameOverMenu} notify={this.handleMenuSelect} />;
