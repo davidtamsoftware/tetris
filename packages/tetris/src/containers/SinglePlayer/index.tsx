@@ -109,23 +109,21 @@ class SinglePlayer extends React.Component<Props, Models.Game> {
   }
 
   private handleKeyDown = (event: KeyboardEvent) => {
-    if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {
-      this.tetris.restart();
-    } else if (this.state.gameState === Models.GameState.Active && event.keyCode === 27) {
+    if (this.state.gameState === Models.GameState.Active && event.code === "Escape") {
       this.tetris.togglePause();
     } else if (this.state.gameState !== Models.GameState.Active) {
       return;
-    } else if (event.keyCode === 90) {
+    } else if (event.code === "ShiftRight") {
       this.tetris.rotateLeft();
-    } else if (event.keyCode === 38) {
+    } else if (event.code === "ArrowUp") {
       this.tetris.rotateRight();
-    } else if (event.keyCode === 39) {
+    } else if (event.code === "ArrowRight") {
       this.tetris.moveRight();
-    } else if (event.keyCode === 37) {
+    } else if (event.code === "ArrowLeft") {
       this.tetris.moveLeft();
-    } else if (event.keyCode === 40) {
+    } else if (event.code === "ArrowDown") {
       this.tetris.drop();
-    } else if (event.keyCode === 32) {
+    } else if (event.code === "Space") {
       this.tetris.drop(true);
     }
   }

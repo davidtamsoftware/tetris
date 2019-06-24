@@ -8,7 +8,7 @@ export const Controls = () => (<table className={styles.controls}>
     </tr>
     <tr>
       <td>Rotate Left</td>
-      <td>Z</td>
+      <td>R.Shift</td>
     </tr>
     <tr>
       <td>Rotate Right</td>

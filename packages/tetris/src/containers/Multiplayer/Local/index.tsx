@@ -62,35 +62,33 @@ class App extends React.Component<Props & { mode: MultiplayerMode }, Multiplayer
   }
 
   private handleKeyDown = (event: KeyboardEvent) => {
-    if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {
-      this.multiplayer.restart();
-    } else if (this.state.gameState === Models.GameState.Active && event.keyCode === 27) {
+    if (this.state.gameState === Models.GameState.Active && event.code === "Escape") {
       this.multiplayer.togglePause();
     } else if (this.state.gameState !== Models.GameState.Active) {
       return;
-    } else if (event.keyCode === 90) {
+    } else if (event.code === "ShiftRight") {
       this.multiplayer.rotateLeft(MultiplayerAction.Player.One);
-    } else if (event.keyCode === 38) {
+    } else if (event.code === "ArrowUp") {
       this.multiplayer.rotateRight(MultiplayerAction.Player.One);
-    } else if (event.keyCode === 39) {
+    } else if (event.code === "ArrowRight") {
       this.multiplayer.moveRight(MultiplayerAction.Player.One);
-    } else if (event.keyCode === 37) {
+    } else if (event.code === "ArrowLeft") {
       this.multiplayer.moveLeft(MultiplayerAction.Player.One);
-    } else if (event.keyCode === 40) {
+    } else if (event.code === "ArrowDown") {
       this.multiplayer.drop(MultiplayerAction.Player.One);
-    } else if (event.keyCode === 32) {
+    } else if (event.code === "Space") {
       this.multiplayer.drop(MultiplayerAction.Player.One, true);
-    } else if (event.keyCode === 69) {
+    } else if (event.code === "KeyE") {
       this.multiplayer.rotateLeft(MultiplayerAction.Player.Two);
-    } else if (event.keyCode === 38) {
+    } else if (event.code === "KeyR") {
       this.multiplayer.rotateRight(MultiplayerAction.Player.Two);
-    } else if (event.keyCode === 70) {
+    } else if (event.code === "KeyF") {
       this.multiplayer.moveRight(MultiplayerAction.Player.Two);
-    } else if (event.keyCode === 83) {
+    } else if (event.code === "KeyS") {
       this.multiplayer.moveLeft(MultiplayerAction.Player.Two);
-    } else if (event.keyCode === 68) {
+    } else if (event.code === "KeyD") {
       this.multiplayer.drop(MultiplayerAction.Player.Two);
-    } else if (event.keyCode === 65) {
+    } else if (event.code === "KeyA") {
       this.multiplayer.drop(MultiplayerAction.Player.Two, true);
     }
   }

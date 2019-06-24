@@ -212,29 +212,27 @@ class App extends React.Component<Props, MultiplayerAction.MultiplayerState &
 
   private handleKeyDown = (event: KeyboardEvent) => {
     if (!this.state.gameState) {
-      if (!this.state.matchMenu && event.keyCode === 27) {
+      if (!this.state.matchMenu && event.code === "Escape") {
         this.setState({
           matchMenu: true
         })
       }
       return;
-    } else if (this.state.gameState === Models.GameState.GameOver && event.keyCode === 82) {
-      this.multiplayer.restart();
-    } else if (this.state.gameState !== Models.GameState.GameOver && event.keyCode === 27) {
+    } else if (this.state.gameState !== Models.GameState.GameOver && event.code === "Escape") {
       this.multiplayer.togglePause();
     } else if (this.state.gameState !== Models.GameState.Active) {
       return;
-    } else if (event.keyCode === 90) {
+    } else if (event.code === "ShiftRight") {
       this.multiplayer.rotateLeft();
-    } else if (event.keyCode === 38) {
+    } else if (event.code === "ArrowUp") {
       this.multiplayer.rotateRight();
-    } else if (event.keyCode === 39) {
+    } else if (event.code === "ArrowRight") {
       this.multiplayer.moveRight();
-    } else if (event.keyCode === 37) {
+    } else if (event.code === "ArrowLeft") {
       this.multiplayer.moveLeft();
-    } else if (event.keyCode === 40) {
+    } else if (event.code === "ArrowDown") {
       this.multiplayer.drop();
-    } else if (event.keyCode === 32) {
+    } else if (event.code === "Space") {
       this.multiplayer.drop(true);
     }
   }

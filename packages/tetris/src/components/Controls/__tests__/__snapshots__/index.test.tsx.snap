@@ -19,7 +19,7 @@ exports[`<Controls /> renders correctly 1`] = `
         Rotate Left
       </td>
       <td>
-        Z
+        R.Shift
       </td>
     </tr>
     <tr>

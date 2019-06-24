@@ -1,7 +1,7 @@
-import { shallow } from "enzyme";
+import { mount, shallow } from "enzyme";
 import React from "react";
-import { Tetris } from "tetris-core";
-import { GameState } from "tetris-core/lib/models";
+import { Functions, Tetris } from "tetris-core";
+import { Fill, GameState } from "tetris-core/lib/models";
 import SinglePlayer from "..";
 
 jest.mock("tetris-core");
@@ -24,7 +24,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { keyCode: 40 } as any);
+    const evt = new KeyboardEvent("keydown", { code: "ArrowDown" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.drop).toBeCalledTimes(1);
     wrapper.unmount();
@@ -40,7 +40,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { keyCode: 37 } as any);
+    const evt = new KeyboardEvent("keydown", { code: "ArrowLeft" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.moveLeft).toBeCalledTimes(1);
     wrapper.unmount();
@@ -56,7 +56,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { keyCode: 39 } as any);
+    const evt = new KeyboardEvent("keydown", { code: "ArrowRight" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.moveRight).toBeCalledTimes(1);
     wrapper.unmount();
@@ -72,7 +72,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { keyCode: 32 } as any);
+    const evt = new KeyboardEvent("keydown", { code: "Space" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.drop).toBeCalledTimes(1);
     expect((mockTetrisInstance.drop as jest.Mock).mock.calls[0][0]).toBe(true);
@@ -89,7 +89,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { keyCode: 90 } as any);
+    const evt = new KeyboardEvent("keydown", { code: "ShiftRight" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.rotateLeft).toBeCalledTimes(1);
     wrapper.unmount();
@@ -105,7 +105,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { keyCode: 38 } as any);
+    const evt = new KeyboardEvent("keydown", { code: "ArrowUp" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.rotateRight).toBeCalledTimes(1);
     wrapper.unmount();
@@ -121,7 +121,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { keyCode: 27 } as any);
+    const evt = new KeyboardEvent("keydown", { code: "Escape" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.togglePause).toBeCalledTimes(1);
     wrapper.unmount();
@@ -130,11 +130,15 @@ describe("<SinglePlayer />", () => {
   });
 
   it("should be able to handle when player clicks restart", async () => {
+    (Functions as any).merge = jest.fn(() => ({ playfield: [[Fill.Blank]] }));
     mockTetris.prototype.getState = () => ({
       gameState: GameState.GameOver,
+      playfield: [[Fill.Blank]],
+      nextPiece: [[Fill.Blue]],
+      scoreboard: {},
     }) as any;
 
-    const wrapper = shallow(<SinglePlayer />);
+    const wrapper = mount(<SinglePlayer />);
 
     expect(mockTetris).toBeCalledTimes(1);
     const mockTetrisInstance = mockTetris.mock.instances[0];
@@ -142,7 +146,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
     await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
-    const evt = new KeyboardEvent("keydown", { keyCode: 82 } as any);
+    const evt = new KeyboardEvent("keydown", { code: "Enter" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.restart).toBeCalledTimes(1);
     wrapper.unmount();
