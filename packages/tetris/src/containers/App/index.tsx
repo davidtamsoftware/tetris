@@ -69,10 +69,11 @@ class App extends React.Component<{}, State> {
         return game;
     }
 
-    private handle = (key: string) => {
+    private handle = (key: Key) => {
         this.setState({
             gameMode: key as any,
         });
+        return true;
     };
 
     private returnToMain = () => {

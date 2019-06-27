@@ -28,3 +28,10 @@
 .main {
   position: relative;
 }
+
+.menu {
+    position: absolute;
+    left: calc(50% - 200px - 5px - 20px);
+    top: 200px;
+    background-color: black;
+}

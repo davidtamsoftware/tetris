@@ -1,5 +1,12 @@
 import * as React from "react";
+import { Key } from "../../containers/App";
 import styles from "./index.module.css";
+
+/**
+ * key defines the back
+ * boolean true will close the menu, false will pop menu
+ */
+type MenuHandler = (key: Key) => boolean;
 
 interface State {
     menuState: Node[];
@@ -8,7 +15,7 @@ interface State {
 
 interface Props {
     menu: Node;
-    notify: any;
+    notify: MenuHandler;
     menuClose?: any;
 }
 
