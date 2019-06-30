@@ -2,7 +2,7 @@ import { mount } from "enzyme";
 import React from "react";
 import { Functions, Tetris } from "tetris-core";
 import { Fill, GameState } from "tetris-core/lib/models";
-import SinglePlayer from "../indexHooks";
+import SinglePlayer from "..";
 
 jest.mock("tetris-core");
 
