@@ -6,7 +6,7 @@ import styles from "./index.module.css";
  * key defines the back
  * boolean true will close the menu, false will pop menu
  */
-type MenuHandler = (key: Key) => boolean;
+export type MenuHandler = (key: Key) => boolean;
 
 interface State {
     menuState: Node[];

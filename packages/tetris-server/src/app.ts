@@ -1,5 +1,6 @@
 import express from "express";
 import http from "http";
+import { Player } from "tetris-core/lib/actions/Multiplayer";
 import { Action, ClientMessage, ServerMessage } from "tetris-ws-model";
 import WebSocket from "ws";
 import { Match, MatchPlayer } from "./Match";
@@ -50,18 +51,19 @@ wss.on("connection", (ws) => {
                     return;
                 }
                 const player = Match.getPlayerNumber(match, matchPlayer);
+                const playerActions = player === Player.One ? match.game.player1Actions : match.game.player2Actions;
                 if (msg.action === Action.MoveLeft) {
-                    match.game.moveLeft(player);
+                    playerActions.moveLeft();
                 } else if (msg.action === Action.MoveRight) {
-                    match.game.moveRight(player);
+                    playerActions.moveRight();
                 } else if (msg.action === Action.RotateLeft) {
-                    match.game.rotateLeft(player);
+                    playerActions.rotateLeft();
                 } else if (msg.action === Action.RotateRight) {
-                    match.game.rotateRight(player);
+                    playerActions.rotateRight();
                 } else if (msg.action === Action.HardDrop) {
-                    match.game.drop(player, true);
+                    playerActions.drop(true);
                 } else if (msg.action === Action.SoftDrop) {
-                    match.game.drop(player, false);
+                    playerActions.drop();
                 } else if (msg.action === Action.TogglePause) {
                     match.game.togglePause();
                 } else if (msg.action === Action.Restart

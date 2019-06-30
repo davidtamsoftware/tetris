@@ -1,5 +1,7 @@
 import { generateRandomPiece } from ".";
 import { Game, GameState, Piece } from "../models";
+import GameActions from "./GameActions";
+import PlayerActions from "./PlayerActions";
 import { Event, EventHandler, Tetris } from "./Tetris";
 
 export enum Player {
@@ -21,7 +23,9 @@ export interface MultiplayerState {
     player2: Game;
 }
 
-export class Multiplayer {
+export class Multiplayer implements GameActions {
+    public readonly player1Actions: PlayerActions;
+    public readonly player2Actions: PlayerActions;
 
     public readonly mode: MultiplayerMode;
     private lastState: string;
@@ -54,6 +58,22 @@ export class Multiplayer {
             this.player1.subscribeToEvent(this.player2.damage, Event.Attack);
             this.player2.subscribeToEvent(this.player1.damage, Event.Attack);
         }
+
+        this.player1Actions = {
+            drop: this.player1.drop.bind(this.player1),
+            moveLeft: this.player1.moveLeft.bind(this.player1),
+            moveRight: this.player1.moveRight.bind(this.player1),
+            rotateLeft: this.player1.rotateLeft.bind(this.player1),
+            rotateRight: this.player1.rotateRight.bind(this.player1),
+        };
+
+        this.player2Actions = {
+            drop: this.player2.drop.bind(this.player2),
+            moveLeft: this.player2.moveLeft.bind(this.player2),
+            moveRight: this.player2.moveRight.bind(this.player2),
+            rotateLeft: this.player2.rotateLeft.bind(this.player2),
+            rotateRight: this.player2.rotateRight.bind(this.player2),
+        };
     }
 
     public subscribeToEvent(handler: EventHandler, ...events: Event[]) {
@@ -77,7 +97,6 @@ export class Multiplayer {
             event === Event.GameOver ||
             event === Event.PauseIn ||
             event === Event.PauseOut));
-
     }
 
     public unsubscribeToEvent(handler: EventHandler) {
@@ -88,22 +107,6 @@ export class Multiplayer {
         this.eventSubscribers.delete(handler);
     }
 
-    public moveLeft(player: Player) {
-        return this.players[player].moveLeft();
-    }
-
-    public moveRight(player: Player) {
-        return this.players[player].moveRight();
-    }
-
-    public rotateRight(player: Player) {
-        return this.players[player].rotateRight();
-    }
-
-    public rotateLeft(player: Player) {
-        return this.players[player].rotateLeft();
-    }
-
     public togglePause() {
         this.players[Player.One].togglePause();
         this.players[Player.Two].togglePause();
@@ -112,10 +115,6 @@ export class Multiplayer {
         this.setState({
             gameState: this.getState().gameState === GameState.Paused ? GameState.Active : GameState.Paused,
         });
-    }
-
-    public drop(player: Player, hardDrop?: boolean): Promise<void> {
-        return this.players[player].drop(hardDrop);
     }
 
     public endGame(player?: Player) {

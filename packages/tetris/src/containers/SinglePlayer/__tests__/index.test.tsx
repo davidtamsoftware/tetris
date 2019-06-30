@@ -1,8 +1,8 @@
-import { mount, shallow } from "enzyme";
+import { mount } from "enzyme";
 import React from "react";
 import { Functions, Tetris } from "tetris-core";
 import { Fill, GameState } from "tetris-core/lib/models";
-import SinglePlayer from "..";
+import SinglePlayer from "../indexHooks";
 
 jest.mock("tetris-core");
 
@@ -17,8 +17,7 @@ describe("<SinglePlayer />", () => {
   });
 
   it("should be able to handle when player clicks move down", () => {
-    const wrapper = shallow(<SinglePlayer />);
-
+    const wrapper = mount(<SinglePlayer />);
     expect(mockTetris).toBeCalledTimes(1);
     const mockTetrisInstance = mockTetris.mock.instances[0];
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
@@ -33,7 +32,7 @@ describe("<SinglePlayer />", () => {
   });
 
   it("should be able to handle when player clicks move left", () => {
-    const wrapper = shallow(<SinglePlayer />);
+    const wrapper = mount(<SinglePlayer />);
 
     expect(mockTetris).toBeCalledTimes(1);
     const mockTetrisInstance = mockTetris.mock.instances[0];
@@ -49,7 +48,7 @@ describe("<SinglePlayer />", () => {
   });
 
   it("should be able to handle when player clicks move right", () => {
-    const wrapper = shallow(<SinglePlayer />);
+    const wrapper = mount(<SinglePlayer />);
 
     expect(mockTetris).toBeCalledTimes(1);
     const mockTetrisInstance = mockTetris.mock.instances[0];
@@ -65,7 +64,7 @@ describe("<SinglePlayer />", () => {
   });
 
   it("should be able to handle when player clicks hard drop", () => {
-    const wrapper = shallow(<SinglePlayer />);
+    const wrapper = mount(<SinglePlayer />);
 
     expect(mockTetris).toBeCalledTimes(1);
     const mockTetrisInstance = mockTetris.mock.instances[0];
@@ -82,7 +81,7 @@ describe("<SinglePlayer />", () => {
   });
 
   it("should be able to handle when player clicks rotate left", () => {
-    const wrapper = shallow(<SinglePlayer />);
+    const wrapper = mount(<SinglePlayer />);
 
     expect(mockTetris).toBeCalledTimes(1);
     const mockTetrisInstance = mockTetris.mock.instances[0];
@@ -98,7 +97,7 @@ describe("<SinglePlayer />", () => {
   });
 
   it("should be able to handle when player clicks rotate right", () => {
-    const wrapper = shallow(<SinglePlayer />);
+    const wrapper = mount(<SinglePlayer />);
 
     expect(mockTetris).toBeCalledTimes(1);
     const mockTetrisInstance = mockTetris.mock.instances[0];
@@ -114,7 +113,7 @@ describe("<SinglePlayer />", () => {
   });
 
   it("should be able to handle when player clicks pause", () => {
-    const wrapper = shallow(<SinglePlayer />);
+    const wrapper = mount(<SinglePlayer />);
 
     expect(mockTetris).toBeCalledTimes(1);
     const mockTetrisInstance = mockTetris.mock.instances[0];
@@ -145,7 +144,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
+    await new Promise((res) => setTimeout(res, 100)); // wait for refresh
     const evt = new KeyboardEvent("keydown", { code: "Enter" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.restart).toBeCalledTimes(1);

@@ -2,6 +2,7 @@ import * as Functions from "..";
 import { Fill, GameState } from "../../models";
 import { Multiplayer } from "../../tetris-core";
 import { MultiplayerMode, Player } from "../Multiplayer";
+import PlayerActions from "../PlayerActions";
 
 describe("High score battle logic", () => {
     it("should declare the winner when both player's games end", async () => {
@@ -11,8 +12,8 @@ describe("High score battle logic", () => {
         // worst case is 18 pieces to force game over
         // height is 18, smallest piece is 1 row tall
         for (let i = 0; i < 18; i++) {
-            await multiplayer.drop(Multiplayer.Player.One, true);
-            await multiplayer.drop(Multiplayer.Player.Two, true);
+            await multiplayer.player1Actions.drop(true);
+            await multiplayer.player2Actions.drop(true);
         }
         expect(multiplayer.getState().gameState).toBe(GameState.GameOver);
         expect(multiplayer.getState().winner).toBeNull();
@@ -23,14 +24,14 @@ describe("High score battle logic", () => {
         // worst case is 18 pieces to force game over
         // height is 18, smallest piece is 1 row tall
         for (let i = 0; i < 18; i++) {
-            await multiplayer.drop(Multiplayer.Player.One, true);
+            await multiplayer.player1Actions.drop(true);
         }
 
         await new Promise((res, rej) => setTimeout(res, 2000));
         // worst case is 18 pieces to force game over
         // height is 18, smallest piece is 1 row tall
         for (let i = 0; i < 18; i++) {
-            await multiplayer.drop(Multiplayer.Player.Two, true);
+            await multiplayer.player2Actions.drop(true);
         }
 
         expect(multiplayer.getState().gameState).toBe(GameState.GameOver);
@@ -43,14 +44,14 @@ describe("High score battle logic", () => {
         // worst case is 18 pieces to force game over
         // height is 18, smallest piece is 1 row tall
         for (let i = 0; i < 18; i++) {
-            await multiplayer.drop(Multiplayer.Player.Two, true);
+            await multiplayer.player2Actions.drop(true);
         }
 
         await new Promise((res, rej) => setTimeout(res, 2000));
         // worst case is 18 pieces to force game over
         // height is 18, smallest piece is 1 row tall
         for (let i = 0; i < 18; i++) {
-            await multiplayer.drop(Multiplayer.Player.One, true);
+            await multiplayer.player1Actions.drop(true);
         }
 
         expect(multiplayer.getState().gameState).toBe(GameState.GameOver);
@@ -63,31 +64,31 @@ describe("High score battle logic", () => {
         const history = [];
         // simulate that player 1 played faster
         history.push(multiplayer.getState().player1.piece);
-        await multiplayer.drop(Multiplayer.Player.One, true);
+        await multiplayer.player1Actions.drop(true);
         history.push(multiplayer.getState().player1.piece);
-        await multiplayer.drop(Multiplayer.Player.One, true);
+        await multiplayer.player1Actions.drop(true);
         history.push(multiplayer.getState().player1.piece);
-        await multiplayer.drop(Multiplayer.Player.One, true);
+        await multiplayer.player1Actions.drop(true);
         history.push(multiplayer.getState().player1.piece);
 
         // check that player 2 got the same pieces as player 1 and simulate
         // that player 2 caught up and played faster and got ahead by 2 pieces
         expect(multiplayer.getState().player2.piece).toEqual(history.shift());
-        await multiplayer.drop(Multiplayer.Player.Two, true);
+        await multiplayer.player2Actions.drop(true);
         expect(multiplayer.getState().player2.piece).toEqual(history.shift());
-        await multiplayer.drop(Multiplayer.Player.Two, true);
+        await multiplayer.player2Actions.drop(true);
         expect(multiplayer.getState().player2.piece).toEqual(history.shift());
-        await multiplayer.drop(Multiplayer.Player.Two, true);
+        await multiplayer.player2Actions.drop(true);
         expect(multiplayer.getState().player2.piece).toEqual(history.shift());
-        await multiplayer.drop(Multiplayer.Player.Two, true);
+        await multiplayer.player2Actions.drop(true);
         history.push(multiplayer.getState().player2.piece);
-        await multiplayer.drop(Multiplayer.Player.Two, true);
+        await multiplayer.player2Actions.drop(true);
         history.push(multiplayer.getState().player2.piece);
 
         // check that player 1 got the same pieces as player 2
-        await multiplayer.drop(Multiplayer.Player.One, true);
+        await multiplayer.player1Actions.drop(true);
         expect(multiplayer.getState().player1.piece).toEqual(history.shift());
-        await multiplayer.drop(Multiplayer.Player.One, true);
+        await multiplayer.player1Actions.drop(true);
         expect(multiplayer.getState().player1.piece).toEqual(history.shift());
     });
 
@@ -98,8 +99,8 @@ describe("High score battle logic", () => {
         // worst case is 18 pieces to force game over
         // height is 18, smallest piece is 1 row tall
         for (let i = 0; i < 18; i++) {
-            await multiplayer.drop(Multiplayer.Player.One, true);
-            await multiplayer.drop(Multiplayer.Player.Two, true);
+            await multiplayer.player1Actions.drop(true);
+            await multiplayer.player2Actions.drop(true);
         }
         expect(multiplayer.getState().gameState).toBe(GameState.GameOver);
         expect(multiplayer.getState().winner).toBeNull();
@@ -113,8 +114,8 @@ describe("High score battle logic", () => {
     it("should be able to pause/unpause the game", async () => {
         const multiplayer = new Multiplayer.Multiplayer(MultiplayerMode.HighScoreBattle);
         multiplayer.start();
-        await multiplayer.drop(Player.Two, true);
-        await multiplayer.drop(Player.Two);
+        await multiplayer.player2Actions.drop(true);
+        await multiplayer.player2Actions.drop();
         await new Promise((res, rej) => setTimeout(res, 100));
         const prevPlayer1Piece = multiplayer.getState().player1.piece;
         const prevPlayer1Position = multiplayer.getState().player1.position;
@@ -158,7 +159,7 @@ describe("Attack mode logic", () => {
         multiplayer.start();
         await setupLine(multiplayer, Player.One, false);
         expect(multiplayer.getState().player2.pendingDamage).toBe(0);
-        await multiplayer.drop(Player.One, true);
+        await multiplayer.player1Actions.drop(true);
         await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
         expect(multiplayer.getState().player2.pendingDamage).toBe(1);
     });
@@ -170,7 +171,7 @@ describe("Attack mode logic", () => {
         multiplayer.start();
         await setupLine(multiplayer, Player.One, false);
         expect(multiplayer.getState().player2.pendingDamage).toBe(0);
-        await multiplayer.drop(Player.One, true);
+        await multiplayer.player1Actions.drop(true);
         await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
         expect(multiplayer.getState().player2.pendingDamage).toBe(2);
     });
@@ -184,11 +185,11 @@ describe("Attack mode logic", () => {
         await setupLine(multiplayer, Player.Two, false);
         expect(multiplayer.getState().player1.pendingDamage).toBe(0);
         expect(multiplayer.getState().player2.pendingDamage).toBe(0);
-        await multiplayer.drop(Player.One, true);
+        await multiplayer.player1Actions.drop(true);
         await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
         expect(multiplayer.getState().player1.pendingDamage).toBe(0);
         expect(multiplayer.getState().player2.pendingDamage).toBe(2);
-        await multiplayer.drop(Player.Two, true);
+        await multiplayer.player2Actions.drop(true);
         await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
         expect(multiplayer.getState().player1.pendingDamage).toBe(0);
         expect(multiplayer.getState().player2.pendingDamage).toBe(0);
@@ -201,10 +202,10 @@ describe("Attack mode logic", () => {
         multiplayer.start();
         await setupLine(multiplayer, Player.One, false);
         expect(multiplayer.getState().player2.pendingDamage).toBe(0);
-        await multiplayer.drop(Player.One, true);
+        await multiplayer.player1Actions.drop(true);
         await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
         expect(multiplayer.getState().player2.pendingDamage).toBe(2);
-        await multiplayer.drop(Player.Two, true);
+        await multiplayer.player2Actions.drop(true);
         await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
         expect(multiplayer.getState().player2.pendingDamage).toBe(0);
     });
@@ -214,7 +215,7 @@ describe("Attack mode logic", () => {
         multiplayer.start();
         expect(multiplayer.getState().winner).toBeUndefined();
         for (let i = 0; i < 15; i++) {
-            await multiplayer.drop(Player.One, true);
+            await multiplayer.player1Actions.drop(true);
         }
         await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
         expect(multiplayer.getState().winner).toBe(Player.Two);
@@ -223,7 +224,7 @@ describe("Attack mode logic", () => {
         multiplayer.restart();
         expect(multiplayer.getState().winner).toBeUndefined();
         for (let i = 0; i < 15; i++) {
-            await multiplayer.drop(Player.Two, true);
+            await multiplayer.player2Actions.drop(true);
         }
         await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
         expect(multiplayer.getState().winner).toBe(Player.One);
@@ -238,7 +239,7 @@ describe("Attack mode logic", () => {
         multiplayer.start();
         expect(multiplayer.getState().winner).toBeUndefined();
         for (let i = 0; i < 15; i++) {
-            await multiplayer.drop(Player.One, true);
+            await multiplayer.player1Actions.drop(true);
         }
         await new Promise((res, rej) => setTimeout(res, 100)); // wait for refresh
         expect(multiplayer.getState().winner).toBe(Player.Two);
@@ -259,52 +260,54 @@ describe("Attack mode logic", () => {
 });
 
 const setupLine = async (multiplayer: Multiplayer.Multiplayer, player: Player, completeLine: boolean) => {
-    multiplayer.moveLeft(player);
-    multiplayer.moveLeft(player);
-    multiplayer.moveLeft(player);
-    await multiplayer.drop(player, true);
+    const playerActions: PlayerActions =
+        player === Player.One ? multiplayer.player1Actions : multiplayer.player2Actions;
+    playerActions.moveLeft();
+    playerActions.moveLeft();
+    playerActions.moveLeft();
+    await playerActions.drop(true);
 
-    multiplayer.moveLeft(player);
-    multiplayer.moveLeft(player);
-    await multiplayer.drop(player, true);
+    playerActions.moveLeft();
+    playerActions.moveLeft();
+    await playerActions.drop(true);
 
-    multiplayer.moveLeft(player);
-    await multiplayer.drop(player, true);
+    playerActions.moveLeft();
+    await playerActions.drop(true);
 
-    multiplayer.moveRight(player);
-    await multiplayer.drop(player, true);
+    playerActions.moveRight();
+    await playerActions.drop(true);
 
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    await multiplayer.drop(player, true);
+    playerActions.moveRight();
+    playerActions.moveRight();
+    await playerActions.drop(true);
 
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    await multiplayer.drop(player, true);
+    playerActions.moveRight();
+    playerActions.moveRight();
+    playerActions.moveRight();
+    await playerActions.drop(true);
 
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    await multiplayer.drop(player, true);
+    playerActions.moveRight();
+    playerActions.moveRight();
+    playerActions.moveRight();
+    playerActions.moveRight();
+    await playerActions.drop(true);
 
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    await multiplayer.drop(player, true);
+    playerActions.moveRight();
+    playerActions.moveRight();
+    playerActions.moveRight();
+    playerActions.moveRight();
+    playerActions.moveRight();
+    await playerActions.drop(true);
 
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    multiplayer.moveRight(player);
-    await multiplayer.drop(player, true);
+    playerActions.moveRight();
+    playerActions.moveRight();
+    playerActions.moveRight();
+    playerActions.moveRight();
+    playerActions.moveRight();
+    playerActions.moveRight();
+    await playerActions.drop(true);
 
     if (completeLine) {
-        await multiplayer.drop(player, true);
+        await playerActions.drop(true);
     }
 };

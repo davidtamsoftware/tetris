@@ -10,6 +10,8 @@ import {
     rotateRight,
 } from ".";
 import { Fill, Game, GameState, pieces, Playfield, playfield as initialPlayfield } from "../models";
+import GameActions from "./GameActions";
+import PlayerActions from "./PlayerActions";
 
 type Handler = (game: Game) => void;
 
@@ -41,7 +43,7 @@ export interface HighScoreService {
  * @description Contains the logic for tetris actions and uses pure functions to transform playfield contents
  * and save state to memory.
  */
-export class Tetris {
+export class Tetris implements PlayerActions, GameActions {
 
     private subscribers: Set<Handler>;
     private eventSubscribers: Map<EventHandler, Event[]>;

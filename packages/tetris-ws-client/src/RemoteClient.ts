@@ -3,12 +3,14 @@ import { Event, EventHandler } from "tetris-core/lib/actions/Tetris";
 import { GameState } from "tetris-core/lib/models";
 import { Action, ClientMessage, MatchEvent, MatchState, ResponseType,
   ServerMessage } from "tetris-ws-model";
+import PlayerActions from "tetris-core/lib/actions/PlayerActions";
+import GameActions from "tetris-core/lib/actions/GameActions";
 
 type Handler = (game: any) => void;
 type MatchEventHandler = (event: MatchEvent) => void;
 type MatchStateHandler = (matchState: MatchState) => void;
 
-export class MultiplayerRemoteClient {
+export class MultiplayerRemoteClient implements PlayerActions, GameActions {
   private subscribers: Set<Handler>;
   private eventSubscribers: Map<EventHandler, Event[]>;
   private matchEventSubscribers: Set<MatchEventHandler>;
@@ -135,6 +137,10 @@ export class MultiplayerRemoteClient {
     this.client!.send(JSON.stringify(payload));
   }
 
+  public endGame() {
+    this.disconnect();
+  }
+  
   public getState() {
     // deep copy
     return JSON.parse(JSON.stringify(this.multiplayerState || {}));

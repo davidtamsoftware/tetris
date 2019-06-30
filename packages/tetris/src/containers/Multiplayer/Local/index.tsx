@@ -25,7 +25,7 @@ class App extends React.Component<Props & { mode: MultiplayerMode }, Multiplayer
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
     this.multiplayer.unsubscribe(this.handle);
-    this.multiplayer.subscribeToEvent(handleEvent);
+    this.multiplayer.unsubscribeToEvent(handleEvent);
   }
 
   public render() {
@@ -67,29 +67,29 @@ class App extends React.Component<Props & { mode: MultiplayerMode }, Multiplayer
     } else if (this.state.gameState !== Models.GameState.Active) {
       return;
     } else if (event.code === "ShiftRight") {
-      this.multiplayer.rotateLeft(MultiplayerAction.Player.One);
+      this.multiplayer.player1Actions.rotateLeft();
     } else if (event.code === "ArrowUp") {
-      this.multiplayer.rotateRight(MultiplayerAction.Player.One);
+      this.multiplayer.player1Actions.rotateRight();
     } else if (event.code === "ArrowRight") {
-      this.multiplayer.moveRight(MultiplayerAction.Player.One);
+      this.multiplayer.player1Actions.moveRight();
     } else if (event.code === "ArrowLeft") {
-      this.multiplayer.moveLeft(MultiplayerAction.Player.One);
+      this.multiplayer.player1Actions.moveLeft();
     } else if (event.code === "ArrowDown") {
-      this.multiplayer.drop(MultiplayerAction.Player.One);
+      this.multiplayer.player1Actions.drop();
     } else if (event.code === "Space") {
-      this.multiplayer.drop(MultiplayerAction.Player.One, true);
+      this.multiplayer.player1Actions.drop(true);
     } else if (event.code === "KeyE") {
-      this.multiplayer.rotateLeft(MultiplayerAction.Player.Two);
+      this.multiplayer.player2Actions.rotateLeft();
     } else if (event.code === "KeyR") {
-      this.multiplayer.rotateRight(MultiplayerAction.Player.Two);
+      this.multiplayer.player2Actions.rotateRight();
     } else if (event.code === "KeyF") {
-      this.multiplayer.moveRight(MultiplayerAction.Player.Two);
+      this.multiplayer.player2Actions.moveRight();
     } else if (event.code === "KeyS") {
-      this.multiplayer.moveLeft(MultiplayerAction.Player.Two);
+      this.multiplayer.player2Actions.moveLeft();
     } else if (event.code === "KeyD") {
-      this.multiplayer.drop(MultiplayerAction.Player.Two);
+      this.multiplayer.player2Actions.drop();
     } else if (event.code === "KeyA") {
-      this.multiplayer.drop(MultiplayerAction.Player.Two, true);
+      this.multiplayer.player2Actions.drop(true);
     }
   }
 }

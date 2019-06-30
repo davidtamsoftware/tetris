@@ -83,7 +83,9 @@ class SinglePlayer extends React.Component<Props, Models.Game> {
   private handleMenuSelect = (key: Key) => {
     if (key === "HOME" || key === "QUIT_CONFIRM") {
       this.tetris.endGame();
-      this.props.exit();
+      if (this.props.exit) {
+        this.props.exit();
+      }
     } else if (key === "QUIT_CANCEL") {
       return false;
     } else if (key === "RESUME") {
