@@ -1,4 +1,4 @@
-# Tetris <!-- omit in toc --> &middot; [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/) [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
+# Tetris <!-- omit in toc --> &middot; [![Build Status](https://travis-ci.org/davidtamsoftware/tetris.svg?branch=master)](https://travis-ci.org/davidtamsoftware/tetris) [![Coverage Status](https://coveralls.io/repos/github/davidtamsoftware/tetris/badge.svg?branch=master)](https://coveralls.io/github/davidtamsoftware/tetris?branch=master) [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/) [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
 
 ## Overview <!-- omit in toc -->
@@ -8,24 +8,30 @@ Classic Tetris game implemented using latest web technologies. Supports single p
 A running demo can be found [here](https://hidden-tundra-30225.herokuapp.com)
 
 ## Table of Contents <!-- omit in toc -->
-- [Game Features](#game-features)
-  - [Audio](#audio)
-  - [Scoring / Level System](#scoring--level-system)
-  - [Single Player](#single-player)
-  - [Local Multiplayer](#local-multiplayer)
-    - [High Score Battle](#high-score-battle)
-    - [Attack Mode](#attack-mode)
-  - [Remote Multiplayer](#remote-multiplayer)
-- [Technical Solution](#technical-solution)
-  - [Stack](#stack)
-  - [Design](#design)
-  - [Module Dependency](#module-dependency)
-  - [Summary of Design Patterns / Algorithms](#summary-of-design-patterns--algorithms)
-  - [Performance for Multiplayer](#performance-for-multiplayer)
-  - [Misc Features for Multiplayer](#misc-features-for-multiplayer)
-  - [Future Components](#future-components)
-  - [Deployment](#deployment)
-- [Running the App](#running-the-app)
+- [Game Features](#Game-Features)
+  - [Audio](#Audio)
+  - [Scoring / Level System](#Scoring--Level-System)
+  - [Single Player](#Single-Player)
+  - [Local Multiplayer](#Local-Multiplayer)
+    - [High Score Battle](#High-Score-Battle)
+    - [Attack Mode](#Attack-Mode)
+  - [Remote Multiplayer](#Remote-Multiplayer)
+- [Controls](#Controls)
+  - [Primary Player](#Primary-Player)
+  - [Secondary Player](#Secondary-Player)
+- [Technical Solution](#Technical-Solution)
+  - [Tech Stack](#Tech-Stack)
+  - [Modules](#Modules)
+  - [Module Dependency](#Module-Dependency)
+  - [Solution Architecture](#Solution-Architecture)
+  - [Front End Design / React Component Interaction](#Front-End-Design--React-Component-Interaction)
+  - [Back End Design / Game Server](#Back-End-Design--Game-Server)
+  - [Summary of Design Patterns / Algorithms](#Summary-of-Design-Patterns--Algorithms)
+  - [Performance for Multiplayer](#Performance-for-Multiplayer)
+  - [Misc Features for Multiplayer](#Misc-Features-for-Multiplayer)
+  - [Future Components](#Future-Components)
+  - [Deployment](#Deployment)
+- [Running the App](#Running-the-App)
 
 # Game Features
 
@@ -64,13 +70,56 @@ A running demo can be found [here](https://hidden-tundra-30225.herokuapp.com)
 * Players enter same match id to join the same game
 * Supports both high score battle and attack mode
 
+# Controls
+
+<table style="width: 100%; align: center">
+<tr>
+<td align="center">
+
+## Primary Player
+
+</td>
+<td align="center">
+
+## Secondary Player
+
+</td>
+</tr>
+<tr>
+<td align="center">
+
+| Key | Action |
+| --- | --- |
+| &larr; | Move Left |
+| &rarr; | Move Right |
+| &darr; | Move Down |
+| Spacebar | Drop |
+| R. Shift | Rotate Left |
+| &uarr; | Rotate Right |
+
+</td>
+<td align="center">
+
+| Key | Action |
+| --- | --- |
+| S | Move Left |
+| F | Move Right |
+| D | Move Down |
+| A | Drop |
+| E | Rotate Left |
+| R | Rotate Right |
+
+</td>
+</tr>
+<table>
+
 # Technical Solution
 
 * Implemented using React and TypeScript
 * Minimal libraries used to reduce external dependencies
 * Follow object oriented programming and functional programming principles
 
-## Stack
+## Tech Stack
 
 * TypeScript
 * React
@@ -78,15 +127,35 @@ A running demo can be found [here](https://hidden-tundra-30225.herokuapp.com)
 * Lerna
 * Web Sockets
 
-## Design
+## Modules
+
+| Modules| Description|
+| - | -|
+| tetris | Tetris webapp / presentation tier of the game implemented using React |
+| tetris-ws-client | Web socket client library to communicate with game server |
+| tetris-ws-model | Library that defines the data model used to represent the game instructions sent between client and server |
+| tetris-core | Core library that holds all the domain logic for the Tetris game |
+| tetris-server | Game server that manages the instances of the games and sends state to the game clients |
+
+## Module Dependency
+
+![picture](readme-assets/package-dependency.svg)
+
+## Solution Architecture
 
 The following solution overview diagram shows a subset of the components that make up the client / server Tetris game.
 
 ![picture](readme-assets/solution-overview.svg)
 
-## Module Dependency
+## Front End Design / React Component Interaction
 
-![picture](readme-assets/package-dependency.svg)
+The following details how the components interacts with React custom hooks to setup the Tetris game.
+
+![picture](readme-assets/component-interaction.svg)
+
+## Back End Design / Game Server
+
+![picture](readme-assets/tetris-server-design.svg)
 
 ## Summary of Design Patterns / Algorithms
 
@@ -120,7 +189,7 @@ The following solution overview diagram shows a subset of the components that ma
 
 ## Future Components
 
-Since state is managed on the game server, each game server must maintain its own active games. As we horizontally scale game servers, the client will need to know how many game servers are available and what matches exist on each game server. To achieve this, a new Tetris server registry would need to be created. Using [Netflix Eureka](https://github.com/Netflix/eureka/wiki/Eureka-at-a-glance#high-level-architecture), game servers can be registered to the registry upon startup and polling interval. Updates (firewall changes) will need to be made to lock down the Eureka API to only allow readonly api calls to be made from the web client. The web client will communicate with Eureka APIs to determine which game servers are running.
+Since state is managed on the game server, each game server must maintain its own active games. The game server is implemented using web sockets so there is session affinity as the connection remains open for the duration of the time. As we horizontally scale the game servers, new clients will need to know how many game servers are available and what matches exist on each game server. To achieve this, a new Tetris server registry would need to be created. Using [Netflix Eureka](https://github.com/Netflix/eureka/wiki/Eureka-at-a-glance#high-level-architecture), game servers can be registered to the registry upon startup and polling interval. Updates (firewall changes) will need to be made to lock down the Eureka API to only allow readonly api calls to be made from the web client. The web client will communicate with Eureka APIs to determine which game servers are running.
 
 This solution will allow users to browse through the list of registered game servers, and connect to the game server's APIs to view the list of active matches or join/create a match. This would allow for game servers to be scaled horizontally and allow users to find the game. 
 
@@ -135,15 +204,15 @@ The following diagram illustrates the changes that would made (Green indicates n
 
 # Running the App
 
-1) At the root of the project, install and build the project:
+At the root of the project, install and build the project:
 ```
 npm install
 ```
-2) Go to tetris webapp project under packages/tetris and run the app:
+To start the tetris webapp:
 ```
-npm run watch
+lerna exec --scope tetris -- npm run watch
 ```
-3) Go to the Tetris server project under packages/tetris-server and run the server:
+To start the tetris server:
 ```
-npm start
+lerna exec --scope tetris-server -- npm start
 ```

@@ -2,7 +2,7 @@ import * as React from "react";
 import { MatchEvent } from "tetris-ws-model";
 import { Multiplayer } from "..";
 import Menu from "../../../components/Menu";
-import { useMultiplayerRemote } from "../../../effects";
+import { useMultiplayerRemote } from "../../../hooks";
 import { gameOverMenu, gameOverNoRestartMenu, matchMenu, pauseMenu, Props } from "../../App";
 import styles from "./index.module.css";
 

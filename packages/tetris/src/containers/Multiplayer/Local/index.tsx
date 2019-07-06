@@ -3,7 +3,7 @@ import { Models, Multiplayer as MultiplayerAction } from "tetris-core";
 import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
 import { Multiplayer } from "..";
 import Menu from "../../../components/Menu";
-import { useMultiplayerLocal } from "../../../effects";
+import { useMultiplayerLocal } from "../../../hooks";
 import { gameOverMenu, pauseMenu, Props } from "../../App";
 
 const MultiplayerLocal = (props: Props & { mode: MultiplayerMode }) => {

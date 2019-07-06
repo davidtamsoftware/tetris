@@ -6,7 +6,7 @@ import { NextPiece } from "../../components/NextPiece";
 import { Playfield } from "../../components/Playfield";
 import { Scoreboard } from "../../components/Scoreboard";
 import { Stats } from "../../components/Stats";
-import { useTetris } from "../../effects";
+import { useTetris } from "../../hooks";
 import { gameOverMenu, pauseMenu, Props } from "../App";
 import styles from "./index.module.css";
 
