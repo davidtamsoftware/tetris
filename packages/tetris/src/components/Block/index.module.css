@@ -59,3 +59,22 @@
     border-color: white;
     background-color: white;
 }
+
+.block.flicker {
+    animation-duration: 0.05s;
+    animation-name: flicker;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+@keyframes flicker {
+    from {
+        border-color: white;
+        background-color: white;
+    }
+  
+    to {
+        border-color: gray lightgray rgb(102, 102, 102) gray;
+        background-color: gray;
+    }
+  }

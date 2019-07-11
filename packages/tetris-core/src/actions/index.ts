@@ -143,10 +143,8 @@ export const moveDown = async (
 
 export const removeCompletedLines =
     (playfield: Playfield, updateGame: (game: Playfield) => void, publishEvent: (event: Event) => void) => {
-        const animateDeletionState1 =
-            playfield.map((row) => row.every((col) => !!col) ? row.map(() => Fill.White) : row) as Playfield;
-        const animateDeletionState2 =
-            playfield.map((row) => row.every((col) => !!col) ? row.map(() => Fill.Gray) : row) as Playfield;
+        const animateState =
+            playfield.map((row) => row.every((col) => !!col) ? row.map(() => Fill.Flicker) : row) as Playfield;
         const newState = playfield.filter((row) => !row.every((col) => !!col));
         const padEmptyLines = playfield.length - newState.length;
         if (!!padEmptyLines) {
@@ -171,15 +169,12 @@ export const removeCompletedLines =
                     publishEvent(Event.Tetris);
                     break;
             }
-            updateGame(animateDeletionState1);
-            setTimeout(() => updateGame(animateDeletionState2), 50);
-            setTimeout(() => updateGame(animateDeletionState1), 100);
-            setTimeout(() => updateGame(animateDeletionState2), 150);
+            updateGame(animateState);
             return new Promise<{ playfield: Playfield; linesRemoved: number; }>((resolve, reject) => {
                 setTimeout(() => resolve({
                     playfield: newState,
                     linesRemoved: padEmptyLines,
-                } as any), 200);
+                } as any), 300);
             });
         }
 
@@ -243,20 +238,15 @@ export const appendRandomLines = (playfield: Playfield, count: number, updateGam
         lines.push(playfield[0].map(() => Math.round(Math.random())));
     }
 
-    const animateState1 = clonedPlayfield
-        .concat(new Array(count).fill(new Array(playfield[0].length).fill(Fill.White)));
-    const animateState2 = clonedPlayfield
-        .concat(new Array(count).fill(new Array(playfield[0].length).fill(Fill.Gray)));
+    const animateState = clonedPlayfield
+        .concat(new Array(count).fill(new Array(playfield[0].length).fill(Fill.Flicker)));
 
-    updateGame(animateState1);
-    setTimeout(() => updateGame(animateState2), 50);
-    setTimeout(() => updateGame(animateState1), 100);
-    setTimeout(() => updateGame(animateState2), 150);
+    updateGame(animateState);
 
     // TODO: ensure that there is at least 1 zero and at least 1 non-zero
     const result = clonedPlayfield.concat(lines);
 
     return new Promise<Playfield>((resolve) => {
-        setTimeout(() => resolve(result), 200);
+        setTimeout(() => resolve(result), 300);
     });
 };

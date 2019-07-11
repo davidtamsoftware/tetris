@@ -7,7 +7,7 @@ interface Props {
     size?: "small" | "large";
 }
 
-const colors = ["black", "orange", "yellow", "green", "blue", "gray", "red", "purple", "white"];
+const colors = ["black", "orange", "yellow", "green", "blue", "gray", "red", "purple", "white", "flicker"];
 
 export const Block = (props: Props) => (
     <div className={`${styles.block} ${styles[colors[props.data]]} ${styles[props.size || "large"]}`} />
