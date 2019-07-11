@@ -19,5 +19,20 @@
 }
 
 .menuItem.selected {
-    border: 3px solid green;
+    animation-timing-function: cubic-bezier(0.6, 0.04, 0.98, 0.335);
+    animation-duration: 1.0s;
+    animation-name: changecolor;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    border: 3px solid;
+}
+
+@keyframes changecolor {
+    from {
+        border-color: green;
+    }
+  
+    to {
+        border-color: lightgreen;
+    }
 }

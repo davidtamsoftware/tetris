@@ -8,12 +8,12 @@ import { gameOverMenu, pauseMenu, Props } from "../../App";
 
 const MultiplayerLocal = (props: Props & { mode: MultiplayerMode }) => {
 
-  const { state, multiplayer, handleMenuSelect } = useMultiplayerLocal(props.mode, props.exit);
+  const { game, handleMenuClose, handleMenuSelect } = useMultiplayerLocal(props.mode, props.exit);
 
   return <Multiplayer
-    {...state}
+    {...game}
     mode={props.mode}
-    pauseMenu={<Menu menu={pauseMenu} notify={handleMenuSelect} menuClose={multiplayer.togglePause.bind(multiplayer)} />}
+    pauseMenu={<Menu menu={pauseMenu} notify={handleMenuSelect} menuClose={handleMenuClose} />}
     gameOverMenu={<Menu menu={gameOverMenu} notify={handleMenuSelect} />}
   />;
 }

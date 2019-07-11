@@ -100,38 +100,41 @@ const usePlayer2Controls = (
     });
 }
 
-const useHandleGameMenuSelect = (gameActions: GameActions, exit?: () => void) => {
-    return useRef((key: Key) => {
-        if (key === "HOME" || key === "QUIT_CONFIRM") {
-            gameActions.endGame();
-            if (exit) {
-                exit();
-            }
-        } else if (key === "QUIT_CANCEL") {
-            return false;
-        } else if (key === "RESUME") {
-            gameActions.togglePause();
-        } else if (key === "RESTART") {
-            gameActions.restart();
+const useHandleGameMenuSelect = (gameActions: GameActions, exit?: () => void) => useRef((key: Key) => {
+    if (key === "HOME" || key === "QUIT_CONFIRM") {
+        gameActions.endGame();
+        if (exit) {
+            exit();
         }
-        return true;
-    }).current;
-}
+    } else if (key === "QUIT_CANCEL") {
+        return false;
+    } else if (key === "RESUME") {
+        gameActions.togglePause();
+    } else if (key === "RESTART") {
+        gameActions.restart();
+    }
+    return true;
+}).current;
+
+const useHandleGameMenuClose = (gameActions: GameActions) => useRef(() => {
+    gameActions.togglePause();
+    return true;
+}).current;
 
 export const useTetris = (exit?: () => void): {
-    state: Models.Game,
-    tetris: Tetris,
+    game: Models.Game,
+    handleMenuClose: MenuHandler,
     handleMenuSelect: MenuHandler,
 } => {
     const tetris = useRef(new Tetris(undefined, localStorageHighScoreService)).current;
-    const [state, setState] = useState(tetris.getState());
+    const [game, setGame] = useState(tetris.getState());
 
     useEffect(() => {
-        tetris.subscribe(setState);
+        tetris.subscribe(setGame);
         tetris.subscribeToEvent(handleEvent);
         tetris.start();
         return () => {
-            tetris.unsubscribe(setState);
+            tetris.unsubscribe(setGame);
             tetris.unsubscribeToEvent(handleEvent);
         }
     }, []);
@@ -140,25 +143,26 @@ export const useTetris = (exit?: () => void): {
     usePlayer1Controls(() => tetris.getState().gameState, tetris);
 
     const handleMenuSelect = useHandleGameMenuSelect(tetris, exit);
+    const handleMenuClose = useHandleGameMenuClose(tetris);
 
-    return { state, tetris, handleMenuSelect };
+    return { game, handleMenuClose, handleMenuSelect };
 }
 
 export const useMultiplayerLocal = (mode: MultiplayerMode, exit?: () => void): {
-    state: MultiplayerAction.MultiplayerState,
-    multiplayer: MultiplayerAction.Multiplayer,
+    game: MultiplayerAction.MultiplayerState,
+    handleMenuClose: MenuHandler,
     handleMenuSelect: MenuHandler,
 } => {
     const multiplayer = useRef(new MultiplayerAction.Multiplayer(mode)).current;
 
-    const [state, setState] = useState(multiplayer.getState());
+    const [game, setGame] = useState(multiplayer.getState());
 
     useEffect(() => {
-        multiplayer.subscribe(setState);
+        multiplayer.subscribe(setGame);
         multiplayer.subscribeToEvent(handleEvent);
         multiplayer.start();
         return () => {
-            multiplayer.unsubscribe(setState);
+            multiplayer.unsubscribe(setGame);
             multiplayer.unsubscribeToEvent(handleEvent);
         }
     }, []);
@@ -167,8 +171,9 @@ export const useMultiplayerLocal = (mode: MultiplayerMode, exit?: () => void): {
     usePlayer1Controls(() => multiplayer.getState().gameState, multiplayer.player1Actions);
     usePlayer2Controls(() => multiplayer.getState().gameState, multiplayer.player2Actions);
     const handleMenuSelect = useHandleGameMenuSelect(multiplayer, exit);
+    const handleMenuClose = useHandleGameMenuClose(multiplayer);
 
-    return { state, multiplayer, handleMenuSelect };
+    return { game, handleMenuClose, handleMenuSelect };
 }
 
 interface ClientMatchState {
@@ -180,151 +185,149 @@ interface ClientMatchState {
     matchMessages: string[];
 }
 
-export const useMultiplayerRemote =
-    (exit?: () => void): {
-        state: MultiplayerAction.MultiplayerState & ClientMatchState,
-        multiplayer: MultiplayerRemoteClient,
-        matchIdInput: React.RefObject<HTMLInputElement>,
-        handleMenuSelect: MenuHandler,
-        handleSubmitMatchId: FormEventHandler,
-        handleMatchMenuSelect: MenuHandler,
-        handleMatchMenuClose: VoidFunction
-    } => {
+export const useMultiplayerRemote = (exit?: () => void): {
+    game: MultiplayerAction.MultiplayerState & ClientMatchState,
+    matchIdInput: React.RefObject<HTMLInputElement>,
+    handleMenuClose: MenuHandler,
+    handleMenuSelect: MenuHandler,
+    handleSubmitMatchId: FormEventHandler,
+    handleMatchMenuSelect: MenuHandler,
+    handleMatchMenuClose: VoidFunction
+} => {
+    const multiplayer = useRef(new MultiplayerRemoteClient(process.env.REACT_APP_TETRIS_SERVER_URL as any)).current;
 
-        const multiplayer = useRef(new MultiplayerRemoteClient(process.env.REACT_APP_TETRIS_SERVER_URL as any)).current;
+    const [game, setGame] = useState<MultiplayerAction.MultiplayerState & ClientMatchState>({
+        ...multiplayer.getState(),
+        playerCount: 0,
+        matchMessages: [],
+    });
 
-        const [state, setState] = useState<MultiplayerAction.MultiplayerState & ClientMatchState>({
-            ...multiplayer.getState(),
-            playerCount: 0,
-            matchMessages: [],
-        });
+    const matchIdInput = useRef<HTMLInputElement>(null);
 
-        const matchIdInput = useRef<HTMLInputElement>(null);
-
-        useEffect(() => {
-            const handler = (event: KeyboardEvent) => {
-                if (!state.gameState) {
-                    if (!state.matchMenu && event.code === "Escape") {
-                        setState((prevState) => ({
-                            ...prevState,
-                            matchMenu: true
-                        }));
-                    }
-                    return;
-                }
-            }
-
-            document.addEventListener("keydown", handler);
-            return () => {
-                document.removeEventListener("keydown", handler);
-            };
-        }, []);
-
-        useEffect(() => {
-            const handleMatchEvent = (matchEvent: MatchEvent) => {
-                setState((prevState) => ({
-                    ...prevState,
-                    matchEvent,
-                    gameState: state.gameState && matchEvent === MatchEvent.DISCONNECTED ? GameState.GameOver : state.gameState,
-                }));
-            };
-
-            const handleMatchState = (matchState: MatchState) => {
-                // if 2 => 1, player left game
-                // if 1 => 2 && gameState === undefined, player has joined the game, starting game
-                // if 0 => 2, starting game
-
-                const newMsg: string[] = [];
-                if (state.playerCount === 2 && matchState.playerCount === 1) {
-                    newMsg.push("Player has left the game");
-                } else if (state.playerCount === 1 && matchState.playerCount === 2 && state.gameState === undefined) {
-                    newMsg.push("Player has joined the game");
-                    newMsg.push("Starting game...");
-                } else if (state.playerCount === 1 && matchState.playerCount === 2) {
-                    newMsg.push("Player has joined the game");
-                } else if (state.playerCount === 0 && matchState.playerCount === 2 && state.gameState === undefined) {
-                    newMsg.push("Starting game...");
-                }
-                const matchMessages = [...state.matchMessages, ...newMsg];
-
-                setTimeout(() => {
-                    const clonedMessages = [...state.matchMessages];
-                    newMsg.forEach(() => clonedMessages.shift());
-                    setState((prevState) => ({
+    useEffect(() => {
+        const handler = (event: KeyboardEvent) => {
+            if (!game.gameState) {
+                if (!game.matchMenu && (event.key === "Escape" || event.key === "Esc")) {
+                    setGame((prevState) => ({
                         ...prevState,
-                        matchMessages: clonedMessages,
+                        matchMenu: true
                     }));
-                }, 5000);
-
-                setState((prevState) => ({
-                    ...prevState,
-                    ...matchState,
-                    matchMessages,
-                }));
-            };
-
-            const handle = (multiplayerState: MultiplayerAction.MultiplayerState) => {
-                setState((prevState) => ({
-                    ...prevState,
-                    ...multiplayerState,
-                }));
-            };
-
-            matchIdInput.current!.focus();
-            multiplayer.subscribe(handle);
-            multiplayer.subscribeToEvent(handleEvent);
-            multiplayer.subscribeToMatchEvent(handleMatchEvent);
-            multiplayer.subscribeToMatchState(handleMatchState);
-            return () => {
-                multiplayer.unsubscribe(handle);
-                multiplayer.unsubscribeToEvent(handleEvent);
-                multiplayer.unsubscribeToMatchEvent(handleMatchEvent);
-                multiplayer.unsubscribeToMatchState(handleMatchState);
-                if (state.matchId !== undefined) {
-                    multiplayer.disconnect();
                 }
+                return;
             }
-        }, []);
+        }
 
-
-        const handleSubmitMatchId = useRef((event: FormEvent) => {
-            event.preventDefault();
-            const matchId = matchIdInput.current!.value;
-            if (matchId) {
-                setState((prevState) => ({ ...prevState, matchId }));
-                multiplayer.join(matchId);
-            }
-        }).current;
-
-        const handleMatchMenuSelect = useRef((key: Key) => {
-            if (key === "QUIT_CONFIRM") {
-                if (exit) {
-                    exit();
-                }
-            } else if (key === "QUIT_CANCEL") {
-                return false;
-            }
-            return true;
-        }).current;
-
-        const handleMatchMenuClose = useRef(() => {
-            setState((prevState) => ({
-                ...prevState,
-                matchMenu: false,
-            }));
-        }).current;
-
-        useGameControls(() => multiplayer.getState().gameState, multiplayer);
-        usePlayer1Controls(() => multiplayer.getState().gameState, multiplayer);
-        const handleMenuSelect = useHandleGameMenuSelect(multiplayer, exit);
-
-        return {
-            state,
-            multiplayer,
-            matchIdInput,
-            handleMenuSelect,
-            handleSubmitMatchId,
-            handleMatchMenuSelect,
-            handleMatchMenuClose,
+        document.addEventListener("keydown", handler);
+        return () => {
+            document.removeEventListener("keydown", handler);
         };
-    }
+    }, []);
+
+    useEffect(() => {
+        const handleMatchEvent = (matchEvent: MatchEvent) => {
+            setGame((prevState) => ({
+                ...prevState,
+                matchEvent,
+                gameState: game.gameState && matchEvent === MatchEvent.DISCONNECTED ? GameState.GameOver : game.gameState,
+            }));
+        };
+
+        const handleMatchState = (matchState: MatchState) => {
+            // if 2 => 1, player left game
+            // if 1 => 2 && gameState === undefined, player has joined the game, starting game
+            // if 0 => 2, starting game
+
+            const newMsg: string[] = [];
+            if (game.playerCount === 2 && matchState.playerCount === 1) {
+                newMsg.push("Player has left the game");
+            } else if (game.playerCount === 1 && matchState.playerCount === 2 && game.gameState === undefined) {
+                newMsg.push("Player has joined the game");
+                newMsg.push("Starting game...");
+            } else if (game.playerCount === 1 && matchState.playerCount === 2) {
+                newMsg.push("Player has joined the game");
+            } else if (game.playerCount === 0 && matchState.playerCount === 2 && game.gameState === undefined) {
+                newMsg.push("Starting game...");
+            }
+            const matchMessages = [...game.matchMessages, ...newMsg];
+
+            setTimeout(() => {
+                const clonedMessages = [...game.matchMessages];
+                newMsg.forEach(() => clonedMessages.shift());
+                setGame((prevState) => ({
+                    ...prevState,
+                    matchMessages: clonedMessages,
+                }));
+            }, 5000);
+
+            setGame((prevState) => ({
+                ...prevState,
+                ...matchState,
+                matchMessages,
+            }));
+        };
+
+        const handle = (multiplayerState: MultiplayerAction.MultiplayerState) => {
+            setGame((prevState) => ({
+                ...prevState,
+                ...multiplayerState,
+            }));
+        };
+
+        matchIdInput.current!.focus();
+        multiplayer.subscribe(handle);
+        multiplayer.subscribeToEvent(handleEvent);
+        multiplayer.subscribeToMatchEvent(handleMatchEvent);
+        multiplayer.subscribeToMatchState(handleMatchState);
+        return () => {
+            multiplayer.unsubscribe(handle);
+            multiplayer.unsubscribeToEvent(handleEvent);
+            multiplayer.unsubscribeToMatchEvent(handleMatchEvent);
+            multiplayer.unsubscribeToMatchState(handleMatchState);
+            if (game.matchId !== undefined) {
+                multiplayer.disconnect();
+            }
+        }
+    }, []);
+
+    const handleSubmitMatchId = useRef((event: FormEvent) => {
+        event.preventDefault();
+        const matchId = matchIdInput.current!.value;
+        if (matchId) {
+            setGame((prevState) => ({ ...prevState, matchId }));
+            multiplayer.join(matchId);
+        }
+    }).current;
+
+    const handleMatchMenuSelect = useRef((key: Key) => {
+        if (key === "QUIT_CONFIRM") {
+            if (exit) {
+                exit();
+            }
+        } else if (key === "QUIT_CANCEL") {
+            return false;
+        }
+        return true;
+    }).current;
+
+    const handleMatchMenuClose = useRef(() => {
+        setGame((prevState) => ({
+            ...prevState,
+            matchMenu: false,
+        }));
+    }).current;
+
+    useGameControls(() => multiplayer.getState().gameState, multiplayer);
+    usePlayer1Controls(() => multiplayer.getState().gameState, multiplayer);
+    const handleMenuSelect = useHandleGameMenuSelect(multiplayer, exit);
+    const handleMenuClose = useHandleGameMenuClose(multiplayer);
+
+    return {
+        game,
+        matchIdInput,
+        handleMenuClose,
+        handleMenuSelect,
+        handleSubmitMatchId,
+        handleMatchMenuSelect,
+        handleMatchMenuClose,
+    };
+}

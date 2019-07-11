@@ -11,32 +11,32 @@ import { gameOverMenu, pauseMenu, Props } from "../App";
 import styles from "./index.module.css";
 
 const SinglePlayer = (props: Props) => {
-    const { state, tetris, handleMenuSelect } = useTetris(props.exit);
+    const { game, handleMenuClose, handleMenuSelect } = useTetris(props.exit);
 
-    if (!state.playfield) {
+    if (!game.playfield) {
         return null;
     }
 
-    const result = Functions.merge(state.playfield, state.position, state.piece);
+    const result = Functions.merge(game.playfield, game.position, game.piece);
 
     return (
         <div className={styles.App}>
             <div className={styles.left}>
                 <Controls />
-                <NextPiece piece={state.nextPiece} />
+                <NextPiece piece={game.nextPiece} />
             </div>
             <div className={styles.right}>
-                <Scoreboard scoreboard={state.scoreboard} />
-                <Stats stats={state.stats} />
+                <Scoreboard scoreboard={game.scoreboard} />
+                <Stats stats={game.stats} />
             </div>
             <div className={styles.main}>
-                <Playfield playfield={result.playfield} gameState={state.gameState} />
-                {state.gameState === Models.GameState.Paused &&
+                <Playfield playfield={result.playfield} gameState={game.gameState} />
+                {game.gameState === Models.GameState.Paused &&
                     <div className={styles.menu}>
-                        <Menu menu={pauseMenu} notify={handleMenuSelect} menuClose={tetris.togglePause.bind(tetris)} />
+                        <Menu menu={pauseMenu} notify={handleMenuSelect} menuClose={handleMenuClose} />
                     </div>
                 }
-                {state.gameState === Models.GameState.GameOver &&
+                {game.gameState === Models.GameState.GameOver &&
                     <div className={styles.menu}>
                         <Menu menu={gameOverMenu} notify={handleMenuSelect} />
                     </div>

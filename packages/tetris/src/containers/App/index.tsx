@@ -7,6 +7,7 @@ import MultiplayerRemote from "../Multiplayer/Remote";
 import SinglePlayer from "../SinglePlayer";
 import controller from "./console.svg";
 import githubLogo from "./github.svg";
+import styles from "./index.module.css";
 import linkedinLogo from "./linkedin.svg";
 import mail from "./mail.svg";
 
@@ -30,10 +31,7 @@ class App extends React.Component<{}, State> {
         if (!this.state.gameMode) {
             game = <>
                 <div style={{ textAlign: "center", margin: "0 auto", border: "0px solid white" }}>
-                    <span style={{
-                        fontSize: "5em",
-                        textShadow: "3px 3px gray"
-                    }}>TETRIS</span>
+                    <span className={styles.title}>TETRIS</span>
                 </div>
                 <div style={{ clear: "both", paddingTop: "60px" }}>
                     <Menu menu={mainMenu} notify={this.handle} />

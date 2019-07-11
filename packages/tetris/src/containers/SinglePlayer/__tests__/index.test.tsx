@@ -88,7 +88,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { key: "ShiftRight" } as any);
+    const evt = new KeyboardEvent("keydown", { key: "Shift" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.rotateLeft).toBeCalledTimes(1);
     wrapper.unmount();
