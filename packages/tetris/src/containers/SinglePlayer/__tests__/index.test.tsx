@@ -23,7 +23,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { code: "ArrowDown" } as any);
+    const evt = new KeyboardEvent("keydown", { key: "ArrowDown" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.drop).toBeCalledTimes(1);
     wrapper.unmount();
@@ -39,7 +39,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { code: "ArrowLeft" } as any);
+    const evt = new KeyboardEvent("keydown", { key: "ArrowLeft" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.moveLeft).toBeCalledTimes(1);
     wrapper.unmount();
@@ -55,7 +55,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { code: "ArrowRight" } as any);
+    const evt = new KeyboardEvent("keydown", { key: "ArrowRight" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.moveRight).toBeCalledTimes(1);
     wrapper.unmount();
@@ -71,7 +71,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { code: "Space" } as any);
+    const evt = new KeyboardEvent("keydown", { key: " " } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.drop).toBeCalledTimes(1);
     expect((mockTetrisInstance.drop as jest.Mock).mock.calls[0][0]).toBe(true);
@@ -88,7 +88,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { code: "ShiftRight" } as any);
+    const evt = new KeyboardEvent("keydown", { key: "ShiftRight" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.rotateLeft).toBeCalledTimes(1);
     wrapper.unmount();
@@ -104,7 +104,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { code: "ArrowUp" } as any);
+    const evt = new KeyboardEvent("keydown", { key: "ArrowUp" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.rotateRight).toBeCalledTimes(1);
     wrapper.unmount();
@@ -120,7 +120,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribe).toBeCalledTimes(1);
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
-    const evt = new KeyboardEvent("keydown", { code: "Escape" } as any);
+    const evt = new KeyboardEvent("keydown", { key: "Escape" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.togglePause).toBeCalledTimes(1);
     wrapper.unmount();
@@ -145,7 +145,7 @@ describe("<SinglePlayer />", () => {
     expect(mockTetrisInstance.subscribeToEvent).toBeCalledTimes(1);
     expect(mockTetrisInstance.start).toBeCalledTimes(1);
     await new Promise((res) => setTimeout(res, 100)); // wait for refresh
-    const evt = new KeyboardEvent("keydown", { code: "Enter" } as any);
+    const evt = new KeyboardEvent("keydown", { key: "Enter" } as any);
     document.dispatchEvent(evt);
     expect(mockTetrisInstance.restart).toBeCalledTimes(1);
     wrapper.unmount();

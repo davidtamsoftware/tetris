@@ -65,13 +65,13 @@ class Menu extends React.Component<Props, State> {
     }
 
     private handleKeyDown = (event: KeyboardEvent) => {
-        if (event.code === "ArrowUp") {
+        if (event.key === "ArrowUp" || event.key === "Up") {
             this.up();
-        } else if (event.code === "ArrowDown") {
+        } else if (event.key === "ArrowDown" || event.key === "Down") {
             this.down();
-        } else if (event.code === "Enter") {
+        } else if (event.key === "Enter") {
             this.selection(this.state.selection, true);
-        } else if (event.code === "Escape" || event.code === "Backspace") {
+        } else if (event.key === "Escape" || event.key === "Esc" || event.key === "Backspace") {
             this.back();
         }
     }

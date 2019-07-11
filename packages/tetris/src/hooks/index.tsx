@@ -20,12 +20,12 @@ const localStorageHighScoreService: HighScoreService = {
 }
 
 interface KeyMapping {
-    rotateLeft: string;
-    rotateRight: string;
-    moveLeft: string;
-    moveRight: string;
-    drop: string;
-    hardDrop: string;
+    rotateLeft: string[];
+    rotateRight: string[];
+    moveLeft: string[];
+    moveRight: string[];
+    drop: string[];
+    hardDrop: string[];
 }
 
 const useGameControls = (
@@ -33,7 +33,7 @@ const useGameControls = (
     gameActions: GameActions) => {
     useEffect(() => {
         const handler = (event: KeyboardEvent) => {
-            if (getGameState() === Models.GameState.Active && event.code === "Escape") {
+            if (getGameState() === Models.GameState.Active && (event.key === "Escape" || event.key === "Esc")) {
                 gameActions.togglePause();
             }
         }
@@ -53,17 +53,17 @@ const usePlayerControls = (
         const handler = (event: KeyboardEvent) => {
             if (getGameState() !== Models.GameState.Active) {
                 return;
-            } else if (event.code === keyMapping.rotateLeft) {
+            } else if (keyMapping.rotateLeft.some((value) => value.toLowerCase() === event.key.toLowerCase())) {
                 playerActions.rotateLeft();
-            } else if (event.code === keyMapping.rotateRight) {
+            } else if (keyMapping.rotateRight.some((value) => value.toLowerCase() === event.key.toLowerCase())) {
                 playerActions.rotateRight();
-            } else if (event.code === keyMapping.moveRight) {
+            } else if (keyMapping.moveRight.some((value) => value.toLowerCase() === event.key.toLowerCase())) {
                 playerActions.moveRight();
-            } else if (event.code === keyMapping.moveLeft) {
+            } else if (keyMapping.moveLeft.some((value) => value.toLowerCase() === event.key.toLowerCase())) {
                 playerActions.moveLeft();
-            } else if (event.code === keyMapping.drop) {
+            } else if (keyMapping.drop.some((value) => value.toLowerCase() === event.key.toLowerCase())) {
                 playerActions.drop();
-            } else if (event.code === keyMapping.hardDrop) {
+            } else if (keyMapping.hardDrop.some((value) => value.toLowerCase() === event.key.toLowerCase())) {
                 playerActions.drop(true);
             }
         };
@@ -78,12 +78,12 @@ const usePlayer1Controls = (
     getGameState: () => Models.GameState,
     playerActions: PlayerActions) => {
     usePlayerControls(getGameState, playerActions, {
-        rotateLeft: "ShiftRight",
-        rotateRight: "ArrowUp",
-        moveRight: "ArrowRight",
-        moveLeft: "ArrowLeft",
-        drop: "ArrowDown",
-        hardDrop: "Space",
+        rotateLeft: ["Shift"],
+        rotateRight: ["ArrowUp", "Up"],
+        moveRight: ["ArrowRight", "Right"],
+        moveLeft: ["ArrowLeft", "Left"],
+        drop: ["ArrowDown", "Down"],
+        hardDrop: [" ", "Spacebar"],
     });
 }
 
@@ -91,12 +91,12 @@ const usePlayer2Controls = (
     getGameState: () => Models.GameState,
     playerActions: PlayerActions) => {
     usePlayerControls(getGameState, playerActions, {
-        rotateLeft: "KeyE",
-        rotateRight: "KeyR",
-        moveRight: "KeyF",
-        moveLeft: "KeyS",
-        drop: "KeyD",
-        hardDrop: "KeyA",
+        rotateLeft: ["e"],
+        rotateRight: ["r"],
+        moveRight: ["f"],
+        moveLeft: ["s"],
+        drop: ["d"],
+        hardDrop: ["a"],
     });
 }
 
