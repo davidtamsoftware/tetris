@@ -77,6 +77,7 @@ export class Multiplayer implements GameActions {
     }
 
     public subscribeToEvent(handler: EventHandler, ...events: Event[]) {
+        // subscribe to all events if events arg is 0 in length
         const tempEvents: any[] = events.length === 0 ?
             Object.keys(Event)
                 .map((key: any) => Event[key])
@@ -89,6 +90,10 @@ export class Multiplayer implements GameActions {
             event !== Event.PauseOut);
 
         // make sure we dont publish duplicate events
+        // player1 and player2 have game event for start, gameover, pausein
+        // and pauseout but we don't want to use these since Multiplayer
+        // orchestrates the true game event (when both player1/2 is game over,
+        // then multiplayer is game over)
         this.player1.subscribeToEvent(handler, ...filteredEvents);
         this.player2.subscribeToEvent(handler, ...filteredEvents);
 
