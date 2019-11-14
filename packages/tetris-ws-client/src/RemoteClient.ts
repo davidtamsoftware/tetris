@@ -1,10 +1,10 @@
+import GameActions from "tetris-core/lib/actions/GameActions";
 import { MultiplayerState } from "tetris-core/lib/actions/Multiplayer";
+import PlayerActions from "tetris-core/lib/actions/PlayerActions";
 import { Event, EventHandler } from "tetris-core/lib/actions/Tetris";
 import { GameState } from "tetris-core/lib/models";
 import { Action, ClientMessage, MatchEvent, MatchState, ResponseType,
   ServerMessage } from "tetris-ws-model";
-import PlayerActions from "tetris-core/lib/actions/PlayerActions";
-import GameActions from "tetris-core/lib/actions/GameActions";
 
 type Handler = (game: any) => void;
 type MatchEventHandler = (event: MatchEvent) => void;
@@ -20,7 +20,7 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
   private client?: WebSocket;
 
   private wsUrl: string;
-  
+
   constructor(wsUrl: string) {
     this.wsUrl = wsUrl;
     this.multiplayerState = {} as any;
@@ -70,14 +70,14 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
         // tslint:disable-next-line:no-console
         console.log("error parsing: ", event);
       }
-    }
+    };
 
     this.client!.onclose = (event) => {
       if (this.getState().gameState && this.getState().gameState !== GameState.GameOver) {
         this.publishEvent(Event.GameOver);
       }
       this.publishMatchEvent(MatchEvent.DISCONNECTED);
-    }
+    };
   }
 
   public moveLeft() {
@@ -140,7 +140,7 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
   public endGame() {
     this.disconnect();
   }
-  
+
   public getState() {
     // deep copy
     return JSON.parse(JSON.stringify(this.multiplayerState || {}));
@@ -169,7 +169,7 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
   public unsubscribeToMatchEvent(handler: MatchEventHandler) {
     this.matchEventSubscribers.delete(handler);
   }
-  
+
   public subscribeToMatchState(handler: MatchStateHandler) {
     this.matchStateSubscribers.add(handler);
   }
@@ -184,7 +184,7 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
       ...this.multiplayerState,
       ...state,
       winner: state.winner,
-    }
+    };
 
     this.notify();
   }
