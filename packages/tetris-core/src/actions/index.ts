@@ -174,7 +174,7 @@ export const removeCompletedLines =
                 setTimeout(() => resolve({
                     playfield: newState,
                     linesRemoved: padEmptyLines,
-                } as any), 300);
+                }), 300);
             });
         }
 

@@ -15,6 +15,10 @@ import PlayerActions from "./PlayerActions";
 
 type Handler = (game: Game) => void;
 
+/**
+ * payload can be a custom object for event (ie. damage event will send
+ * payload with number of damage lines)
+ */
 export type EventHandler = (event: Event, payload?: any) => void;
 
 export enum Event {
@@ -49,8 +53,8 @@ export class Tetris implements PlayerActions, GameActions {
     private eventSubscribers: Map<EventHandler, Event[]>;
     private game?: Game;
     private freezeSemaphore: boolean;
-    private loop?: number;
-    private refreshLoop?: number;
+    private loop: any; // setInterval
+    private refreshLoop: any; // setInterval
     private pieceGenerator?: () => Fill[][];
     private highScoreService?: HighScoreService;
 

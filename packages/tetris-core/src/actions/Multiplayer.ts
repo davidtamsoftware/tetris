@@ -14,7 +14,7 @@ export enum MultiplayerMode {
     AttackMode,
 }
 
-type Handler = (game: any) => void;
+export type Handler = (game: MultiplayerState) => void;
 
 export interface MultiplayerState {
     winner?: Player | null; // null represents tie game
@@ -36,7 +36,7 @@ export class Multiplayer implements GameActions {
     private player2: Tetris;
     private players: Tetris[];
 
-    private refreshLoop?: number;
+    private refreshLoop: any; // setInterval
 
     private nextPiecesPlayer1: Piece[];
     private nextPiecesPlayer2: Piece[];
@@ -214,7 +214,7 @@ export class Multiplayer implements GameActions {
         if (this.lastState === JSON.stringify(this.multiplayerState)) {
             return;
         }
-        this.subscribers.forEach((subscriber) => subscriber(this.multiplayerState));
+        this.subscribers.forEach((subscriber) => subscriber(this.multiplayerState!));
         this.lastState = JSON.stringify(this.multiplayerState);
     }
 

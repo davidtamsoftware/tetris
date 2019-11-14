@@ -1,12 +1,11 @@
 import GameActions from "tetris-core/lib/actions/GameActions";
-import { MultiplayerState } from "tetris-core/lib/actions/Multiplayer";
+import { Handler, MultiplayerState } from "tetris-core/lib/actions/Multiplayer";
 import PlayerActions from "tetris-core/lib/actions/PlayerActions";
 import { Event, EventHandler } from "tetris-core/lib/actions/Tetris";
 import { GameState } from "tetris-core/lib/models";
 import { Action, ClientMessage, MatchEvent, MatchState, ResponseType,
   ServerMessage } from "tetris-ws-model";
 
-type Handler = (game: any) => void;
 type MatchEventHandler = (event: MatchEvent) => void;
 type MatchStateHandler = (matchState: MatchState) => void;
 
@@ -26,7 +25,7 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
     this.multiplayerState = {} as any;
     this.subscribers = new Set<Handler>();
     this.eventSubscribers = new Map<EventHandler, Event[]>();
-    this.matchEventSubscribers = new Set<Handler>();
+    this.matchEventSubscribers = new Set<MatchEventHandler>();
     this.matchStateSubscribers = new Set<MatchStateHandler>();
   }
 
@@ -54,17 +53,19 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
         if (message.type === ResponseType.GameState) {
           const state = message.payload as MultiplayerState;
           if (this.getState().gameState === GameState.Active && state.gameState === GameState.Paused) {
+            // calculate if pause in event is needed locally instead of sending from server
             this.publishEvent(Event.PauseIn);
           } else if (this.getState().gameState === GameState.Paused && state.gameState === GameState.Active) {
+            // calculate if pause out event is needed locally instead of sending from server
             this.publishEvent(Event.PauseOut);
           }
           this.setState(state);
         } else if (message.type === ResponseType.GameEvent) {
-          this.publishEvent(message.payload);
+          this.publishEvent(message.payload as Event);
         } else if (message.type === ResponseType.MatchEvent) {
-          this.publishMatchEvent(message.payload);
+          this.publishMatchEvent(message.payload as MatchEvent);
         } else if (message.type === ResponseType.MatchState) {
-          this.publishStateEvent(message.payload);
+          this.publishStateEvent(message.payload as MatchState);
         }
       } catch (error) {
         // tslint:disable-next-line:no-console
@@ -115,8 +116,6 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
       action: Action.TogglePause,
     };
     this.client!.send(JSON.stringify(payload));
-    // this.publishEvent(Event.PauseIn);
-    // TODO: determine when to publish pause out
   }
 
   public drop(hardDrop?: boolean) {

@@ -1,6 +1,6 @@
 import { Event, Multiplayer } from "tetris-core";
-import { Player } from "tetris-core/lib/actions/Multiplayer";
-import { MatchEvent, MatchState, ResponseType, ServerMessage } from "tetris-ws-model/lib/tetris-ws-model";
+import { MultiplayerState, Player } from "tetris-core/lib/actions/Multiplayer";
+import { MatchEvent, MatchState, Payload, ResponseType, ServerMessage } from "tetris-ws-model/lib/tetris-ws-model";
 
 /**
  * Abstraction layer to remote player implementation
@@ -131,7 +131,7 @@ export class Match {
         } as MatchState);
     }
 
-    private handle = (state: any) => {
+    private handle = (state: MultiplayerState) => {
         this.broadcast(ResponseType.GameState, state);
     }
 
@@ -139,7 +139,7 @@ export class Match {
         this.broadcast(ResponseType.GameEvent, event);
     }
 
-    private broadcast = (type: ResponseType, payload: any) => {
+    private broadcast = (type: ResponseType, payload: Payload) => {
         if (this._player1) {
             this._player1.sendState({
                 type,

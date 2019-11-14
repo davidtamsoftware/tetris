@@ -1,4 +1,5 @@
-import { Multiplayer } from "tetris-core";
+import { Event, Multiplayer } from "tetris-core";
+import { MultiplayerState } from "tetris-core/lib/actions/Multiplayer";
 
 export enum Action {
     Joinmatch,
@@ -34,7 +35,9 @@ export interface ClientMessage {
     matchId?: string;
 }
 
+export type Payload = Event | MultiplayerState | MatchState | MatchEvent;
+
 export interface ServerMessage {
     type: ResponseType;
-    payload: any;
+    payload: Payload;
 }
