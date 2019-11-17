@@ -41,7 +41,7 @@ export class Multiplayer implements GameActions {
     private nextPiecesPlayer1: Piece[];
     private nextPiecesPlayer2: Piece[];
 
-    constructor(mode?: MultiplayerMode) {
+    constructor(mode?: MultiplayerMode, private refreshInterval = 25) {
         this.nextPiecesPlayer1 = [];
         this.nextPiecesPlayer2 = [];
         this.player1 = new Tetris(() => this.generatePiece(Player.One));
@@ -181,8 +181,7 @@ export class Multiplayer implements GameActions {
         this.players[Player.One].restart();
         this.players[Player.Two].restart();
         this.initializeState();
-        // TODO: add constructor arg to control local vs remote refresh interval
-        this.refreshLoop = setInterval(this.notify, 50); // 35
+        this.refreshLoop = setInterval(this.notify, this.refreshInterval);
         this.publishEvent(Event.Start);
     }
 

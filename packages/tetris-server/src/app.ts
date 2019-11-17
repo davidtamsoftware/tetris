@@ -23,6 +23,7 @@ server.listen(process.env.PORT || 8080);
 // TODO: port config
 const wss = new WebSocket.Server({ server });
 
+let countIncoming = 0;
 wss.on("connection", (ws) => {
     const matchPlayer = {
         uid: ws,
@@ -30,6 +31,7 @@ wss.on("connection", (ws) => {
     } as MatchPlayer;
 
     ws.on("close", () => {
+        countIncoming++;
         const match = matchService.findMatch(matchPlayer);
         if (!match) {
             return;
@@ -38,37 +40,40 @@ wss.on("connection", (ws) => {
     });
 
     ws.on("message", (message) => {
+        countIncoming++;
         try {
-            const msg = JSON.parse(message.toString()) as ClientMessage;
-            if (msg.action === Action.Joinmatch && msg.matchId) {
-                const match = matchService.getOrCreate(msg.matchId);
-                match.join(matchPlayer);
-                // tslint:disable-next-line:no-console
-                console.log("player has joined the game");
-            } else {
-                const match = matchService.findMatch(matchPlayer);
-                if (!match) {
-                    return;
-                }
-                const player = Match.getPlayerNumber(match, matchPlayer);
-                const playerActions = player === Player.One ? match.game.player1Actions : match.game.player2Actions;
-                if (msg.action === Action.MoveLeft) {
-                    playerActions.moveLeft();
-                } else if (msg.action === Action.MoveRight) {
-                    playerActions.moveRight();
-                } else if (msg.action === Action.RotateLeft) {
-                    playerActions.rotateLeft();
-                } else if (msg.action === Action.RotateRight) {
-                    playerActions.rotateRight();
-                } else if (msg.action === Action.HardDrop) {
-                    playerActions.drop(true);
-                } else if (msg.action === Action.SoftDrop) {
-                    playerActions.drop();
-                } else if (msg.action === Action.TogglePause) {
-                    match.game.togglePause();
-                } else if (msg.action === Action.Restart
-                    && match.player1 && match.player2) {
-                    match.game.restart();
+            const msgs = JSON.parse(message.toString()) as ClientMessage[];
+            for (const msg of msgs) {
+                if (msg.action === Action.Joinmatch && msg.matchId) {
+                    const match = matchService.getOrCreate(msg.matchId);
+                    match.join(matchPlayer);
+                    // tslint:disable-next-line:no-console
+                    console.log("player has joined the game");
+                } else {
+                    const match = matchService.findMatch(matchPlayer);
+                    if (!match) {
+                        return;
+                    }
+                    const player = Match.getPlayerNumber(match, matchPlayer);
+                    const playerActions = player === Player.One ? match.game.player1Actions : match.game.player2Actions;
+                    if (msg.action === Action.MoveLeft) {
+                        playerActions.moveLeft();
+                    } else if (msg.action === Action.MoveRight) {
+                        playerActions.moveRight();
+                    } else if (msg.action === Action.RotateLeft) {
+                        playerActions.rotateLeft();
+                    } else if (msg.action === Action.RotateRight) {
+                        playerActions.rotateRight();
+                    } else if (msg.action === Action.HardDrop) {
+                        playerActions.drop(true);
+                    } else if (msg.action === Action.SoftDrop) {
+                        playerActions.drop();
+                    } else if (msg.action === Action.TogglePause) {
+                        match.game.togglePause();
+                    } else if (msg.action === Action.Restart
+                        && match.player1 && match.player2) {
+                        match.game.restart();
+                    }
                 }
             }
         } catch (error) {
@@ -86,15 +91,18 @@ setInterval(() => console.log(
     })),
 ), 5000);
 
-let count = 0;
+let countOutgoing = 0;
 setInterval(() => {
     // tslint:disable-next-line:no-console
-    console.log("avg messages sent per 10 seconds: ", count);
-    count = 0;
+    console.log("messages sent per 10 seconds: ", countOutgoing);
+    // tslint:disable-next-line:no-console
+    console.log("messages recieved per 10 seconds: ", countIncoming);
+    countOutgoing = 0;
+    countIncoming = 0;
 }, 10000);
 
 const sendState = (ws: WebSocket, state: ServerMessage) => {
-    count++;
+    countOutgoing++;
     ws.send(JSON.stringify(state), (error) => {
         if (error) {
             // tslint:disable-next-line:no-console

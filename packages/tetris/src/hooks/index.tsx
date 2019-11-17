@@ -194,7 +194,10 @@ export const useMultiplayerRemote = (exit?: () => void): {
     handleMatchMenuSelect: MenuHandler,
     handleMatchMenuClose: VoidFunction
 } => {
-    const multiplayer = useRef(new MultiplayerRemoteClient(process.env.REACT_APP_TETRIS_SERVER_URL as any)).current;
+    const multiplayer = useRef(new MultiplayerRemoteClient(
+        process.env.REACT_APP_TETRIS_SERVER_URL as string,
+        process.env.REACT_APP_TETRIS_WS_CLIENT_BATCH && !isNaN(Number(process.env.REACT_APP_TETRIS_WS_CLIENT_BATCH)) ? Number(process.env.REACT_APP_TETRIS_WS_CLIENT_BATCH) : undefined,
+        process.env.REACT_APP_TETRIS_WS_CLIENT_BUFFER_LENGTH && !isNaN(Number(process.env.REACT_APP_TETRIS_WS_CLIENT_BUFFER_LENGTH)) ? Number(process.env.REACT_APP_TETRIS_WS_CLIENT_BUFFER_LENGTH) : undefined)).current;
 
     const [game, setGame] = useState<MultiplayerAction.MultiplayerState & ClientMatchState>({
         ...multiplayer.getState(),
@@ -283,9 +286,7 @@ export const useMultiplayerRemote = (exit?: () => void): {
             multiplayer.unsubscribeToEvent(handleEvent);
             multiplayer.unsubscribeToMatchEvent(handleMatchEvent);
             multiplayer.unsubscribeToMatchState(handleMatchState);
-            if (game.matchId !== undefined) {
-                multiplayer.disconnect();
-            }
+            multiplayer.disconnect();
         }
     }, []);
 

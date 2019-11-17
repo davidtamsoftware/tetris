@@ -3,8 +3,10 @@ import { Handler, MultiplayerState } from "tetris-core/lib/actions/Multiplayer";
 import PlayerActions from "tetris-core/lib/actions/PlayerActions";
 import { Event, EventHandler } from "tetris-core/lib/actions/Tetris";
 import { GameState } from "tetris-core/lib/models";
-import { Action, ClientMessage, MatchEvent, MatchState, ResponseType,
-  ServerMessage } from "tetris-ws-model";
+import {
+  Action, ClientMessage, MatchEvent, MatchState, ResponseType,
+  ServerMessage,
+} from "tetris-ws-model";
 
 type MatchEventHandler = (event: MatchEvent) => void;
 type MatchStateHandler = (matchState: MatchState) => void;
@@ -20,13 +22,16 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
 
   private wsUrl: string;
 
-  constructor(wsUrl: string) {
+  private buffer: ClientMessage[];
+
+  constructor(wsUrl: string, private batchIntervalMs: number = 0, private maxBufferLength: number = Number.MAX_VALUE) {
     this.wsUrl = wsUrl;
     this.multiplayerState = {} as any;
     this.subscribers = new Set<Handler>();
     this.eventSubscribers = new Map<EventHandler, Event[]>();
     this.matchEventSubscribers = new Set<MatchEventHandler>();
     this.matchStateSubscribers = new Set<MatchStateHandler>();
+    this.buffer = [];
   }
 
   public disconnect() {
@@ -44,7 +49,7 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
     };
 
     this.client!.addEventListener("open", () => {
-      this.client!.send(JSON.stringify(payload));
+      this.produce(payload);
     });
 
     this.client!.onmessage = (event) => {
@@ -85,21 +90,21 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
     const payload: ClientMessage = {
       action: Action.MoveLeft,
     };
-    this.client!.send(JSON.stringify(payload));
+    this.produce(payload);
   }
 
   public moveRight() {
     const payload: ClientMessage = {
       action: Action.MoveRight,
     };
-    this.client!.send(JSON.stringify(payload));
+    this.produce(payload);
   }
 
   public rotateRight() {
     const payload: ClientMessage = {
       action: Action.RotateRight,
     };
-    this.client!.send(JSON.stringify(payload));
+    this.produce(payload);
     this.publishEvent(Event.RotateRight);
   }
 
@@ -107,7 +112,7 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
     const payload: ClientMessage = {
       action: Action.RotateLeft,
     };
-    this.client!.send(JSON.stringify(payload));
+    this.produce(payload);
     this.publishEvent(Event.RotateLeft);
   }
 
@@ -115,14 +120,14 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
     const payload: ClientMessage = {
       action: Action.TogglePause,
     };
-    this.client!.send(JSON.stringify(payload));
+    this.produce(payload);
   }
 
   public drop(hardDrop?: boolean) {
     const payload: ClientMessage = {
       action: hardDrop ? Action.HardDrop : Action.SoftDrop,
     };
-    this.client!.send(JSON.stringify(payload));
+    this.produce(payload);
   }
 
   public start() {
@@ -133,7 +138,7 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
     const payload: ClientMessage = {
       action: Action.Restart,
     };
-    this.client!.send(JSON.stringify(payload));
+    this.produce(payload);
   }
 
   public endGame() {
@@ -206,5 +211,22 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
 
   private publishStateEvent = (state: MatchState) => {
     this.matchStateSubscribers.forEach((handler) => handler(state));
+  }
+
+  private produce = (clientMessage: ClientMessage) => {
+    if (this.batchIntervalMs > 0) {
+      this.buffer.push(clientMessage);
+      if (this.buffer.length === 1) {
+        setTimeout(() => {
+          // tslint:disable-next-line:no-console
+          // console.log("buffer size:", this.buffer.length,
+          // this.buffer.slice(this.buffer.length - this.maxBufferLength));
+          this.client!.send(JSON.stringify(this.buffer.slice(this.buffer.length - this.maxBufferLength)));
+          this.buffer = [];
+        }, this.batchIntervalMs);
+      }
+    } else {
+      this.client!.send(JSON.stringify([clientMessage]));
+    }
   }
 }

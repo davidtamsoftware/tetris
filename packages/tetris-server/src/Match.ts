@@ -1,5 +1,5 @@
 import { Event, Multiplayer } from "tetris-core";
-import { MultiplayerState, Player } from "tetris-core/lib/actions/Multiplayer";
+import { MultiplayerMode, MultiplayerState, Player } from "tetris-core/lib/actions/Multiplayer";
 import { MatchEvent, MatchState, Payload, ResponseType, ServerMessage } from "tetris-ws-model/lib/tetris-ws-model";
 
 /**
@@ -31,7 +31,10 @@ export class Match {
     public constructor(matchId: string) {
         this._delayedStartExecuted = false;
         this._matchId = matchId;
-        this._game = new Multiplayer.Multiplayer();
+
+        this._game = new Multiplayer.Multiplayer(
+            MultiplayerMode.AttackMode,
+            process.env.TETRIS_SERVER_REFRESH_INTERVAL && !isNaN(Number(process.env.TETRIS_SERVER_REFRESH_INTERVAL)) ? Number(process.env.TETRIS_SERVER_REFRESH_INTERVAL) : undefined);
         this._game.subscribe(this.handle);
         // Subscribe to only a subset of the events that are triggered by server
         // game calculation logic. This is to reduce the number of web socket

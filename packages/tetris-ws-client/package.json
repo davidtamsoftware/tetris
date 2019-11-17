@@ -26,5 +26,8 @@
   "dependencies": {
     "tetris-core": "^0.0.0",
     "tetris-ws-model": "^0.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.8"
   }
 }
