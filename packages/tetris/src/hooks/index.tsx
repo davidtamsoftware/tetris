@@ -1,4 +1,4 @@
-import { FormEvent, FormEventHandler, useEffect, useRef, useState } from "react";
+import { FormEvent, FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
 import { Models, Multiplayer as MultiplayerAction, Tetris } from "tetris-core";
 import GameActions from "tetris-core/lib/actions/GameActions";
 import { MultiplayerMode, Player } from "tetris-core/lib/actions/Multiplayer";
@@ -226,12 +226,24 @@ export const useMultiplayerRemote = (exit?: () => void): {
         };
     }, []);
 
+    // This is used for updating values needed for the notification logic triggered by match event callback handler.
+    // The handler uses data from the game state but in order to prevent having the handler bound to component did update,
+    // a reference to the latest state is required. Below is a reference to the values needed.
+    const notifications = useRef<{ playerCount: number, gameState?: GameState, matchMessages: string[] }>({
+        playerCount: 0,
+        matchMessages: [],
+    }).current;
+    
+    // Array of timeout ids that reference pending timeouts. Upon unmounting of component, any incomplete timeout
+    // will be cancelled
+    const timeoutIds = useRef<any[]>([]).current;
+
     useEffect(() => {
         const handleMatchEvent = (matchEvent: MatchEvent) => {
             setGame((prevState) => ({
                 ...prevState,
                 matchEvent,
-                gameState: game.gameState && matchEvent === MatchEvent.DISCONNECTED ? GameState.GameOver : game.gameState,
+                gameState: prevState.gameState && matchEvent === MatchEvent.DISCONNECTED ? GameState.GameOver : prevState.gameState,
             }));
         };
 
@@ -241,39 +253,52 @@ export const useMultiplayerRemote = (exit?: () => void): {
             // if 0 => 2, starting game
 
             const newMsg: string[] = [];
-            if (game.playerCount === 2 && matchState.playerCount === 1) {
+            if (notifications.playerCount === 2 && matchState.playerCount === 1) {
                 newMsg.push("Player has left the game");
-            } else if (game.playerCount === 1 && matchState.playerCount === 2 && game.gameState === undefined) {
+            } else if (notifications.playerCount === 1 && matchState.playerCount === 2 && notifications.gameState === undefined) {
                 newMsg.push("Player has joined the game");
                 newMsg.push("Starting game...");
-            } else if (game.playerCount === 1 && matchState.playerCount === 2) {
+            } else if (notifications.playerCount === 1 && matchState.playerCount === 2) {
                 newMsg.push("Player has joined the game");
-            } else if (game.playerCount === 0 && matchState.playerCount === 2 && game.gameState === undefined) {
+            } else if (notifications.playerCount === 0 && matchState.playerCount === 2 && notifications.gameState === undefined) {
                 newMsg.push("Starting game...");
             }
-            const matchMessages = [...game.matchMessages, ...newMsg];
+            
+            const matchMessages = [...notifications.matchMessages, ...newMsg];
 
-            setTimeout(() => {
-                const clonedMessages = [...game.matchMessages];
+            const callbackRef = setTimeout(() => {
+                timeoutIds.shift();
+                const clonedMessages = [...notifications.matchMessages];
                 newMsg.forEach(() => clonedMessages.shift());
-                setGame((prevState) => ({
-                    ...prevState,
-                    matchMessages: clonedMessages,
-                }));
+                setGame((prevState) => {
+                    notifications.matchMessages = clonedMessages;
+                    return {
+                        ...prevState,
+                        matchMessages: clonedMessages,
+                    };
+                });
             }, 5000);
+            timeoutIds.push(callbackRef);
 
-            setGame((prevState) => ({
-                ...prevState,
-                ...matchState,
-                matchMessages,
-            }));
+            setGame((prevState) => {
+                notifications.matchMessages = matchMessages;
+                notifications.playerCount = matchState.playerCount;
+                return {
+                    ...prevState,
+                    ...matchState,
+                    matchMessages,
+                };
+            });
         };
 
         const handle = (multiplayerState: MultiplayerAction.MultiplayerState) => {
-            setGame((prevState) => ({
-                ...prevState,
-                ...multiplayerState,
-            }));
+            setGame((prevState) => {
+                notifications.gameState = multiplayerState.gameState;
+                return {
+                    ...prevState,
+                    ...multiplayerState,
+                };
+            });
         };
 
         matchIdInput.current!.focus();
@@ -282,6 +307,7 @@ export const useMultiplayerRemote = (exit?: () => void): {
         multiplayer.subscribeToMatchEvent(handleMatchEvent);
         multiplayer.subscribeToMatchState(handleMatchState);
         return () => {
+            timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId));
             multiplayer.unsubscribe(handle);
             multiplayer.unsubscribeToEvent(handleEvent);
             multiplayer.unsubscribeToMatchEvent(handleMatchEvent);

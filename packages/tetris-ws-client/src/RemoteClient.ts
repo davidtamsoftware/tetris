@@ -35,7 +35,9 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
   }
 
   public disconnect() {
-    this.client!.close();
+    if (this.client) {
+      this.client.close();
+    }
   }
 
   public join(matchId: string) {
@@ -147,7 +149,7 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
 
   public getState() {
     // deep copy
-    return JSON.parse(JSON.stringify(this.multiplayerState || {}));
+    return JSON.parse(JSON.stringify(this.multiplayerState || {})) as MultiplayerState;
   }
 
   public subscribe(handler: Handler) {
