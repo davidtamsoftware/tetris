@@ -17,6 +17,11 @@
     "build": "tsc"
   },
   "dependencies": {
+    "deep-object-diff": "^1.1.0",
+    "extend": "^3.0.2",
     "tetris-core": "^0.0.0"
+  },
+  "devDependencies": {
+    "@types/extend": "^3.0.1"
   }
 }

@@ -28,6 +28,7 @@ wss.on("connection", (ws) => {
     const matchPlayer = {
         uid: ws,
         sendState: (state) => sendState(ws, state),
+        exit: ws.terminate,
     } as MatchPlayer;
 
     ws.on("close", () => {

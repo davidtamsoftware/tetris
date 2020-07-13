@@ -1,6 +1,6 @@
 import { Event, Multiplayer } from "tetris-core";
 import { MultiplayerMode, MultiplayerState, Player } from "tetris-core/lib/actions/Multiplayer";
-import { MatchEvent, MatchState, Payload, ResponseType, ServerMessage } from "tetris-ws-model/lib/tetris-ws-model";
+import { calcDelta, MatchEvent, MatchState, MultiplayerDeltaState, Payload, ResponseType, ServerMessage } from "tetris-ws-model/lib/tetris-ws-model";
 
 /**
  * Abstraction layer to remote player implementation
@@ -8,6 +8,7 @@ import { MatchEvent, MatchState, Payload, ResponseType, ServerMessage } from "te
 export interface MatchPlayer {
     uid: any;
     sendState(state: ServerMessage): void;
+    exit(): void;
 }
 
 export class Match {
@@ -27,6 +28,7 @@ export class Match {
     private _delayedStartExecuted: boolean;
     private _player1?: MatchPlayer;
     private _player2?: MatchPlayer;
+    private lastState?: MultiplayerState;
 
     public constructor(matchId: string) {
         this._delayedStartExecuted = false;
@@ -82,7 +84,12 @@ export class Match {
                     this._game.start();
                 }, 5000);
             } else {
-                this.handle(this._game.getState());
+                // this is an existing game since gameState !== undefined
+                // send full state to player that joined
+                player.sendState({
+                    type: ResponseType.GameState,
+                    payload: calcDelta({} as any, this._game.getState()) as MultiplayerDeltaState,
+                });
             }
         }
 
@@ -112,6 +119,7 @@ export class Match {
                 type: ResponseType.MatchEvent,
                 payload: MatchEvent.MATCH_FULL,
             });
+            player.exit();
         }
 
         return joined;
@@ -135,7 +143,10 @@ export class Match {
     }
 
     private handle = (state: MultiplayerState) => {
-        this.broadcast(ResponseType.GameState, state);
+        // send delta
+        const delta = calcDelta(this.lastState || {} as MultiplayerState, state);
+        this.lastState = state;
+        this.broadcast(ResponseType.GameState, delta);
     }
 
     private handleEvent = (event: Event) => {

@@ -1,5 +1,6 @@
 import { Event, Multiplayer } from "tetris-core";
 import { MultiplayerState } from "tetris-core/lib/actions/Multiplayer";
+import { MultiplayerDeltaState } from "./util";
 
 export enum Action {
     Joinmatch,
@@ -35,9 +36,11 @@ export interface ClientMessage {
     matchId?: string;
 }
 
-export type Payload = Event | MultiplayerState | MatchState | MatchEvent;
+export type Payload = Event | MultiplayerState | MatchState | MatchEvent | MultiplayerDeltaState;
 
 export interface ServerMessage {
     type: ResponseType;
     payload: Payload;
 }
+
+export * from "./util";

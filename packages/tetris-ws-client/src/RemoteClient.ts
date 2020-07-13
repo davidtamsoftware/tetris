@@ -4,8 +4,8 @@ import PlayerActions from "tetris-core/lib/actions/PlayerActions";
 import { Event, EventHandler } from "tetris-core/lib/actions/Tetris";
 import { GameState } from "tetris-core/lib/models";
 import {
-  Action, ClientMessage, MatchEvent, MatchState, ResponseType,
-  ServerMessage,
+  Action, applyDelta, ClientMessage, MatchEvent, MatchState, MultiplayerDeltaState,
+  ResponseType, ServerMessage,
 } from "tetris-ws-model";
 
 type MatchEventHandler = (event: MatchEvent) => void;
@@ -23,6 +23,8 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
   private wsUrl: string;
 
   private buffer: ClientMessage[];
+
+  private lastState?: MultiplayerState;
 
   constructor(wsUrl: string, private batchIntervalMs: number = 0, private maxBufferLength: number = Number.MAX_VALUE) {
     this.wsUrl = wsUrl;
@@ -58,7 +60,9 @@ export class MultiplayerRemoteClient implements PlayerActions, GameActions {
       try {
         const message: ServerMessage = JSON.parse(event.data);
         if (message.type === ResponseType.GameState) {
-          const state = message.payload as MultiplayerState;
+          const delta = message.payload as MultiplayerDeltaState;
+          const state = applyDelta(this.lastState || {} as any, delta);
+          this.lastState = state;
           if (this.getState().gameState === GameState.Active && state.gameState === GameState.Paused) {
             // calculate if pause in event is needed locally instead of sending from server
             this.publishEvent(Event.PauseIn);
