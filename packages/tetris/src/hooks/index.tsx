@@ -195,7 +195,7 @@ export const useMultiplayerRemote = (exit?: () => void): {
     handleMatchMenuClose: VoidFunction
 } => {
     const multiplayer = useRef(new MultiplayerRemoteClient(
-        process.env.REACT_APP_TETRIS_SERVER_URL as string,
+        process.env.REACT_APP_TETRIS_SERVER_URL as string || `wss://${location.hostname}`,
         process.env.REACT_APP_TETRIS_WS_CLIENT_BATCH && !isNaN(Number(process.env.REACT_APP_TETRIS_WS_CLIENT_BATCH)) ? Number(process.env.REACT_APP_TETRIS_WS_CLIENT_BATCH) : undefined,
         process.env.REACT_APP_TETRIS_WS_CLIENT_BUFFER_LENGTH && !isNaN(Number(process.env.REACT_APP_TETRIS_WS_CLIENT_BUFFER_LENGTH)) ? Number(process.env.REACT_APP_TETRIS_WS_CLIENT_BUFFER_LENGTH) : undefined)).current;
 
