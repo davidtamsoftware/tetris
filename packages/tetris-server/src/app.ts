@@ -3,6 +3,7 @@ import http from "http";
 import { Player } from "tetris-core/lib/actions/Multiplayer";
 import { Action, ClientMessage, ServerMessage } from "tetris-ws-model";
 import WebSocket from "ws";
+import lerna from "../../../lerna.json";
 import { Match, MatchPlayer } from "./Match";
 import { matchService } from "./MatchService";
 
@@ -15,6 +16,15 @@ app.get("/matches", (req, res) => {
         matchId: match.matchId,
         count: (match.player1 ? 1 : 0) + (match.player2 ? 1 : 0),
     })));
+});
+
+app.get("/info", (req, res) => {
+    res.send({
+        app: {
+            name: "tetris",
+            version: lerna.version,
+        },
+    });
 });
 
 const server = http.createServer(app);
