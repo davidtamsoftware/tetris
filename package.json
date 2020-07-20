@@ -4,10 +4,9 @@
   "private": true,
   "scripts": {
     "commit": "git-cz",
-    "bootstrap": "lerna bootstrap",
     "clean": "lerna clean",
     "build": "lerna run build",
-    "postinstall": "npm run bootstrap && npm run build",
+    "postinstall": "lerna link && lerna bootstrap && npm run build",
     "test": "lerna run test",
     "coveralls": "lerna run coveralls"
   },
