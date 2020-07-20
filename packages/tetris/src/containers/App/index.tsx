@@ -37,8 +37,8 @@ class App extends React.Component<{}, State> {
                 <div style={{ clear: "both", paddingTop: "60px" }}>
                     <Menu menu={mainMenu} notify={this.handle} />
                 </div>
-                <div style={{ textAlign: "center", paddingTop: "100px" }}>
-                    <div>
+                <div style={{ textAlign: "center", paddingTop: "150px" }}>
+                    {/* <div>
                         <a href="https://forms.gle/VwsLJjij5EkZ9X758" target="_blank">
                             <img src={mail} style={{ padding: "25px", height: "45px", filter: "invert(0.4)"}}/>
                         </a>
@@ -51,7 +51,7 @@ class App extends React.Component<{}, State> {
                         <a href="https://github.com/davidtamsoftware/tetris#controls" target="_blank">
                             <img src={controller} style={{ padding: "25px", height: "45px", filter: "invert(0.4)"}}/>
                         </a>
-                    </div>
+                    </div> */}
                     <div style={{ fontFamily: "monospace" }}>Version {version}</div>
                     <div style={{ fontFamily: "monospace" }}>Implemented by David Tam</div>
                 </div>
