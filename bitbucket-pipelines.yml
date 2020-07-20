@@ -8,8 +8,12 @@ pipelines:
             - npm install
             - npx lerna bootstrap
             - npx lerna run build
+            - mv packages/tetris-server/node_modules packages/tetris-server/node_modules_with_symlinks
+            - cp -Lr packages/tetris-server/node_modules_with_symlinks packages/tetris-server/node_modules
             # - npx lerna run codecov
           artifacts:
+            - packages/tetris-core/lib/**
+            - packages/tetris-ws-model/lib/**
             - packages/tetris/build/**
             - packages/tetris-server/dist/**
             - packages/tetris-server/node_modules/**
