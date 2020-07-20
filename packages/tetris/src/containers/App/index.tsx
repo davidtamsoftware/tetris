@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Event } from "tetris-core";
 import { MultiplayerMode } from "tetris-core/lib/actions/Multiplayer";
+import { version } from "../../../package.json";
 import Menu from "../../components/Menu";
 import MultiplayerLocal from "../Multiplayer/Local";
 import MultiplayerRemote from "../Multiplayer/Remote";
@@ -51,6 +52,7 @@ class App extends React.Component<{}, State> {
                             <img src={controller} style={{ padding: "25px", height: "45px", filter: "invert(0.4)"}}/>
                         </a>
                     </div>
+                    <div style={{ fontFamily: "monospace" }}>Version {version}</div>
                     <div style={{ fontFamily: "monospace" }}>Implemented by David Tam</div>
                 </div>
             </>;
