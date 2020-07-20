@@ -1,6 +1,6 @@
 {
   "name": "tetris-ws-client",
-  "version": "0.0.0",
+  "version": "0.2.0-RC.0",
   "description": "Client library for communicating with Tetris game server for remote multiplayer games",
   "author": "David Tam <david.tam.kc@gmail.com>",
   "homepage": "https://bitbucket.org/davidtamsoftware/tetris-monorepo#readme",
@@ -24,8 +24,8 @@
     "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "dependencies": {
-    "tetris-core": "^0.0.0",
-    "tetris-ws-model": "^0.0.0"
+    "tetris-core": "^0.2.0-RC.0",
+    "tetris-ws-model": "^0.2.0-RC.0"
   },
   "devDependencies": {
     "@types/node": "^12.12.8"

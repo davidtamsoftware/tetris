@@ -1,6 +1,6 @@
 {
   "name": "tetris",
-  "version": "0.1.0",
+  "version": "0.2.0-RC.0",
   "description": "Web-app for Tetris game",
   "devDependencies": {
     "@types/enzyme": "^3.9.4",
@@ -23,9 +23,9 @@
     "core-js": "^2.5.7",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "tetris-core": "^0.0.0",
-    "tetris-ws-client": "^0.0.0",
-    "tetris-ws-model": "^0.0.0"
+    "tetris-core": "^0.2.0-RC.0",
+    "tetris-ws-client": "^0.2.0-RC.0",
+    "tetris-ws-model": "^0.2.0-RC.0"
   },
   "scripts": {
     "watch": "react-scripts start",
