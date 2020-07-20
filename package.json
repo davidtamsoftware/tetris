@@ -12,7 +12,7 @@
     "coveralls": "lerna run coveralls"
   },
   "engines": {
-    "node": "8.11.4"
+    "node": "12.18.2"
   },
   "author": "David Tam",
   "devDependencies": {
