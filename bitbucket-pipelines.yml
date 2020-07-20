@@ -1,0 +1,84 @@
+image: node:12.18.2
+pipelines:
+  branches:
+    master:
+      - step:
+          name: Build + Test
+          script:
+            - npm install
+            - npx lerna bootstrap
+            - npx lerna run build
+            # - npx lerna run codecov
+          artifacts:
+            - packages/tetris/build/**
+            - packages/tetris-server/dist/**
+            - packages/tetris-server/node_modules/**
+            - node_modules/**
+      - step:
+          name: Version for Pre-Release
+          script:
+            - npx lerna bootstrap
+            - npx lerna version  -m "chore(release)":" [skip ci] publish %s" --conventional-commits --conventional-prerelease --preid RC --yes
+            - cat lerna.json | grep version | awk -F":" '{ print $2 }' | sed 's/[\",]//g' | sed 's/^ *//g' > pre_release_version.txt
+            # - if there's no change to version, then there's no need to recreate image / redeploy. Abort.
+          artifacts:
+            - pre_release_version.txt
+            - lerna.json
+      - step:
+          name: Create / Push Image
+          script:
+            - PRE_RELEASE_VERSION=$(cat ./pre_release_version.txt)
+            - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+            - docker build --tag dtstore/tetris:$PRE_RELEASE_VERSION .
+            - docker push dtstore/tetris:$PRE_RELEASE_VERSION
+            - docker save --output tmp-image.docker dtstore/tetris:$PRE_RELEASE_VERSION
+          services:
+            - docker
+          artifacts:
+            - tmp-image.docker
+      - step:
+          name: Deploy to Staging
+          deployment: staging
+          clone:
+            enabled: false
+          script:
+            - PRE_RELEASE_VERSION=$(cat ./pre_release_version.txt)
+            - docker load --input ./tmp-image.docker
+            - docker tag dtstore/tetris:$PRE_RELEASE_VERSION registry.heroku.com/tetris-staging/web
+            - docker login --username=_ --password=$HEROKU_AUTH_TOKEN registry.heroku.com
+            - docker push registry.heroku.com/tetris-staging/web
+            - curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+            - heroku container:login
+            - heroku container:release web -a tetris-staging
+          services:
+            - docker
+      - step:
+          name: Graduate Pre-Release
+          script:
+            - PRE_RELEASE_VERSION=$(cat ./pre_release_version.txt)
+            - npx lerna bootstrap
+            - npx lerna version -m "chore(release)":" [skip ci] publish %s" --conventional-commits --conventional-graduate --yes
+            - RELEASE_VERSION=$(cat lerna.json | grep version | awk -F":" '{ print $2 }' | sed 's/[\",]//g' | sed 's/^ *//g')
+            - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+            - docker load --input ./tmp-image.docker
+            - docker tag dtstore/tetris:$PRE_RELEASE_VERSION dtstore/tetris:$RELEASE_VERSION
+            - docker push dtstore/tetris:$RELEASE_VERSION
+          services:
+            - docker
+          trigger: manual
+      - step:
+          name: Promote to Production
+          deployment: production
+          clone:
+            enabled: false
+          script:
+            - PRE_RELEASE_VERSION=$(cat ./pre_release_version.txt)
+            - docker load --input ./tmp-image.docker
+            - docker tag dtstore/tetris:$PRE_RELEASE_VERSION registry.heroku.com/tetris-production/web
+            - docker login --username=_ --password=$HEROKU_AUTH_TOKEN registry.heroku.com
+            - docker push registry.heroku.com/tetris-production/web
+            - curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+            - heroku container:login
+            - heroku container:release web -a tetris-production
+          services:
+            - docker
