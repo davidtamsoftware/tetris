@@ -3,7 +3,7 @@ import http from "http";
 import { Player } from "tetris-core/lib/actions/Multiplayer";
 import { Action, ClientMessage, ServerMessage } from "tetris-ws-model";
 import WebSocket from "ws";
-import lerna from "../../../lerna.json";
+import { version } from "../package.json";
 import { Match, MatchPlayer } from "./Match";
 import { matchService } from "./MatchService";
 
@@ -22,7 +22,7 @@ app.get("/info", (req, res) => {
     res.send({
         app: {
             name: "tetris",
-            version: lerna.version,
+            version,
         },
     });
 });
