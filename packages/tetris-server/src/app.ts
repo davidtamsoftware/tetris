@@ -21,7 +21,7 @@ app.get("/matches", (req, res) => {
 app.get("/info", (req, res) => {
     res.send({
         app: {
-            name: "tetris",
+            name: "tetris-server",
             version,
         },
     });
