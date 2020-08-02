@@ -2,6 +2,8 @@ FROM node:12.18.2-alpine3.11
 
 COPY packages/tetris-server/dist packages/tetris-server/dist
 
+COPY packages/tetris-server/package.json packages/tetris-server/
+
 COPY packages/tetris-server/node_modules packages/tetris-server/node_modules
 
 COPY packages/tetris/build packages/tetris/build
