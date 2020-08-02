@@ -1,6 +1,6 @@
 {
   "name": "tetris-ws-model",
-  "version": "0.2.0-RC.0",
+  "version": "0.2.0",
   "description": "Models / contracts for data transfer between client and server",
   "author": "David Tam <david.tam.kc@gmail.com>",
   "homepage": "",
@@ -19,7 +19,7 @@
   "dependencies": {
     "deep-object-diff": "^1.1.0",
     "extend": "^3.0.2",
-    "tetris-core": "^0.2.0-RC.0"
+    "tetris-core": "^0.2.0"
   },
   "devDependencies": {
     "@types/extend": "^3.0.1"

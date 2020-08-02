@@ -1,6 +1,6 @@
 {
   "name": "tetris-server",
-  "version": "0.2.0-RC.0",
+  "version": "0.2.0",
   "description": "Game server for remote multiplayer",
   "author": "David Tam <david.tam.kc@gmail.com>",
   "homepage": "",
@@ -23,8 +23,8 @@
   },
   "dependencies": {
     "express": "^4.16.4",
-    "tetris-core": "^0.2.0-RC.0",
-    "tetris-ws-model": "^0.2.0-RC.0",
+    "tetris-core": "^0.2.0",
+    "tetris-ws-model": "^0.2.0",
     "ws": "^6.1.2"
   },
   "devDependencies": {
