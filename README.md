@@ -1,11 +1,11 @@
-# Tetris <!-- omit in toc --> &middot; [![Build Status](https://travis-ci.org/davidtamsoftware/tetris.svg?branch=master)](https://travis-ci.org/davidtamsoftware/tetris) [![Coverage Status](https://coveralls.io/repos/github/davidtamsoftware/tetris/badge.svg?branch=master)](https://coveralls.io/github/davidtamsoftware/tetris?branch=master) [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/) [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
+# Tetris <!-- omit in toc --> &middot; [![Build Status](https://travis-ci.org/davidtamsoftware/tetris.svg?branch=master)](https://travis-ci.org/davidtamsoftware/tetris) [![Coverage Status](https://coveralls.io/repos/github/davidtamsoftware/tetris/badge.svg?branch=master)](https://coveralls.io/github/davidtamsoftware/tetris?branch=master) [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/) [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 
 ## Overview <!-- omit in toc -->
 
-Classic Tetris game implemented using latest web technologies. Supports single player and multiplayer (local and remote).
+Classic Tetris game implemented using latest web technologies. Supports single player and multiplayer (local and remote). Full end to end development with CI/CD pipeline, auto version / release note generation.
 
-A running demo can be found [here](https://hidden-tundra-30225.herokuapp.com)
+A running demo can be found [here](https://tetris-production.herokuapp.com)
 
 ## Table of Contents <!-- omit in toc -->
 - [Game Features](#game-features)
@@ -30,16 +30,25 @@ A running demo can be found [here](https://hidden-tundra-30225.herokuapp.com)
   - [Front End Design / React Component Interaction](#front-end-design--react-component-interaction)
   - [Back End Design / Game Server](#back-end-design--game-server)
   - [Summary of Design Patterns / Algorithms](#summary-of-design-patterns--algorithms)
-  - [Observer Pattern](#observer-pattern)
+  - [Sequence Diagram](#sequence-diagram)
     - [Single Player](#single-player-1)
     - [Local Multiplayer](#local-multiplayer-1)
     - [Remote Multiplayer](#remote-multiplayer-1)
   - [Performance for Multiplayer](#performance-for-multiplayer)
-  - [Future Improvements for Multiplayer Performance](#future-improvements-for-multiplayer-performance)
   - [Misc Features for Multiplayer](#misc-features-for-multiplayer)
   - [Future Components](#future-components)
-  - [Deployment](#deployment)
-- [Running the App](#running-the-app)
+- [Running the App Locally](#running-the-app-locally)
+- [CI/CD](#cicd)
+  - [Features](#features)
+  - [Pipeline](#pipeline)
+  - [Technologies Used](#technologies-used)
+  - [Environments](#environments)
+    - [Dev](#dev)
+    - [Staging](#staging)
+    - [Prod](#prod)
+  - [Test Coverage](#test-coverage)
+  - [Rollbacks](#rollbacks)
+- [TODO](#todo)
 
 # Game Features
 
@@ -133,7 +142,7 @@ Client configurations can be adjusted in:
 | --- | --- | --- | --- |
 | REACT_APP_TETRIS_SERVER_URL | Game server URL | string | ws://192.168.1.75:8080 |
 | REACT_APP_TETRIS_WS_CLIENT_BATCH | Defines the smallest interval in milliseconds for sending player commands to server | number | 50 |
-| REACT_APP_TETRIS_WS_CLIENT_BUFFER_LENGTH | Defines the maximum number of commands in each transission to server | number | 1 |
+| REACT_APP_TETRIS_WS_CLIENT_BUFFER_LENGTH | Defines the maximum number of commands in each tranmission to server | number | 1 |
 
 ## Server Configurations
 
@@ -198,14 +207,16 @@ The following details how the components interacts with React custom hooks to se
   * Reuse existing game logic and add multiplayer synchronization between 2 Tetris instances
 * Observer Pattern
   * Allow for state changes to be pushed to clients following an event based model
-* Functional programming for Tetris transformations (rotation, movement of pieces)
+* Functional programming (pure functions) for Tetris transformations (rotation, movement of pieces)
 * Matrix maniplulation algorithms for rotations
 * Inversion of Control / Dependency Injection
   * useGameControls React hook does key binding to GameActions interface
   * The assembler (useTetris, useMultiplayer, useMultiplayerRemote) will create the GameAction implementation (single player, local multiplayer, or remote multiplayer) and pass into this React hook
   * usePlayerControls follows this same pattern for key binding to PlayerActions interface.
+* Rich Domain Model
+  * Domain models for Tetris and Multiplayer encapsulate both data and behaviour.
 
-##  Observer Pattern
+##  Sequence Diagram
 
 The following sequence diagram illustrates the flow of messages for the different game modes.
 
@@ -225,18 +236,16 @@ The following sequence diagram illustrates the flow of messages for the differen
 
 * Game state is calculated on server and pushed to client
 * Throttle the number of messages sent from server to client.
-  * Broadcast only 1 game state update message every 50ms (configurable) to prevent backpressure for rendering UI
-  * Broadcast game events (damage, line removals, game over) to players as required as these cannot be mass generated by the user
-  * Do not broadcast game events that can be mass generated by player (rotations, pause in/out). Instead, generate these on the client side since these can be detected at on the client to reduce the number of messages. On local mode, components can locally subscribe to these events as there is no network overhead since it is local.
+  * Game states are used to manage the current state of the tetris playfield and score
+    * Broadcast only 1 game state update message every 50ms (configurable) to prevent backpressure for rendering UI
+  * Game events are used to control audio
+    * Broadcast game events (damage, line removals, game start, game over) to players as required as these cannot be mass generated by the user
+    * Do not broadcast game events that can be mass generated by player (rotations, pause in/out). Instead, generate these on the client side since these can be detected at on the client to reduce the number of messages. On local mode, components can locally subscribe to these events as there is no network overhead since it is local.
 * Throttle the number of messages sent from client to server
   * Send batch only if there is a message that is available over the last time interval
   * Set a time duration (configurable) that would be sufficient for batching a collection of commands but small enough to not have perceived lag
   * Prevent backpressure for server to process client commands by setting maximum number of commands (configurable) that can be set over within the time duration (ie. if the player holds down the rotate button, there could be send dozens of times within 1 second. This can be throttled to have < 10 actions. The feedback would feel responsive but reduce the amount of processing required for the server.)
-
-## Future Improvements for Multiplayer Performance
-
-* To reduce the size of the payload being sent, the server can broadcast the delta of state change since last broadcast
-  * Need to periodically send full state in case message was lost in transmission. How frequent to send full state depends on the tolerance level in the worse case scenario
+* To reduce the size of the payload being sent, server broadcasts delta state since last broadcast
 
 ## Misc Features for Multiplayer
 
@@ -256,12 +265,7 @@ The following diagram illustrates the changes that would made (Green indicates n
 
 ![picture](readme-assets/future-server-registry.svg)
 
-## Deployment
-
-* Published to Heroku
-* https://hidden-tundra-30225.herokuapp.com
-
-# Running the App
+# Running the App Locally
 
 At the root of the project, install and build the project:
 ```
@@ -275,3 +279,51 @@ To start the tetris server:
 ```
 lerna exec --scope tetris-server -- npm start
 ```
+# CI/CD
+
+## Features
+
+* Automatically trigger unit tests locally before pushing to origin
+* Enforce usage of conventional commit format for commit messages
+* Automatic detection of semantic version bump through commit message
+* Automatic release note generation
+* Pipeline is automatically triggered when new code is pushed to master
+
+## Pipeline
+
+![picture](readme-assets/tetris-cicd.svg)
+
+## Technologies Used
+
+| Tools | Technology |
+| - | - |
+| Version control | Git |
+| Version control provider / repository | Bitbucket (also mirrored to GitHub for public access but not for CI/CD) |
+| Git Hooks | Husky; Pre-push hook for ensuring passing tests before pushing to remote feature branch |
+| Branching Strategy | Trunk based development with [short lived feature branches](https://trunkbaseddevelopment.com/short-lived-feature-branches/); no release branch
+| Versioning / Release Notes | Lerna and [Conventional Commits]() to automatically determine semantic version bump. Merge to master generates pre-release. Once pre-release is validated in staging, pre-released is graduated and pre-release docker image tagged as release and deployed to production. |
+| Continuous Integration Build Server | Bitbucket CI Pipelines |
+| Containerization | Docker |
+| Hosting | Heroku Dyno using [docker deploy](https://devcenter.heroku.com/articles/container-registry-and-runtime#pushing-an-existing-image) |
+| Docker Registry | Dockerhub |
+
+## Environments
+
+### Dev
+* https://tetris-dev.herokuapp.com
+* [Deployment with Git](https://devcenter.heroku.com/articles/git) Procfile defined in source code.
+
+### Staging
+* https://tetris-staging.herokuapp.com
+
+### Prod
+* https://tetris-production.herokuapp.com
+
+## Test Coverage
+
+Test coverage results reported to coveralls on each build:
+https://coveralls.io/github/davidtamsoftware/tetris
+
+## Rollbacks
+
+In the event of a rollback, revert commit on master with message ["[skip ci]"] to prevent triggering Bitbucket pipeline when pushed to master. Redeploy past release on staging/production using [Bitbucket Deployment Dashboard](https://support.atlassian.com/bitbucket-cloud/docs/view-your-deployments-dashboard/) to refer to an older build/tag and redeploy that image back to the environment.
