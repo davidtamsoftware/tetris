@@ -48,7 +48,6 @@ A running demo can be found [here](https://tetris-production.herokuapp.com)
     - [Prod](#prod)
   - [Test Coverage](#test-coverage)
   - [Rollbacks](#rollbacks)
-- [TODO](#todo)
 
 # Game Features
 
